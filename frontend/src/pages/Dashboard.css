@@ -1,0 +1,109 @@
+.dashboard-page {
+  --dash-bg-1: #0b1220;
+  --dash-bg-2: #0f1a2e;
+  --dash-card: rgba(255, 255, 255, 0.06);
+  --dash-card-border: rgba(255, 255, 255, 0.10);
+  --dash-text: #e8eaed;
+  --dash-muted: #b0bec5;
+  --dash-muted-2: #78909c;
+  --dash-accent: #64b5f6;
+  --dash-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+
+  padding: 0;
+  border-radius: 14px;
+  background: radial-gradient(1200px 500px at 20% 0%, rgba(100, 181, 246, 0.18) 0%, rgba(100, 181, 246, 0) 60%),
+    linear-gradient(135deg, var(--dash-bg-1) 0%, var(--dash-bg-2) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--dash-shadow);
+}
+
+.dashboard-page .page-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 1.75rem 2rem 1.25rem 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard-page .page-header h1 {
+  color: var(--dash-text);
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.dashboard-page .page-header p {
+  color: var(--dash-muted);
+}
+
+.dashboard-page .content-card,
+.dashboard-page .stat-card {
+  background: var(--dash-card);
+  border: 1px solid var(--dash-card-border);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+}
+
+.dashboard-page .content-card h3 {
+  color: var(--dash-text);
+}
+
+.dashboard-page .stat-card {
+  backdrop-filter: blur(10px);
+}
+
+.dashboard-page .stat-card:hover {
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-page .stat-content h3 {
+  color: var(--dash-text);
+}
+
+.dashboard-page .stat-content p {
+  color: var(--dash-muted);
+}
+
+.dashboard-page .activity-item {
+  background: rgba(255, 255, 255, 0.04);
+  border-left: 3px solid var(--dash-accent);
+}
+
+.dashboard-page .activity-item span {
+  color: var(--dash-text);
+}
+
+.dashboard-page .activity-time {
+  color: var(--dash-muted-2);
+}
+
+.dashboard-page .status-item span {
+  color: var(--dash-text);
+}
+
+.dashboard-page .status-indicator.online {
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.15);
+}
+
+.dashboard-page .status-indicator.warning {
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.16);
+}
+
+.dashboard-page .status-indicator.offline {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.16);
+}
+
+.dashboard-page .content-wrapper-inner {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+/* Make the dark card feel anchored (avoid outer light showing through) */
+.dashboard-page {
+  margin: 0;
+}
+
+@media (max-width: 768px) {
+  .dashboard-page .page-header {
+    padding: 1.25rem 1rem 1rem 1rem;
+  }
+
+  .dashboard-page .content-wrapper-inner {
+    padding: 0 1rem 1rem 1rem;
+  }
+}

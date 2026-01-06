@@ -1,0 +1,107 @@
+.products-page {
+  --prod-bg-1: #0b1220;
+  --prod-bg-2: #0f1a2e;
+  --prod-card: rgba(255, 255, 255, 0.06);
+  --prod-border: rgba(255, 255, 255, 0.10);
+  --prod-text: #e8eaed;
+  --prod-muted: #b0bec5;
+  --prod-muted-2: #78909c;
+
+  border-radius: 14px;
+  background: radial-gradient(1200px 500px at 20% 0%, rgba(100, 181, 246, 0.16) 0%, rgba(100, 181, 246, 0) 60%),
+    linear-gradient(135deg, var(--prod-bg-1) 0%, var(--prod-bg-2) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+}
+
+.products-page .page-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+  padding: 1.75rem 2rem 1.25rem 2rem;
+  margin-bottom: 1.25rem;
+}
+
+.products-page .page-header h1 {
+  color: var(--prod-text);
+  font-weight: 800;
+}
+
+.products-page .page-header p {
+  color: var(--prod-muted);
+}
+
+.products-page .content-wrapper-inner {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+}
+
+.products-page .content-card {
+  background: var(--prod-card);
+  border: 1px solid var(--prod-border);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(10px);
+}
+
+.products-page .content-card h3 {
+  color: var(--prod-text);
+}
+
+/* Table */
+.products-page .custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.products-page .custom-table th,
+.products-page .custom-table td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.products-page .custom-table th {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(232, 234, 237, 0.85);
+}
+
+.products-page .custom-table td {
+  color: var(--prod-text);
+}
+
+.products-page .custom-table tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.products-page .status-badge.active {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+}
+
+.products-page .status-badge.inactive {
+  background: rgba(239, 68, 68, 0.16);
+  color: #ff8a80;
+}
+
+.products-page .btn-edit {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+}
+
+.products-page .btn-edit:hover {
+  background: rgba(16, 185, 129, 0.26);
+}
+
+.products-page .btn-delete {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ff8a80;
+}
+
+.products-page .btn-delete:hover {
+  background: rgba(239, 68, 68, 0.26);
+}
+
+@media (max-width: 768px) {
+  .products-page .page-header {
+    padding: 1.25rem 1rem 1rem 1rem;
+  }
+
+  .products-page .content-wrapper-inner {
+    padding: 0 1rem 1rem 1rem;
+  }
+}
