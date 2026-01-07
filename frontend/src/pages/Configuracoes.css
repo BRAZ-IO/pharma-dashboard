@@ -1,0 +1,579 @@
+/* Configuracoes Page Styles */
+.configuracoes-page {
+  padding: 0;
+  min-height: 100vh;
+  background: #0b1220;
+  color: #e8eaed;
+}
+
+.configuracoes-page-header {
+  padding: 2rem 2rem 1rem;
+  background: linear-gradient(180deg, #0f1a2e 0%, #0b1220 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.configuracoes-page-header h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  color: #e8eaed;
+  margin: 0;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.configuracoes-nav {
+  display: flex;
+  gap: 2rem;
+}
+
+.configuracoes-nav .nav-link {
+  color: #78909c;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.configuracoes-nav .nav-link:hover {
+  color: #e8eaed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.configuracoes-nav .nav-link.active {
+  color: #64b5f6;
+  background: rgba(100, 181, 246, 0.1);
+}
+
+/* Configuracoes Content */
+.configuracoes-geral,
+.configuracoes-sistema,
+.configuracoes-notificacoes {
+  padding: 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.configuracoes-header {
+  margin-bottom: 2rem;
+}
+
+.configuracoes-header h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e8eaed;
+  margin: 0 0 0.5rem 0;
+}
+
+.configuracoes-header p {
+  font-size: 0.875rem;
+  color: #78909c;
+  margin: 0;
+}
+
+/* Form Styles */
+.configuracoes-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+}
+
+.form-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #78909c;
+  margin: 0 0 1.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.form-group label {
+  font-size: 0.875rem;
+  color: #b0bec5;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  color: #e8eaed;
+  font-size: 0.875rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.form-group input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: #64b5f6;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.form-group select {
+  cursor: pointer;
+}
+
+.form-group select option {
+  background: #0f1a2e;
+  color: #e8eaed;
+}
+
+/* Dias da Semana */
+.dias-semana-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.dia-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dia-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dia-card.selected {
+  background: rgba(100, 181, 246, 0.1);
+  border-color: rgba(100, 181, 246, 0.3);
+}
+
+.dia-checkbox {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #26de81;
+  transition: all 0.3s ease;
+}
+
+.dia-card.selected .dia-checkbox {
+  background: rgba(38, 222, 129, 0.2);
+  border-color: #26de81;
+}
+
+.dia-label {
+  font-size: 0.875rem;
+  color: #e8eaed;
+  font-weight: 500;
+}
+
+/* Checkbox Label */
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: #64b5f6;
+}
+
+.checkbox-label span {
+  font-size: 0.875rem;
+  color: #e8eaed;
+  font-weight: 500;
+}
+
+/* Notificações */
+.notificacoes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.notificacao-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.notificacao-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.notificacao-item.sub-item {
+  margin-left: 2rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.notificacao-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.notificacao-title {
+  font-size: 0.875rem;
+  color: #e8eaed;
+  font-weight: 500;
+}
+
+.notificacao-description {
+  font-size: 0.75rem;
+  color: #78909c;
+  margin: 0;
+}
+
+.horario-silencioso-config {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  color: #e8eaed;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .configuracoes-page-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .configuracoes-nav {
+    gap: 1rem;
+  }
+  
+  .configuracoes-geral,
+  .configuracoes-sistema,
+  .configuracoes-notificacoes {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .configuracoes-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem 1rem 1rem;
+  }
+
+  .configuracoes-page-header h1 {
+    font-size: 1.5rem;
+  }
+  
+  .configuracoes-nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .configuracoes-nav .nav-link {
+    white-space: nowrap;
+  }
+
+  .configuracoes-geral,
+  .configuracoes-sistema,
+  .configuracoes-notificacoes {
+    padding: 1rem;
+  }
+  
+  .configuracoes-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .configuracoes-header p {
+    font-size: 0.8rem;
+  }
+  
+  .form-section {
+    padding: 1.25rem;
+  }
+  
+  .form-section h3 {
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-group label {
+    font-size: 0.8rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    font-size: 0.875rem;
+  }
+  
+  .dias-semana-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.625rem;
+  }
+  
+  .dia-card {
+    padding: 0.875rem;
+  }
+  
+  .dia-label {
+    font-size: 0.8rem;
+  }
+  
+  .notificacoes-list {
+    gap: 0.875rem;
+  }
+  
+  .notificacao-item {
+    padding: 1rem;
+  }
+  
+  .notificacao-item.sub-item {
+    margin-left: 1rem;
+  }
+  
+  .notificacao-title {
+    font-size: 0.8rem;
+  }
+  
+  .notificacao-description {
+    font-size: 0.7rem;
+  }
+  
+  .horario-silencioso-config {
+    grid-template-columns: 1fr;
+    gap: 0.875rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .configuracoes-page-header {
+    padding: 1rem;
+  }
+  
+  .configuracoes-page-header h1 {
+    font-size: 1.25rem;
+  }
+  
+  .configuracoes-nav {
+    gap: 0.5rem;
+  }
+  
+  .configuracoes-nav .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .configuracoes-geral,
+  .configuracoes-sistema,
+  .configuracoes-notificacoes {
+    padding: 0.75rem;
+  }
+  
+  .configuracoes-header {
+    margin-bottom: 1.5rem;
+  }
+  
+  .configuracoes-header h2 {
+    font-size: 1.125rem;
+  }
+  
+  .configuracoes-header p {
+    font-size: 0.75rem;
+  }
+  
+  .configuracoes-form {
+    gap: 1.25rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+  }
+  
+  .form-section h3 {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-grid {
+    gap: 0.875rem;
+  }
+  
+  .form-group label {
+    font-size: 0.75rem;
+  }
+  
+  .form-group input,
+  .form-group select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .dias-semana-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .dia-card {
+    padding: 0.75rem;
+  }
+  
+  .dia-checkbox {
+    width: 22px;
+    height: 22px;
+    font-size: 0.8rem;
+  }
+  
+  .dia-label {
+    font-size: 0.75rem;
+  }
+  
+  .checkbox-label {
+    gap: 0.625rem;
+  }
+  
+  .checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .checkbox-label span {
+    font-size: 0.8rem;
+  }
+  
+  .notificacoes-list {
+    gap: 0.75rem;
+  }
+  
+  .notificacao-item {
+    padding: 0.875rem;
+  }
+  
+  .notificacao-item.sub-item {
+    margin-left: 0.75rem;
+  }
+  
+  .notificacao-title {
+    font-size: 0.75rem;
+  }
+  
+  .notificacao-description {
+    font-size: 0.65rem;
+  }
+  
+  .horario-silencioso-config {
+    padding: 0.875rem;
+    gap: 0.75rem;
+  }
+  
+  .form-actions {
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+  }
+  
+  .form-actions button {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+}

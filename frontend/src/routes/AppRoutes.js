@@ -23,6 +23,10 @@ import Usuarios from '../pages/Usuarios';
 import UsuariosLista from '../pages/UsuariosLista';
 import UsuariosDetalhes from '../pages/UsuariosDetalhes';
 import UsuariosCadastro from '../pages/UsuariosCadastro';
+import Configuracoes from '../pages/Configuracoes';
+import ConfiguracoesGeral from '../pages/ConfiguracoesGeral';
+import ConfiguracoesSistema from '../pages/ConfiguracoesSistema';
+import ConfiguracoesNotificacoes from '../pages/ConfiguracoesNotificacoes';
 
 const AppRoutes = () => {
   return (
@@ -65,7 +69,11 @@ const AppRoutes = () => {
           <Route path="cadastro" element={<UsuariosCadastro />} />
           <Route path="cadastro/:id" element={<UsuariosCadastro />} />
         </Route>
-        <Route path="configuracoes" element={<div className="simple-page configuracoes-page"><h2>Configurações</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="configuracoes" element={<Configuracoes />}>
+          <Route index element={<ConfiguracoesGeral />} />
+          <Route path="sistema" element={<ConfiguracoesSistema />} />
+          <Route path="notificacoes" element={<ConfiguracoesNotificacoes />} />
+        </Route>
       </Route>
       
       {/* Fallback route - redirects to sobre */}
