@@ -1,17 +1,11 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Layout from '../layout/Layout';
+import LayoutBootstrap from '../layout/LayoutBootstrap';
 import ProtectedRoute from '../components/ProtectedRoute';
 import { ROUTES } from './routeConfig';
 
 // Page imports
 import Login from '../pages/Login';
-import Dashboard from '../pages/Dashboard';
-import PDV from '../pages/PDV';
-import Produtos from '../pages/Produtos';
-import Estoque from '../pages/Estoque';
-import Usuarios from '../pages/Usuarios';
-import Configuracoes from '../pages/Configuracoes';
 import Sobre from '../pages/Sobre';
 
 const AppRoutes = () => {
@@ -29,16 +23,16 @@ const AppRoutes = () => {
         path={ROUTES.APP}
         element={
           <ProtectedRoute>
-            <Layout />
+            <LayoutBootstrap />
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="pdv" element={<PDV />} />
-        <Route path="produtos" element={<Produtos />} />
-        <Route path="estoque" element={<Estoque />} />
-        <Route path="usuarios" element={<Usuarios />} />
-        <Route path="configuracoes" element={<Configuracoes />} />
+        <Route path="dashboard" element={<div className="simple-page dashboard-page"><h2>Dashboard</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="pdv" element={<div className="simple-page pdv-page"><h2>PDV</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="produtos" element={<div className="simple-page products-page"><h2>Produtos</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="estoque" element={<div className="simple-page estoque-page"><h2>Estoque</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="usuarios" element={<div className="simple-page usuarios-page"><h2>Usuários</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="configuracoes" element={<div className="simple-page configuracoes-page"><h2>Configurações</h2><p>Em desenvolvimento...</p></div>} />
       </Route>
       
       {/* Fallback route - redirects to sobre */}

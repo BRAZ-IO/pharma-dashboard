@@ -378,7 +378,25 @@ body {
   accent-color: #3498db;
 }
 
-/* Utility Classes */
+/* Simple Pages */
+.simple-page {
+  padding: 2rem;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.simple-page h2 {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #3498db;
+}
+
+.simple-page p {
+  font-size: 1.1rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
 .d-flex {
   display: flex;
 }

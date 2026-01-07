@@ -1,148 +1,172 @@
-/* Layout Styles */
-.layout {
+/* Layout Bootstrap Styles */
+.layout-bootstrap {
   display: flex;
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
 }
 
-.main-content {
+.main-content-bootstrap {
   flex: 1;
-  margin-left: 220px;
+  margin-left: 280px;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   min-height: 100vh;
   position: relative;
 }
 
-.content-wrapper {
+.content-wrapper-bootstrap {
   padding: 1rem 2rem 2rem 2rem;
-  padding-top: 80px;
+  padding-top: 85px;
   max-width: 100%;
   overflow-x: auto;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 65px);
+}
+
+/* When sidebar is collapsed */
+.layout-bootstrap.sidebar-collapsed .main-content-bootstrap {
+  margin-left: 70px;
 }
 
 /* When rendering Dashboard, make the surrounding area dark and reduce outer padding */
-.content-wrapper:has(.dashboard-page) {
+.content-wrapper-bootstrap:has(.dashboard-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
+  padding-top: 65px;
 }
 
-.content-wrapper:has(.pdv-page) {
+.content-wrapper-bootstrap:has(.pdv-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
+  padding-top: 65px;
 }
 
- .content-wrapper:has(.products-page) {
+.content-wrapper-bootstrap:has(.products-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
- }
+  padding-top: 65px;
+}
 
-.content-wrapper:has(.estoque-page) {
+.content-wrapper-bootstrap:has(.estoque-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
+  padding-top: 65px;
 }
 
-.content-wrapper:has(.usuarios-page) {
+.content-wrapper-bootstrap:has(.usuarios-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
+  padding-top: 65px;
 }
 
-.content-wrapper:has(.configuracoes-page) {
+.content-wrapper-bootstrap:has(.configuracoes-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
+  padding-top: 65px;
 }
 
-.content-wrapper:has(.sobre-page) {
+.content-wrapper-bootstrap:has(.sobre-page) {
   background: #0b1220;
   padding: 0;
-  padding-top: 60px;
+  padding-top: 65px;
 }
 
-.main-content:has(.dashboard-page) {
+.main-content-bootstrap:has(.dashboard-page) {
   background: #0b1220;
 }
 
-.main-content:has(.pdv-page) {
+.main-content-bootstrap:has(.pdv-page) {
   background: #0b1220;
 }
 
-.main-content:has(.products-page) {
+.main-content-bootstrap:has(.products-page) {
   background: #0b1220;
 }
 
-.main-content:has(.estoque-page) {
+.main-content-bootstrap:has(.estoque-page) {
   background: #0b1220;
 }
 
-.main-content:has(.usuarios-page) {
+.main-content-bootstrap:has(.usuarios-page) {
   background: #0b1220;
 }
 
-.main-content:has(.configuracoes-page) {
+.main-content-bootstrap:has(.configuracoes-page) {
   background: #0b1220;
 }
 
-.main-content:has(.sobre-page) {
+.main-content-bootstrap:has(.sobre-page) {
   background: #0b1220;
+}
+
+/* Mobile menu toggle button */
+.mobile-menu-toggle {
+  position: fixed;
+  top: 75px;
+  left: 1rem;
+  z-index: 1001;
+  background: linear-gradient(180deg, #0b1220 0%, #0f1a2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem;
+  color: #b0bec5;
+  font-size: 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.35);
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-toggle:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+  color: #e8eaed;
 }
 
 /* Responsive adjustments */
-@media (max-width: 768px) {
-  .main-content {
-    margin-left: 0;
-  }
-}
-
-@media (max-width: 576px) {
-  .main-content {
+@media (max-width: 767.98px) {
+  .main-content-bootstrap {
     margin-left: 0;
   }
   
-  .content-wrapper {
+  .layout-bootstrap.sidebar-collapsed .main-content-bootstrap {
+    margin-left: 0;
+  }
+  
+  .content-wrapper-bootstrap {
     padding: 1rem;
+    padding-top: 85px;
+  }
+  
+  .mobile-menu-toggle {
+    top: 75px;
+    left: 0.75rem;
   }
 }
 
 @media (max-width: 576px) {
-  .content-wrapper:has(.dashboard-page) {
+  .content-wrapper-bootstrap {
+    padding: 0.75rem;
+    padding-top: 85px;
+  }
+  
+  .content-wrapper-bootstrap:has(.dashboard-page),
+  .content-wrapper-bootstrap:has(.pdv-page),
+  .content-wrapper-bootstrap:has(.products-page),
+  .content-wrapper-bootstrap:has(.estoque-page),
+  .content-wrapper-bootstrap:has(.usuarios-page),
+  .content-wrapper-bootstrap:has(.configuracoes-page),
+  .content-wrapper-bootstrap:has(.sobre-page) {
     padding: 0;
-    padding-top: 60px;
+    padding-top: 65px;
   }
 }
 
-@media (max-width: 576px) {
-  .content-wrapper:has(.pdv-page) {
-    padding: 0;
-    padding-top: 60px;
+/* Desktop: Ensure proper spacing with sidebar */
+@media (min-width: 768px) {
+  .main-content-bootstrap {
+    margin-left: 280px;
   }
-}
-
- @media (max-width: 576px) {
-  .content-wrapper:has(.products-page) {
-   padding: 0;
-   padding-top: 60px;
-  }
- }
-
-/* When sidebar is collapsed */
-.layout:has(.sidebar.collapsed) .main-content {
-  margin-left: 65px;
-}
-
-@media (max-width: 576px) {
-  .layout:has(.sidebar.collapsed) .main-content {
-    margin-left: 0;
-  }
-}
-
-@media (max-width: 768px) {
-  .layout:has(.sidebar.collapsed) .main-content {
-    margin-left: 0;
+  
+  .layout-bootstrap.sidebar-collapsed .main-content-bootstrap {
+    margin-left: 70px;
   }
 }
