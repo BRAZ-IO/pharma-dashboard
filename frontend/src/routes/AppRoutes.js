@@ -6,7 +6,6 @@ import { ROUTES } from './routeConfig';
 
 // Page imports
 import Login from '../pages/Login';
-import Sobre from '../pages/Sobre';
 import Dashboard from '../pages/Dashboard';
 import PDV from '../pages/PDV';
 import PDVMain from '../pages/PDVMain';
@@ -37,10 +36,9 @@ const AppRoutes = () => {
       {/* Public Routes */}
       <Route path={ROUTES.LOGIN} element={<Login />} />
       <Route path="/registro" element={<Registro />} />
-      <Route path={ROUTES.SOBRE} element={<Sobre />} />
       
-      {/* Default route - redirects to sobre page */}
-      <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.SOBRE} replace />} />
+      {/* Default route - redirects to login page */}
+      <Route path={ROUTES.HOME} element={<Navigate to={ROUTES.LOGIN} replace />} />
       
       {/* Protected Routes - requires authentication */}
       <Route
@@ -82,8 +80,8 @@ const AppRoutes = () => {
         <Route path="ajuda" element={<Ajuda />} />
       </Route>
       
-      {/* Fallback route - redirects to sobre */}
-      <Route path="*" element={<Navigate to={ROUTES.SOBRE} replace />} />
+      {/* Fallback route - redirects to login */}
+      <Route path="*" element={<Navigate to={ROUTES.LOGIN} replace />} />
     </Routes>
   );
 };

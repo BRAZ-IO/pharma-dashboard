@@ -2,7 +2,6 @@
 export const ROUTES = {
   // Public routes
   LOGIN: '/login',
-  SOBRE: '/sobre',
   HOME: '/',
   
   // Protected routes (under /app)

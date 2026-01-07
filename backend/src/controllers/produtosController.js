@@ -1,0 +1,184 @@
+const { Produto, Estoque } = require('../models');
+const { Op } = require('sequelize');
+
+const produtosController = {
+  // GET /api/produtos
+  async listar(req, res, next) {
+    try {
+      const { 
+        page = 1, 
+        limit = 10, 
+        search, 
+        categoria, 
+        ativo,
+        requer_receita,
+        controlado 
+      } = req.query;
+      
+      const offset = (page - 1) * limit;
+      const where = {};
+
+      if (search) {
+        where[Op.or] = [
+          { nome: { [Op.iLike]: `%${search}%` } },
+          { codigo_barras: { [Op.iLike]: `%${search}%` } },
+          { fabricante: { [Op.iLike]: `%${search}%` } },
+          { principio_ativo: { [Op.iLike]: `%${search}%` } }
+        ];
+      }
+
+      if (categoria) where.categoria = categoria;
+      if (ativo !== undefined) where.ativo = ativo === 'true';
+      if (requer_receita !== undefined) where.requer_receita = requer_receita === 'true';
+      if (controlado !== undefined) where.controlado = controlado === 'true';
+
+      const { count, rows: produtos } = await Produto.findAndCountAll({
+        where,
+        include: [{
+          model: Estoque,
+          as: 'estoques',
+          attributes: ['quantidade_atual', 'lote', 'data_validade']
+        }],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        order: [['nome', 'ASC']]
+      });
+
+      res.json({
+        produtos,
+        pagination: {
+          total: count,
+          page: parseInt(page),
+          limit: parseInt(limit),
+          totalPages: Math.ceil(count / limit)
+        }
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // GET /api/produtos/:id
+  async buscarPorId(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const produto = await Produto.findByPk(id, {
+        include: [{
+          model: Estoque,
+          as: 'estoques'
+        }]
+      });
+
+      if (!produto) {
+        return res.status(404).json({
+          error: 'Produto não encontrado'
+        });
+      }
+
+      res.json({ produto });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // GET /api/produtos/codigo-barras/:codigo
+  async buscarPorCodigoBarras(req, res, next) {
+    try {
+      const { codigo } = req.params;
+
+      const produto = await Produto.findOne({
+        where: { codigo_barras: codigo },
+        include: [{
+          model: Estoque,
+          as: 'estoques'
+        }]
+      });
+
+      if (!produto) {
+        return res.status(404).json({
+          error: 'Produto não encontrado'
+        });
+      }
+
+      res.json({ produto });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // POST /api/produtos
+  async criar(req, res, next) {
+    try {
+      const produtoData = req.body;
+
+      const produto = await Produto.create(produtoData);
+
+      // Criar registro de estoque inicial
+      await Estoque.create({
+        produto_id: produto.id,
+        quantidade_atual: 0,
+        quantidade_minima: 10,
+        quantidade_maxima: 1000
+      });
+
+      res.status(201).json({
+        message: 'Produto criado com sucesso',
+        produto
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // PUT /api/produtos/:id
+  async atualizar(req, res, next) {
+    try {
+      const { id } = req.params;
+      const produtoData = req.body;
+
+      const produto = await Produto.findByPk(id);
+
+      if (!produto) {
+        return res.status(404).json({
+          error: 'Produto não encontrado'
+        });
+      }
+
+      await produto.update(produtoData);
+
+      res.json({
+        message: 'Produto atualizado com sucesso',
+        produto
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+
+  // DELETE /api/produtos/:id
+  async deletar(req, res, next) {
+    try {
+      const { id } = req.params;
+
+      const produto = await Produto.findByPk(id);
+
+      if (!produto) {
+        return res.status(404).json({
+          error: 'Produto não encontrado'
+        });
+      }
+
+      // Soft delete
+      await produto.update({ ativo: false });
+
+      res.json({
+        message: 'Produto desativado com sucesso'
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
+};
+
+module.exports = produtosController;
