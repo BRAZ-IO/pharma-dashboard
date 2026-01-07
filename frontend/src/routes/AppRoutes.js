@@ -9,6 +9,7 @@ import Login from '../pages/Login';
 import Sobre from '../pages/Sobre';
 import Dashboard from '../pages/Dashboard';
 import PDV from '../pages/PDV';
+import PDVMain from '../pages/PDVMain';
 import PDVVendas from '../pages/PDVVendas';
 import PDVRelatorios from '../pages/PDVRelatorios';
 
@@ -33,7 +34,7 @@ const AppRoutes = () => {
       >
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="pdv" element={<PDV />}>
-          <Route index element={<PDV />} />
+          <Route index element={<PDVMain />} />
           <Route path="vendas" element={<PDVVendas />} />
           <Route path="relatorios" element={<PDVRelatorios />} />
         </Route>

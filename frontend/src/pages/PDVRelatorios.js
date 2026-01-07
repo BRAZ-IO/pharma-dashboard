@@ -10,6 +10,7 @@ const PDVRelatorios = () => {
   const [topProdutos, setTopProdutos] = useState([]);
   const [formasPagamento, setFormasPagamento] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedChart, setSelectedChart] = useState('vendas');
 
   useEffect(() => {
     // Simular carregamento de dados
@@ -37,19 +38,22 @@ const PDVRelatorios = () => {
 
       // Top produtos
       setTopProdutos([
-        { nome: 'Paracetamol 750mg', vendas: 156, total: 1950.00 },
-        { nome: 'Dipirona 500mg', vendas: 134, total: 1192.60 },
-        { nome: 'Amoxicilina 500mg', vendas: 98, total: 1548.40 },
-        { nome: 'Ibuprofeno 400mg', vendas: 87, total: 1609.50 },
-        { nome: 'Vitamina D3', vendas: 76, total: 2728.40 }
+        { nome: 'Paracetamol 750mg', vendas: 156, total: 1950.00, codigo: 'PAR750' },
+        { nome: 'Dipirona 500mg', vendas: 134, total: 1192.60, codigo: 'DIP500' },
+        { nome: 'Amoxicilina 500mg', vendas: 98, total: 1548.40, codigo: 'AMO500' },
+        { nome: 'Ibuprofeno 400mg', vendas: 87, total: 1609.50, codigo: 'IBU400' },
+        { nome: 'Vitamina D3', vendas: 76, total: 2728.40, codigo: 'VITD3' },
+        { nome: 'Losartana 50mg', vendas: 65, total: 1878.50, codigo: 'LOS50' },
+        { nome: 'Omeprazol 20mg', vendas: 54, total: 1204.20, codigo: 'OME20' },
+        { nome: 'Metformina 850mg', vendas: 48, total: 897.60, codigo: 'MET850' }
       ]);
 
       // Formas de pagamento
       setFormasPagamento([
-        { nome: 'Dinheiro', valor: 8234.56, percentual: 45.2 },
-        { nome: 'Cartão de Crédito', valor: 6789.34, percentual: 37.2 },
-        { nome: 'PIX', valor: 2456.78, percentual: 13.4 },
-        { nome: 'Cartão de Débito', valor: 1234.56, percentual: 6.8 }
+        { nome: 'Dinheiro', valor: 8234.56, percentual: 45.2, icon: '💵' },
+        { nome: 'Cartão de Crédito', valor: 6789.34, percentual: 37.2, icon: '💳' },
+        { nome: 'PIX', valor: 2456.78, percentual: 13.4, icon: '📱' },
+        { nome: 'Cartão de Débito', valor: 1234.56, percentual: 6.8, icon: '💰' }
       ]);
 
       setLoading(false);
@@ -64,24 +68,61 @@ const PDVRelatorios = () => {
   };
 
   const getTotalVendas = () => {
-    return vendasPorDia.reduce((sum, dia) => sum + dia.total, 0);
+    const data = periodo === '7dias' ? vendasPorDia : periodo === '30dias' ? vendasPorMes : vendasPorMes;
+    return data.reduce((sum, item) => sum + item.total, 0);
   };
 
   const getMediaMovel = () => {
-    const total = getTotalVendas();
-    return total / vendasPorDia.length;
+    const data = periodo === '7dias' ? vendasPorDia : periodo === '30dias' ? vendasPorMes : vendasPorMes;
+    const total = data.reduce((sum, item) => sum + item.total, 0);
+    return total / data.length;
   };
 
   const getMelhorDia = () => {
-    return vendasPorDia.reduce((melhor, dia) => dia.total > melhor.total ? dia : melhor, vendasPorDia[0]);
+    const data = periodo === '7dias' ? vendasPorDia : vendasPorMes;
+    if (data.length === 0) return { dia: '-', total: 0 };
+    return data.reduce((max, item) => item.total > max.total ? item : max);
   };
 
   const getPiorDia = () => {
-    return vendasPorDia.reduce((pior, dia) => dia.total < pior.total ? dia : pior, vendasPorDia[0]);
+    const data = periodo === '7dias' ? vendasPorDia : vendasPorMes;
+    if (data.length === 0) return { dia: '-', total: 0 };
+    return data.reduce((min, item) => item.total < min.total ? item : min);
   };
 
-  const getTotalMes = () => {
-    return vendasPorMes.reduce((sum, mes) => sum + mes.total, 0);
+  const getChartData = () => {
+    return selectedChart === 'vendas' ? vendasPorDia : vendasPorMes;
+  };
+
+  const getMaxValue = () => {
+    const data = getChartData();
+    if (data.length === 0) return 0;
+    return Math.max(...data.map(item => item.total));
+  };
+
+  const handleExport = () => {
+    // Simular exportação
+    const csvContent = [
+      ['Período', periodo],
+      ['Total de Vendas', formatCurrency(getTotalVendas())],
+      ['Média Diária', formatCurrency(getMediaMovel())],
+      ['Melhor Dia', `${getMelhorDia().dia}: ${formatCurrency(getMelhorDia().total)}`],
+      ['Pior Dia', `${getPiorDia().dia}: ${formatCurrency(getPiorDia().total)}`],
+      [],
+      ['Top Produtos'],
+      ...topProdutos.map(produto => [produto.nome, produto.vendas, formatCurrency(produto.total)]),
+      [],
+      ['Formas de Pagamento'],
+      ...formasPagamento.map(pagamento => [pagamento.nome, formatCurrency(pagamento.valor), `${pagamento.percentual}%`])
+    ].map(row => row.join(',')).join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `relatorio_${periodo}_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -96,33 +137,41 @@ const PDVRelatorios = () => {
           </button>
           <div className="header-title">
             <h1>Relatórios</h1>
-            <p>Análise de vendas e métricas</p>
+            <p>Análise detalhada de vendas</p>
           </div>
+        </div>
+        <div className="header-actions">
+          <button className="btn-export" onClick={handleExport}>
+            📊 Exportar CSV
+          </button>
         </div>
       </div>
 
       <div className="pdv-relatorios-content">
         {/* Período */}
         <div className="period-selector">
-          <div className="period-buttons">
-            <button 
-              className={`period-btn ${periodo === '7dias' ? 'active' : ''}`}
-              onClick={() => setPeriodo('7dias')}
-            >
-              7 dias
-            </button>
-            <button 
-              className={`period-btn ${periodo === '30dias' ? 'active' : ''}`}
-              onClick={() => setPeriodo('30dias')}
-            >
-              30 dias
-            </button>
-            <button 
-              className={`period-btn ${periodo === '6meses' ? 'active' : ''}`}
-              onClick={() => setPeriodo('6meses')}
-            >
-              6 meses
-            </button>
+          <div className="period-header">
+            <h3>Período de Análise</h3>
+            <div className="period-buttons">
+              <button 
+                className={`period-btn ${periodo === '7dias' ? 'active' : ''}`}
+                onClick={() => setPeriodo('7dias')}
+              >
+                7 dias
+              </button>
+              <button 
+                className={`period-btn ${periodo === '30dias' ? 'active' : ''}`}
+                onClick={() => setPeriodo('30dias')}
+              >
+                30 dias
+              </button>
+              <button 
+                className={`period-btn ${periodo === '6meses' ? 'active' : ''}`}
+                onClick={() => setPeriodo('6meses')}
+              >
+                6 meses
+              </button>
+            </div>
           </div>
         </div>
 
@@ -136,74 +185,97 @@ const PDVRelatorios = () => {
             {/* Resumo */}
             <div className="relatorios-summary">
               <div className="summary-cards">
-                <div className="summary-card">
-                  <h3>Total de Vendas</h3>
-                  <p className="summary-value">{formatCurrency(getTotalVendas())}</p>
-                  <span className="summary-period">{periodo === '7dias' ? '(últimos 7 dias)' : periodo === '30dias' ? '(últimos 30 dias)' : '(últimos 6 meses)'}</span>
+                <div className="summary-card primary">
+                  <div className="summary-icon">💰</div>
+                  <div className="summary-content">
+                    <h3>Total de Vendas</h3>
+                    <p className="summary-value">{formatCurrency(getTotalVendas())}</p>
+                    <span className="summary-period">{periodo === '7dias' ? '(últimos 7 dias)' : periodo === '30dias' ? '(últimos 30 dias)' : '(últimos 6 meses)'}</span>
+                  </div>
                 </div>
-                <div className="summary-card">
-                  <h3>Média Diária</h3>
-                  <p className="summary-value">{formatCurrency(getMediaMovel())}</p>
-                  <span className="summary-period">por dia</span>
+                <div className="summary-card success">
+                  <div className="summary-icon">📈</div>
+                  <div className="summary-content">
+                    <h3>Média Diária</h3>
+                    <p className="summary-value">{formatCurrency(getMediaMovel())}</p>
+                    <span className="summary-period">por dia</span>
+                  </div>
                 </div>
-                <div className="summary-card">
-                  <h3>Melhor Dia</h3>
-                  <p className="summary-value">{getMelhorDia().dia}</p>
-                  <span className="summary-value">{formatCurrency(getMelhorDia().total)}</span>
+                <div className="summary-card info">
+                  <div className="summary-icon">🏆</div>
+                  <div className="summary-content">
+                    <h3>Melhor Dia</h3>
+                    <p className="summary-value">{getMelhorDia().dia}</p>
+                    <span className="summary-period">{formatCurrency(getMelhorDia().total)}</span>
+                  </div>
                 </div>
-                <div className="summary-card">
-                  <h3>Pior Dia</h3>
-                  <p className="summary-value">{getPiorDia().dia}</p>
-                  <span className="summary-value">{formatCurrency(getPiorDia().total)}</span>
+                <div className="summary-card warning">
+                  <div className="summary-icon">📉</div>
+                  <div className="summary-content">
+                    <h3>Pior Dia</h3>
+                    <p className="summary-value">{getPiorDia().dia}</p>
+                    <span className="summary-period">{formatCurrency(getPiorDia().total)}</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Gráfico de Vendas */}
-            <div className="chart-section">
-              <h2>Vendas por {periodo === '7dias' ? 'Dia' : periodo === '30dias' ? 'Dia' : 'Mês'}</h2>
-              <div className="chart-container">
-                {periodo === '7dias' ? (
-                  <div className="chart-bars">
-                    {vendasPorDia.map((dia, index) => (
-                      <div key={index} className="chart-bar-wrapper">
-                        <div className="chart-bar" style={{ height: `${(dia.total / getMelhorDia().total) * 100}%` }}></div>
-                        <div className="chart-label">{dia.dia}</div>
-                        <div className="chart-value">{formatCurrency(dia.total)}</div>
-                      </div>
-                    ))}
+            {/* Gráficos */}
+            <div className="relatorios-charts">
+              <div className="chart-section">
+                <div className="chart-header">
+                  <h3>Análise de Vendas</h3>
+                  <div className="chart-toggle">
+                    <button 
+                      className={`chart-btn ${selectedChart === 'vendas' ? 'active' : ''}`}
+                      onClick={() => setSelectedChart('vendas')}
+                    >
+                      Por Dia
+                    </button>
+                    <button 
+                      className={`chart-btn ${selectedChart === 'meses' ? 'active' : ''}`}
+                      onClick={() => setSelectedChart('meses')}
+                    >
+                      Por Mês
+                    </button>
                   </div>
-                ) : periodo === '30dias' ? (
+                </div>
+                <div className="chart-container">
                   <div className="chart-bars">
-                    {vendasPorDia.map((dia, index) => (
-                      <div key={index} className="chart-bar-wrapper">
-                        <div className="chart-bar" style={{ height: `${(dia.total / getMelhorDia().total) * 100}%` }}></div>
-                        <div className="chart-label">{dia.dia}</div>
-                        <div className="chart-value">{formatCurrency(dia.total)}</div>
-                      </div>
-                    ))}
+                    {getChartData().map((item, index) => {
+                      const maxValue = getMaxValue();
+                      const height = maxValue > 0 ? (item.total / maxValue) * 100 : 0;
+                      return (
+                        <div key={index} className="chart-bar-wrapper">
+                          <div 
+                            className="chart-bar" 
+                            style={{ height: `${height}%` }}
+                            title={`${selectedChart === 'vendas' ? item.dia : item.mes}: ${formatCurrency(item.total)}`}
+                          ></div>
+                          <div className="chart-label">
+                            <span>{selectedChart === 'vendas' ? item.dia.substring(0, 3) : item.mes.substring(0, 3)}</span>
+                          </div>
+                          <div className="chart-value">
+                            <span>{formatCurrency(item.total)}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
-                ) : (
-                  <div className="chart-bars">
-                    {vendasPorMes.map((mes, index) => (
-                      <div key={index} className="chart-bar-wrapper">
-                        <div className="chart-bar" style={{ height: `${(mes.total / getTotalMes()) * 100}%` }}></div>
-                        <div className="chart-label">{mes.mes}</div>
-                        <div className="chart-value">{formatCurrency(mes.total)}</div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
             {/* Top Produtos */}
             <div className="top-products-section">
-              <h2>Produtos Mais Vendidos</h2>
+              <div className="section-header">
+                <h3>Top Produtos</h3>
+                <span className="section-subtitle">Mais vendidos no período</span>
+              </div>
               <div className="products-list">
                 {topProdutos.map((produto, index) => (
                   <div key={index} className="product-rank">
-                    <div className="rank-number">#{index + 1}</div>
+                    <div className="rank-number">{index + 1}</div>
                     <div className="product-info">
                       <h4>{produto.nome}</h4>
                       <p className="product-stats">

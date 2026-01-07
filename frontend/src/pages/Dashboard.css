@@ -59,8 +59,8 @@
 }
 
 .stat-card {
-  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
   border-radius: 16px;
   padding: 1.5rem;
   display: flex;
@@ -69,6 +69,7 @@
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  color: #e8eaed !important;
 }
 
 .stat-card::before {
@@ -111,50 +112,128 @@
   align-items: center;
   justify-content: center;
   background: rgba(100, 181, 246, 0.1);
-  color: #64b5f6;
+  color: #64b5f6 !important;
   flex-shrink: 0;
+  font-size: 1.5rem;
+}
+
+.stat-icon span {
+  font-size: 1.75rem !important;
+  line-height: 1;
+  color: inherit !important;
 }
 
 .stat-card.primary .stat-icon {
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: rgba(102, 126, 234, 0.2) !important;
+  color: #667eea !important;
+}
+
+.stat-card.primary .stat-icon span {
+  color: #667eea !important;
 }
 
 .stat-card.success .stat-icon {
-  background: rgba(38, 222, 129, 0.1);
-  color: #26de81;
+  background: rgba(38, 222, 129, 0.2) !important;
+  color: #26de81 !important;
+}
+
+.stat-card.success .stat-icon span {
+  color: #26de81 !important;
 }
 
 .stat-card.info .stat-icon {
-  background: rgba(72, 52, 212, 0.1);
-  color: #4834d4;
+  background: rgba(72, 52, 212, 0.2) !important;
+  color: #4834d4 !important;
+}
+
+.stat-card.info .stat-icon span {
+  color: #4834d4 !important;
 }
 
 .stat-card.warning .stat-icon {
-  background: rgba(255, 165, 2, 0.1);
-  color: #ffa502;
+  background: rgba(255, 165, 2, 0.2) !important;
+  color: #ffa502 !important;
 }
 
-.stat-content {
+.stat-card.warning .stat-icon span {
+  color: #ffa502 !important;
+}
+
+/* Estilos específicos para ícones */
+.icon-money {
+  color: #667eea !important;
+  font-size: 1.75rem !important;
+}
+
+.icon-package {
+  color: #26de81 !important;
+  font-size: 1.75rem !important;
+}
+
+.icon-users {
+  color: #4834d4 !important;
+  font-size: 1.75rem !important;
+}
+
+.icon-clock {
+  color: #ffa502 !important;
+  font-size: 1.75rem !important;
+}
+
+/* Forçar cores dos emojis com filters */
+.stat-card.primary .icon-money {
+  filter: sepia(1) hue-rotate(250deg) saturate(2) brightness(1.2);
+}
+
+.stat-card.success .icon-package {
+  filter: sepia(1) hue-rotate(90deg) saturate(2) brightness(1.2);
+}
+
+.stat-card.info .icon-users {
+  filter: sepia(1) hue-rotate(230deg) saturate(2) brightness(1.2);
+}
+
+.stat-card.warning .icon-clock {
+  filter: sepia(1) hue-rotate(30deg) saturate(2) brightness(1.2);
+}
+
+/* Alternativa com text-shadow para dar cor */
+.stat-card.primary .icon-money {
+  text-shadow: 0 0 10px #667eea, 0 0 20px #667eea;
+}
+
+.stat-card.success .icon-package {
+  text-shadow: 0 0 10px #26de81, 0 0 20px #26de81;
+}
+
+.stat-card.info .icon-users {
+  text-shadow: 0 0 10px #4834d4, 0 0 20px #4834d4;
+}
+
+.stat-card.warning .icon-clock {
+  text-shadow: 0 0 10px #ffa502, 0 0 20px #ffa502;
+}
+
+  .stat-content {
   flex: 1;
+  color: #e8eaed !important;
 }
 
 .stat-content h3 {
   font-size: 1.75rem;
   font-weight: 700;
-  color: #e8eaed;
+  color: #e8eaed !important;
   margin: 0 0 0.25rem 0;
 }
 
 .stat-content p {
-  color: #78909c;
+  color: #78909c !important;
   font-size: 0.875rem;
-  margin: 0 0 0.5rem 0;
+  margin: 0;
 }
 
 .stat-change {
   font-size: 0.75rem;
-  font-weight: 600;
   padding: 0.25rem 0.5rem;
   border-radius: 20px;
   display: inline-block;

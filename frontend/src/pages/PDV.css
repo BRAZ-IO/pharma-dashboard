@@ -47,26 +47,59 @@
   background: rgba(100, 181, 246, 0.1);
 }
 
-.pdv-actions {
-  display: flex;
-  gap: 1rem;
-}
-
+/* Conteúdo do Outlet */
 .pdv-content {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 2rem;
   padding: 0 2rem 2rem;
   min-height: calc(100vh - 120px);
 }
 
-/* Products Section */
-.products-section {
+.pdv-actions {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Layout específico para PDVMain */
+.pdv-main-layout {
+  padding: 0 2rem 2rem;
+  min-height: calc(100vh - 120px);
+}
+
+.pdv-main-layout .pdv-actions {
+  margin-bottom: 1.5rem;
+}
+
+.pdv-main-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+}
+
+.pdv-main-layout .products-section {
   background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
   padding: 1.5rem;
   overflow: hidden;
+}
+
+.pdv-main-layout .cart-section {
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 200px);
+}
+
+.pdv-main-layout .products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  max-height: 600px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
 }
 
 .products-header {

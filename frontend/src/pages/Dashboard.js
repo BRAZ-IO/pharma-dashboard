@@ -90,59 +90,41 @@ const Dashboard = () => {
       <div className="stats-grid">
         <div className="stat-card primary">
           <div className="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
-            </svg>
+            <span className="icon-money">💰</span>
           </div>
           <div className="stat-content">
             <h3>{formatCurrency(stats.totalVendas)}</h3>
             <p>Total de Vendas</p>
-            <span className="stat-change positive">+12.5%</span>
           </div>
         </div>
 
         <div className="stat-card success">
           <div className="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 14c1.49-1.46 2-3.21 2-5.5A5.5 5.5 0 0 0 15.5 3c-1.76 0-3 .5-4 1.5-.99-1-2.24-1.5-4-1.5A5.5 5.5 0 0 0 2 8.5c0 2.3.51 4.05 2 5.5Z"/>
-              <polyline points="12,5 12,19"/>
-            </svg>
+            <span className="icon-package">📦</span>
           </div>
           <div className="stat-content">
             <h3>{stats.totalProdutos}</h3>
             <p>Total de Produtos</p>
-            <span className="stat-change positive">+8.2%</span>
           </div>
         </div>
 
         <div className="stat-card info">
           <div className="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
+            <span className="icon-users">👥</span>
           </div>
           <div className="stat-content">
             <h3>{stats.clientesAtivos}</h3>
             <p>Clientes Ativos</p>
-            <span className="stat-change positive">+15.3%</span>
           </div>
         </div>
 
         <div className="stat-card warning">
           <div className="stat-icon">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-              <polyline points="3.27,6.96 12,12.01 20.73,6.96"/>
-              <line x1="12" y1="22.08" x2="12" y2="12"/>
-            </svg>
+            <span className="icon-clock">⏰</span>
           </div>
           <div className="stat-content">
             <h3>{stats.pedidosPendentes}</h3>
             <p>Pedidos Pendentes</p>
-            <span className="stat-change negative">-5.1%</span>
           </div>
         </div>
       </div>
