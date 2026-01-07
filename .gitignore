@@ -1,9 +1,16 @@
-# Dependências
+# ============================================
+# DEPENDÊNCIAS
+# ============================================
 node_modules/
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
+.pnp
+.pnp.js
 
-# Variáveis de ambiente - CRÍTICO
+# ============================================
+# VARIÁVEIS DE AMBIENTE - CRÍTICO
+# ============================================
 .env
 .env.local
 .env.development
@@ -11,38 +18,118 @@ yarn.lock
 .env.test
 *.env
 !.env.example
+!backend/.env.example
 
-# Logs
+# ============================================
+# LOGS
+# ============================================
 *.log
 npm-debug.log*
 yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 logs/
+*.log.*
 
-# Build
+# ============================================
+# BUILD E DIST
+# ============================================
 dist/
 build/
+out/
+.next/
+.nuxt/
+.cache/
+.parcel-cache/
 
-# IDEs
+# ============================================
+# FRONTEND ESPECÍFICO
+# ============================================
+# React
+/frontend/build/
+/frontend/.env.local
+/frontend/.env.development.local
+/frontend/.env.test.local
+/frontend/.env.production.local
+
+# Playwright
+/frontend/test-results/
+/frontend/playwright-report/
+/frontend/playwright/.cache/
+
+# ============================================
+# BACKEND ESPECÍFICO
+# ============================================
+/backend/.env
+/backend/uploads/
+/backend/logs/
+/backend/sessions/
+
+# ============================================
+# BANCO DE DADOS
+# ============================================
+*.sql
+*.dump
+*.backup
+*.bak
+db.sqlite
+db.sqlite3
+*.db
+
+# ============================================
+# IDEs E EDITORES
+# ============================================
 .vscode/
 .idea/
 *.swp
 *.swo
+*.swn
 *~
 .DS_Store
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
+.vscode-test/
 
-# OS
+# ============================================
+# SISTEMA OPERACIONAL
+# ============================================
 Thumbs.db
+Desktop.ini
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
 
-# Testes
+# ============================================
+# TESTES E COBERTURA
+# ============================================
 coverage/
 .nyc_output/
+*.lcov
+.jest/
+junit.xml
+test-results/
+playwright-report/
 
-# Temporários
+# ============================================
+# TEMPORÁRIOS
+# ============================================
 tmp/
 temp/
 *.tmp
+*.temp
+.cache/
+.temp/
 
-# Certificados - NUNCA COMMITAR
+# ============================================
+# CERTIFICADOS E CHAVES - NUNCA COMMITAR
+# ============================================
 *.pem
 *.key
 *.cert
@@ -50,12 +137,58 @@ temp/
 *.p12
 *.pfx
 *.jks
+*.keystore
+*.cer
+*.der
 
-# Backups
-*.sql
-*.dump
-*.backup
-
-# Uploads
+# ============================================
+# UPLOADS E ARQUIVOS DE USUÁRIOS
+# ============================================
 uploads/
 public/uploads/
+storage/
+user-uploads/
+
+# ============================================
+# DOCUMENTAÇÃO GERADA
+# ============================================
+docs/generated/
+api-docs/generated/
+
+# ============================================
+# ARQUIVOS DE SESSÃO E PROCESSO
+# ============================================
+sessions/
+*.session
+*.pid
+*.seed
+*.pid.lock
+
+# ============================================
+# ARQUIVOS DE CONFIGURAÇÃO LOCAL
+# ============================================
+.env.local
+config.local.js
+config.local.json
+
+# ============================================
+# ARQUIVOS SENSÍVEIS DO PROJETO
+# ============================================
+# Arquivos de reset (contém comandos SQL)
+# RESET-DB.txt já está versionado, mas cuidado ao editar
+
+# ============================================
+# OUTROS
+# ============================================
+.vercel
+.netlify
+.firebase/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*

@@ -7,6 +7,14 @@ const Estoque = sequelize.define('Estoque', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
+  empresa_id: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'empresas',
+      key: 'id'
+    }
+  },
   produto_id: {
     type: DataTypes.UUID,
     allowNull: false,

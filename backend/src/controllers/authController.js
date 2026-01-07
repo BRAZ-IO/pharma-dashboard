@@ -70,12 +70,12 @@ const authController = {
   // POST /api/auth/register
   async register(req, res, next) {
     try {
-      const { nome, email, senha, cpf, telefone, cargo } = req.body;
+      const { nome, email, senha, cpf, telefone, cargo, empresa_id } = req.body;
 
-      if (!nome || !email || !senha) {
+      if (!nome || !email || !senha || !empresa_id) {
         return res.status(400).json({
           error: 'Dados incompletos',
-          message: 'Nome, email e senha são obrigatórios'
+          message: 'Nome, email, senha e empresa_id são obrigatórios'
         });
       }
 
@@ -89,6 +89,7 @@ const authController = {
       }
 
       const usuario = await Usuario.create({
+        empresa_id,
         nome,
         email,
         senha,

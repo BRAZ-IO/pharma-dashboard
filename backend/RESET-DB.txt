@@ -1,0 +1,43 @@
+===================================================
+RESETAR BANCO DE DADOS - EXECUTE UM POR VEZ
+===================================================
+
+IMPORTANTE: Execute cada comando SEPARADAMENTE!
+
+1. Abra o pgAdmin
+2. Clique com botão direito em "postgres" (NÃO em pharma_dashboard!)
+3. Selecione "Query Tool"
+
+---------------------------------------------------
+COMANDO 1: Desconectar usuários
+---------------------------------------------------
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = 'pharma_dashboard'
+  AND pid <> pg_backend_pid();
+
+Execute (F5) e aguarde completar.
+
+---------------------------------------------------
+COMANDO 2: Deletar banco
+---------------------------------------------------
+DROP DATABASE IF EXISTS pharma_dashboard;
+
+Execute (F5) e aguarde completar.
+
+---------------------------------------------------
+COMANDO 3: Recriar banco
+---------------------------------------------------
+CREATE DATABASE pharma_dashboard;
+
+Execute (F5) e aguarde completar.
+
+---------------------------------------------------
+PRONTO! Agora execute no terminal:
+---------------------------------------------------
+npm run seed
+npm run dev
+
+===================================================
+Sistema multi-tenant funcionando!
+===================================================

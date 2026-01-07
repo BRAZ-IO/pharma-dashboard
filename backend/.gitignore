@@ -2,6 +2,7 @@
 node_modules/
 package-lock.json
 yarn.lock
+pnpm-lock.yaml
 
 # Variáveis de ambiente - NUNCA COMMITAR
 .env
@@ -10,34 +11,47 @@ yarn.lock
 .env.production
 .env.test
 *.env
+!.env.example
 
 # Logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
 logs/
+*.log.*
 
 # Testes
 coverage/
 .nyc_output/
+*.lcov
+.jest/
 
 # Build
 dist/
 build/
+out/
 
-# IDEs
+# IDEs e Editores
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 .DS_Store
+*.sublime-project
+*.sublime-workspace
+.project
+.classpath
+.settings/
 
 # Arquivos temporários
 tmp/
 temp/
 *.tmp
+*.temp
+.cache/
 
 # Certificados e chaves - CRÍTICO
 *.pem
@@ -47,12 +61,37 @@ temp/
 *.p12
 *.pfx
 *.jks
+*.keystore
 
 # Backups de banco de dados
 *.sql
 *.dump
 *.backup
+*.bak
+db.sqlite
+db.sqlite3
 
-# Uploads de usuários (se houver)
+# Uploads de usuários
 uploads/
 public/uploads/
+storage/
+
+# Sistema Operacional
+Thumbs.db
+Desktop.ini
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Documentação gerada (se houver)
+docs/generated/
+api-docs/generated/
+
+# Arquivos de sessão
+sessions/
+*.session
+
+# Arquivos de lock de processo
+*.pid
+*.seed
+*.pid.lock

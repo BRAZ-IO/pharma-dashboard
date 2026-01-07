@@ -8,7 +8,9 @@ const usuariosController = {
       const { page = 1, limit = 10, search, ativo, role } = req.query;
       const offset = (page - 1) * limit;
 
-      const where = {};
+      const where = {
+        empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+      };
 
       if (search) {
         where[Op.or] = [

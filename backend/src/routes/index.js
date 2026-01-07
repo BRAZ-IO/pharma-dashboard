@@ -4,6 +4,10 @@ const router = express.Router();
 const authRoutes = require('./auth');
 const usuariosRoutes = require('./usuarios');
 const produtosRoutes = require('./produtos');
+const swaggerRoutes = require('./swagger');
+
+// Documentação Swagger
+router.use('/docs', swaggerRoutes);
 
 // Rotas da API
 router.use('/auth', authRoutes);

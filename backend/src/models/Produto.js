@@ -7,9 +7,16 @@ const Produto = sequelize.define('Produto', {
     defaultValue: DataTypes.UUIDV4,
     primaryKey: true
   },
+  empresa_id: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'empresas',
+      key: 'id'
+    }
+  },
   codigo_barras: {
     type: DataTypes.STRING(50),
-    unique: true,
     allowNull: true
   },
   nome: {
@@ -92,7 +99,13 @@ const Produto = sequelize.define('Produto', {
     allowNull: true
   }
 }, {
-  tableName: 'produtos'
+  tableName: 'produtos',
+  indexes: [
+    {
+      unique: true,
+      fields: ['empresa_id', 'codigo_barras']
+    }
+  ]
 });
 
 module.exports = Produto;

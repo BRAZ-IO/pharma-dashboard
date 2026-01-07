@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { sequelize } = require('../config/database');
-const { Usuario, Produto, Estoque } = require('../models');
+const { Empresa, Usuario, Produto, Estoque } = require('../models');
 
 const seed = async () => {
   try {
@@ -10,8 +10,36 @@ const seed = async () => {
     await sequelize.sync({ force: true });
     console.log('✅ Banco sincronizado');
 
-    // Criar usuário admin
+    // ========================================
+    // CRIAR EMPRESA PADRÃO
+    // ========================================
+    
+    const empresaPadrao = await Empresa.create({
+      razao_social: 'Farmácia Teste Desenvolvimento Ltda',
+      nome_fantasia: 'Farmácia Teste',
+      cnpj: '00.000.000/0001-00',
+      inscricao_estadual: '000.000.000.000',
+      telefone: '(11) 0000-0000',
+      email: 'contato@farmaciateste.local',
+      endereco: {
+        rua: 'Rua de Teste',
+        numero: '123',
+        bairro: 'Bairro Teste',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: '00000-000'
+      },
+      plano: 'basico',
+      ativo: true
+    });
+    console.log('✅ Empresa de teste criada');
+
+    // ========================================
+    // CRIAR USUÁRIOS
+    // ========================================
+    
     const admin = await Usuario.create({
+      empresa_id: empresaPadrao.id,
       nome: 'Administrador',
       email: 'admin@pharma.com',
       senha: '123456',
@@ -22,10 +50,10 @@ const seed = async () => {
     });
     console.log('✅ Usuário admin criado');
 
-    // Criar usuário gerente
     const gerente = await Usuario.create({
+      empresa_id: empresaPadrao.id,
       nome: 'João Silva',
-      email: 'joao@pharma.com',
+      email: 'gerente@pharma.com',
       senha: '123456',
       cpf: '987.654.321-00',
       telefone: '(11) 91234-5678',
@@ -34,10 +62,10 @@ const seed = async () => {
     });
     console.log('✅ Usuário gerente criado');
 
-    // Criar usuário funcionário
     const funcionario = await Usuario.create({
+      empresa_id: empresaPadrao.id,
       nome: 'Maria Santos',
-      email: 'maria@pharma.com',
+      email: 'funcionario@pharma.com',
       senha: '123456',
       telefone: '(11) 95555-4444',
       cargo: 'Atendente',
@@ -45,9 +73,13 @@ const seed = async () => {
     });
     console.log('✅ Usuário funcionário criado');
 
-    // Criar produtos de exemplo
+    // ========================================
+    // CRIAR PRODUTOS
+    // ========================================
+    
     const produtos = [
       {
+        empresa_id: empresaPadrao.id,
         codigo_barras: '7891234567890',
         nome: 'Dipirona 500mg',
         descricao: 'Analgésico e antitérmico',
@@ -65,6 +97,7 @@ const seed = async () => {
         generico: true
       },
       {
+        empresa_id: empresaPadrao.id,
         codigo_barras: '7891234567891',
         nome: 'Paracetamol 750mg',
         descricao: 'Analgésico e antitérmico',
@@ -82,6 +115,7 @@ const seed = async () => {
         generico: true
       },
       {
+        empresa_id: empresaPadrao.id,
         codigo_barras: '7891234567892',
         nome: 'Amoxicilina 500mg',
         descricao: 'Antibiótico',
@@ -97,48 +131,14 @@ const seed = async () => {
         requer_receita: true,
         controlado: false,
         generico: true
-      },
-      {
-        codigo_barras: '7891234567893',
-        nome: 'Omeprazol 20mg',
-        descricao: 'Inibidor da bomba de prótons',
-        categoria: 'Medicamento',
-        subcategoria: 'Gastroenterologia',
-        fabricante: 'EMS',
-        principio_ativo: 'Omeprazol',
-        apresentacao: 'Cápsula',
-        dosagem: '20mg',
-        preco_custo: 10.00,
-        preco_venda: 24.90,
-        margem_lucro: 149.00,
-        requer_receita: false,
-        controlado: false,
-        generico: true
-      },
-      {
-        codigo_barras: '7891234567894',
-        nome: 'Rivotril 2mg',
-        descricao: 'Ansiolítico',
-        categoria: 'Medicamento',
-        subcategoria: 'Controlado',
-        fabricante: 'Roche',
-        principio_ativo: 'Clonazepam',
-        apresentacao: 'Comprimido',
-        dosagem: '2mg',
-        preco_custo: 25.00,
-        preco_venda: 55.00,
-        margem_lucro: 120.00,
-        requer_receita: true,
-        controlado: true,
-        generico: false
       }
     ];
 
     for (const produtoData of produtos) {
       const produto = await Produto.create(produtoData);
       
-      // Criar estoque para cada produto
       await Estoque.create({
+        empresa_id: empresaPadrao.id,
         produto_id: produto.id,
         quantidade_atual: Math.floor(Math.random() * 100) + 20,
         quantidade_minima: 10,
@@ -161,12 +161,15 @@ const seed = async () => {
     console.log('  Senha: 123456');
     console.log('');
     console.log('Gerente:');
-    console.log('  Email: joao@pharma.com');
+    console.log('  Email: gerente@pharma.com');
     console.log('  Senha: 123456');
     console.log('');
     console.log('Funcionário:');
-    console.log('  Email: maria@pharma.com');
+    console.log('  Email: funcionario@pharma.com');
     console.log('  Senha: 123456');
+    console.log('');
+    console.log('💡 Sistema multi-tenant ativo!');
+    console.log('   Você pode cadastrar novas empresas via API');
     console.log('');
 
     process.exit(0);

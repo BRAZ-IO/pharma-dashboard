@@ -16,7 +16,9 @@ const produtosController = {
       } = req.query;
       
       const offset = (page - 1) * limit;
-      const where = {};
+      const where = {
+        empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+      };
 
       if (search) {
         where[Op.or] = [
@@ -63,10 +65,15 @@ const produtosController = {
     try {
       const { id } = req.params;
 
-      const produto = await Produto.findByPk(id, {
+      const produto = await Produto.findOne({
+        where: { 
+          id,
+          empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+        },
         include: [{
           model: Estoque,
-          as: 'estoques'
+          as: 'estoques',
+          where: { empresa_id: req.empresaId }
         }]
       });
 
@@ -88,10 +95,14 @@ const produtosController = {
       const { codigo } = req.params;
 
       const produto = await Produto.findOne({
-        where: { codigo_barras: codigo },
+        where: { 
+          codigo_barras: codigo,
+          empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+        },
         include: [{
           model: Estoque,
-          as: 'estoques'
+          as: 'estoques',
+          where: { empresa_id: req.empresaId }
         }]
       });
 
@@ -110,12 +121,16 @@ const produtosController = {
   // POST /api/produtos
   async criar(req, res, next) {
     try {
-      const produtoData = req.body;
+      const produtoData = {
+        ...req.body,
+        empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+      };
 
       const produto = await Produto.create(produtoData);
 
       // Criar registro de estoque inicial
       await Estoque.create({
+        empresa_id: req.empresaId, // ISOLAMENTO MULTI-TENANT
         produto_id: produto.id,
         quantidade_atual: 0,
         quantidade_minima: 10,
@@ -137,7 +152,12 @@ const produtosController = {
       const { id } = req.params;
       const produtoData = req.body;
 
-      const produto = await Produto.findByPk(id);
+      const produto = await Produto.findOne({
+        where: { 
+          id,
+          empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+        }
+      });
 
       if (!produto) {
         return res.status(404).json({
@@ -161,7 +181,12 @@ const produtosController = {
     try {
       const { id } = req.params;
 
-      const produto = await Produto.findByPk(id);
+      const produto = await Produto.findOne({
+        where: { 
+          id,
+          empresa_id: req.empresaId // ISOLAMENTO MULTI-TENANT
+        }
+      });
 
       if (!produto) {
         return res.status(404).json({
