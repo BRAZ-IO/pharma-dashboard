@@ -12,6 +12,10 @@ import PDV from '../pages/PDV';
 import PDVMain from '../pages/PDVMain';
 import PDVVendas from '../pages/PDVVendas';
 import PDVRelatorios from '../pages/PDVRelatorios';
+import Produtos from '../pages/Produtos';
+import ProdutosLista from '../pages/ProdutosLista';
+import ProdutosDetalhes from '../pages/ProdutosDetalhes';
+import ProdutosCadastro from '../pages/ProdutosCadastro';
 
 const AppRoutes = () => {
   return (
@@ -38,7 +42,12 @@ const AppRoutes = () => {
           <Route path="vendas" element={<PDVVendas />} />
           <Route path="relatorios" element={<PDVRelatorios />} />
         </Route>
-        <Route path="produtos" element={<div className="simple-page products-page"><h2>Produtos</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="produtos" element={<Produtos />}>
+          <Route index element={<ProdutosLista />} />
+          <Route path=":id" element={<ProdutosDetalhes />} />
+          <Route path="cadastro" element={<ProdutosCadastro />} />
+          <Route path="cadastro/:id" element={<ProdutosCadastro />} />
+        </Route>
         <Route path="estoque" element={<div className="simple-page estoque-page"><h2>Estoque</h2><p>Em desenvolvimento...</p></div>} />
         <Route path="usuarios" element={<div className="simple-page usuarios-page"><h2>Usuários</h2><p>Em desenvolvimento...</p></div>} />
         <Route path="configuracoes" element={<div className="simple-page configuracoes-page"><h2>Configurações</h2><p>Em desenvolvimento...</p></div>} />

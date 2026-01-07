@@ -2,7 +2,7 @@
 .layout-bootstrap {
   display: flex;
   min-height: 100vh;
-  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  background: #0b1220;
 }
 
 .main-content-bootstrap {
@@ -39,7 +39,7 @@
   padding-top: 65px;
 }
 
-.content-wrapper-bootstrap:has(.products-page) {
+.content-wrapper-bootstrap:has(.produtos-page) {
   background: #0b1220;
   padding: 0;
   padding-top: 65px;
