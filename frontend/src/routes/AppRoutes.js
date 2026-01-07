@@ -28,6 +28,8 @@ import ConfiguracoesGeral from '../pages/ConfiguracoesGeral';
 import ConfiguracoesSistema from '../pages/ConfiguracoesSistema';
 import ConfiguracoesNotificacoes from '../pages/ConfiguracoesNotificacoes';
 import Registro from '../pages/Registro';
+import Perfil from '../pages/Perfil';
+import Ajuda from '../pages/Ajuda';
 
 const AppRoutes = () => {
   return (
@@ -76,6 +78,8 @@ const AppRoutes = () => {
           <Route path="sistema" element={<ConfiguracoesSistema />} />
           <Route path="notificacoes" element={<ConfiguracoesNotificacoes />} />
         </Route>
+        <Route path="perfil" element={<Perfil />} />
+        <Route path="ajuda" element={<Ajuda />} />
       </Route>
       
       {/* Fallback route - redirects to sobre */}

@@ -45,7 +45,9 @@ const NavbarBootstrap = ({
       '/app/produtos': 'Produtos',
       '/app/estoque': 'Estoque',
       '/app/usuarios': 'Usuários',
-      '/app/configuracoes': 'Configurações'
+      '/app/configuracoes': 'Configurações',
+      '/app/perfil': 'Meu Perfil',
+      '/app/ajuda': 'Central de Ajuda'
     };
     return routeMap[path] || 'Pharma Dashboard';
   };
@@ -188,7 +190,7 @@ const NavbarBootstrap = ({
                   </div>
                 </div>
                 <div className="profile-dropdown-menu">
-                  <button className="dropdown-item">
+                  <button className="dropdown-item" onClick={() => navigate('/app/perfil')}>
                     <div className="item-icon">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -200,7 +202,7 @@ const NavbarBootstrap = ({
                       <span className="item-description">Ver e editar informações</span>
                     </div>
                   </button>
-                  <button className="dropdown-item">
+                  <button className="dropdown-item" onClick={() => navigate('/app/configuracoes')}>
                     <div className="item-icon">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="12" cy="12" r="3"></circle>
@@ -212,7 +214,7 @@ const NavbarBootstrap = ({
                       <span className="item-description">Preferências do sistema</span>
                     </div>
                   </button>
-                  <button className="dropdown-item">
+                  <button className="dropdown-item" onClick={() => navigate('/app/ajuda')}>
                     <div className="item-icon">
                       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                         <circle cx="12" cy="12" r="10"></circle>
