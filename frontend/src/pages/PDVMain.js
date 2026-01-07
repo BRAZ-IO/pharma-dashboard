@@ -25,6 +25,9 @@ const PDVMain = () => {
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [barcodeInput, setBarcodeInput] = useState('');
+  const [scannerActive, setScannerActive] = useState(false);
+  const [lastScannedProduct, setLastScannedProduct] = useState(null);
 
   useEffect(() => {
     const newTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
@@ -51,6 +54,27 @@ const PDVMain = () => {
       ));
     } else {
       setCart([...cart, { ...product, quantity: 1 }]);
+    }
+    
+    // Feedback visual ao escanear
+    setLastScannedProduct(product);
+    setTimeout(() => setLastScannedProduct(null), 2000);
+  };
+
+  const handleBarcodeScanner = (e) => {
+    if (e.key === 'Enter' && barcodeInput.trim()) {
+      const product = products.find(p => p.barcode === barcodeInput.trim());
+      
+      if (product) {
+        addToCart(product);
+        setBarcodeInput('');
+        // Efeito sonoro ou visual de sucesso
+        setScannerActive(true);
+        setTimeout(() => setScannerActive(false), 300);
+      } else {
+        alert('Produto não encontrado!');
+        setBarcodeInput('');
+      }
     }
   };
 
@@ -149,6 +173,40 @@ const PDVMain = () => {
       </div>
       
       <div className="pdv-main-grid">
+        {/* Scanner de Código de Barras */}
+        <div className="barcode-scanner-section">
+          <div className={`scanner-container ${scannerActive ? 'scanner-active' : ''}`}>
+            <div className="scanner-icon">📷</div>
+            <div className="scanner-content">
+              <h3>Scanner de Código de Barras</h3>
+              <p className="scanner-hint">Digite ou escaneie o código de barras</p>
+              <div className="scanner-input-wrapper">
+                <input
+                  type="text"
+                  placeholder="Código de barras..."
+                  value={barcodeInput}
+                  onChange={(e) => setBarcodeInput(e.target.value)}
+                  onKeyPress={handleBarcodeScanner}
+                  className="barcode-input"
+                  autoFocus
+                />
+                <button 
+                  className="btn-scan"
+                  onClick={() => handleBarcodeScanner({ key: 'Enter' })}
+                >
+                  Escanear
+                </button>
+              </div>
+              {lastScannedProduct && (
+                <div className="scan-feedback">
+                  <span className="scan-success">✓</span>
+                  <span>{lastScannedProduct.name} adicionado!</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
         {/* Produtos */}
         <div className="products-section">
           <div className="products-header">

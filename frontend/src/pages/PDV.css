@@ -47,6 +47,159 @@
   background: rgba(100, 181, 246, 0.1);
 }
 
+/* Scanner de Código de Barras */
+.barcode-scanner-section {
+  grid-column: 1 / -1;
+  margin-bottom: 2rem;
+}
+
+.scanner-container {
+  background: linear-gradient(135deg, #1a2332 0%, #0f1a2e 100%);
+  border: 2px solid rgba(100, 181, 246, 0.3);
+  border-radius: 16px;
+  padding: 2rem;
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.scanner-container.scanner-active {
+  border-color: #26de81;
+  background: linear-gradient(135deg, #1a3328 0%, #0f1a2e 100%);
+  box-shadow: 0 4px 30px rgba(38, 222, 129, 0.3);
+  animation: scanPulse 0.3s ease;
+}
+
+@keyframes scanPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.scanner-icon {
+  font-size: 4rem;
+  filter: drop-shadow(0 4px 8px rgba(100, 181, 246, 0.3));
+  animation: scannerFloat 3s ease-in-out infinite;
+}
+
+@keyframes scannerFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.scanner-content {
+  flex: 1;
+}
+
+.scanner-content h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #e8eaed;
+  margin: 0 0 0.5rem 0;
+}
+
+.scanner-hint {
+  color: #78909c;
+  font-size: 0.875rem;
+  margin: 0 0 1rem 0;
+}
+
+.scanner-input-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.barcode-input {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: #e8eaed;
+  font-size: 1.125rem;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  transition: all 0.3s ease;
+}
+
+.barcode-input:focus {
+  outline: none;
+  border-color: #64b5f6;
+  background: rgba(100, 181, 246, 0.1);
+  box-shadow: 0 0 0 4px rgba(100, 181, 246, 0.1);
+}
+
+.barcode-input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  letter-spacing: normal;
+}
+
+.btn-scan {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(100, 181, 246, 0.3);
+  white-space: nowrap;
+}
+
+.btn-scan:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(100, 181, 246, 0.4);
+}
+
+.btn-scan:active {
+  transform: translateY(0);
+}
+
+.scan-feedback {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(38, 222, 129, 0.1);
+  border: 1px solid rgba(38, 222, 129, 0.3);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.scan-success {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #26de81;
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 0.875rem;
+}
+
+.scan-feedback span:last-child {
+  color: #26de81;
+  font-weight: 500;
+}
+
 /* Conteúdo do Outlet */
 .pdv-content {
   padding: 0 2rem 2rem;
