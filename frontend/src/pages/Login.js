@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppNavigation } from '../hooks/useAppNavigation';
+import { Link } from 'react-router-dom';
 import '../styles/login.css';
 
 const Login = () => {
@@ -67,6 +68,9 @@ const Login = () => {
         
         <div className="login-footer">
           <p>Demo: Use qualquer email e senha para entrar</p>
+          <p className="registro-link">
+            Não tem uma conta? <Link to="/registro">Registre sua empresa</Link>
+          </p>
         </div>
       </div>
     </div>

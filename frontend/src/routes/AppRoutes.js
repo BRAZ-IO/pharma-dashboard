@@ -27,12 +27,14 @@ import Configuracoes from '../pages/Configuracoes';
 import ConfiguracoesGeral from '../pages/ConfiguracoesGeral';
 import ConfiguracoesSistema from '../pages/ConfiguracoesSistema';
 import ConfiguracoesNotificacoes from '../pages/ConfiguracoesNotificacoes';
+import Registro from '../pages/Registro';
 
 const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
       <Route path={ROUTES.LOGIN} element={<Login />} />
+      <Route path="/registro" element={<Registro />} />
       <Route path={ROUTES.SOBRE} element={<Sobre />} />
       
       {/* Default route - redirects to sobre page */}
