@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
+import { ROUTE_METADATA, ROUTES } from '../routes/routeConfig';
 import './Sidebar.css';
 
 const Sidebar = ({ mobileOpen = false, onCloseMobile }) => {
@@ -8,66 +9,33 @@ const Sidebar = ({ mobileOpen = false, onCloseMobile }) => {
   const [expandedSections, setExpandedSections] = useState({});
   const location = useLocation();
 
-  const menuSections = [
-    {
-      title: 'Principal',
-      items: [
-        {
-          path: '/dashboard',
-          name: 'Dashboard',
-          icon: '📊',
-          badge: null,
-          description: 'Visão geral'
-        },
-        {
-          path: '/pdv',
-          name: 'PDV',
-          icon: '🧾',
-          badge: null,
-          description: 'Ponto de Venda'
-        }
-      ]
-    },
-    {
-      title: 'Gestão',
-      items: [
-        {
-          path: '/produtos',
-          name: 'Produtos',
-          icon: '💊',
-          badge: '1.2k',
-          description: 'Catálogo de medicamentos'
-        },
-        {
-          path: '/estoque',
-          name: 'Estoque',
-          icon: '📦',
-          badge: '23',
-          badgeType: 'warning',
-          description: 'Controle de inventário'
-        }
-      ]
-    },
-    {
-      title: 'Sistema',
-      items: [
-        {
-          path: '/usuarios',
-          name: 'Usuários',
-          icon: '👥',
-          badge: '12',
-          description: 'Gerenciar usuários'
-        },
-        {
-          path: '/configuracoes',
-          name: 'Configurações',
-          icon: '⚙️',
-          badge: null,
-          description: 'Configurações do sistema'
-        }
-      ]
+  // Group routes by section
+  const menuSections = ROUTE_METADATA.reduce((sections, route) => {
+    const section = sections.find(s => s.title === route.section);
+    if (section) {
+      section.items.push({
+        path: route.path,
+        name: route.name,
+        icon: route.icon,
+        badge: route.badge,
+        badgeType: route.badgeType,
+        description: route.description
+      });
+    } else {
+      sections.push({
+        title: route.section,
+        items: [{
+          path: route.path,
+          name: route.name,
+          icon: route.icon,
+          badge: route.badge,
+          badgeType: route.badgeType,
+          description: route.description
+        }]
+      });
     }
-  ];
+    return sections;
+  }, []);
 
   const toggleSidebar = () => {
     setIsCollapsed(!isCollapsed);
@@ -222,7 +190,7 @@ const Sidebar = ({ mobileOpen = false, onCloseMobile }) => {
           {!isCollapsed && (
             <button className="logout-btn" onClick={() => {
               localStorage.removeItem('isAuthenticated');
-              window.location.href = '/login';
+              window.location.href = ROUTES.LOGIN;
             }}>
               🚪
             </button>

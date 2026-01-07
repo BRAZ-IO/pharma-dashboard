@@ -40,6 +40,30 @@
   padding-top: 60px;
  }
 
+.content-wrapper:has(.estoque-page) {
+  background: #0b1220;
+  padding: 0;
+  padding-top: 60px;
+}
+
+.content-wrapper:has(.usuarios-page) {
+  background: #0b1220;
+  padding: 0;
+  padding-top: 60px;
+}
+
+.content-wrapper:has(.configuracoes-page) {
+  background: #0b1220;
+  padding: 0;
+  padding-top: 60px;
+}
+
+.content-wrapper:has(.sobre-page) {
+  background: #0b1220;
+  padding: 0;
+  padding-top: 60px;
+}
+
 .main-content:has(.dashboard-page) {
   background: #0b1220;
 }
@@ -48,9 +72,25 @@
   background: #0b1220;
 }
 
- .main-content:has(.products-page) {
+.main-content:has(.products-page) {
   background: #0b1220;
- }
+}
+
+.main-content:has(.estoque-page) {
+  background: #0b1220;
+}
+
+.main-content:has(.usuarios-page) {
+  background: #0b1220;
+}
+
+.main-content:has(.configuracoes-page) {
+  background: #0b1220;
+}
+
+.main-content:has(.sobre-page) {
+  background: #0b1220;
+}
 
 /* Responsive adjustments */
 @media (max-width: 768px) {

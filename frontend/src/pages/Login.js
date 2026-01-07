@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAppNavigation } from '../hooks/useAppNavigation';
 import '../styles/login.css';
 
 const Login = () => {
   const [credentials, setCredentials] = useState({ email: '', password: '' });
-  const navigate = useNavigate();
+  const { goToDashboard } = useAppNavigation();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // Mock authentication - in real app, this would call an API
     localStorage.setItem('isAuthenticated', 'true');
-    navigate('/dashboard');
+    goToDashboard();
   };
 
   const handleChange = (e) => {
