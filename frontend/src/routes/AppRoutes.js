@@ -7,6 +7,7 @@ import { ROUTES } from './routeConfig';
 // Page imports
 import Login from '../pages/Login';
 import Sobre from '../pages/Sobre';
+import Dashboard from '../pages/Dashboard';
 
 const AppRoutes = () => {
   return (
@@ -27,7 +28,7 @@ const AppRoutes = () => {
           </ProtectedRoute>
         }
       >
-        <Route path="dashboard" element={<div className="simple-page dashboard-page"><h2>Dashboard</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="dashboard" element={<Dashboard />} />
         <Route path="pdv" element={<div className="simple-page pdv-page"><h2>PDV</h2><p>Em desenvolvimento...</p></div>} />
         <Route path="produtos" element={<div className="simple-page products-page"><h2>Produtos</h2><p>Em desenvolvimento...</p></div>} />
         <Route path="estoque" element={<div className="simple-page estoque-page"><h2>Estoque</h2><p>Em desenvolvimento...</p></div>} />
