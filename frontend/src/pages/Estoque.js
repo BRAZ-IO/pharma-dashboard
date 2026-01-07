@@ -1,28 +1,22 @@
 import React from 'react';
+import { NavLink, Outlet } from 'react-router-dom';
+import './Estoque.css';
 
 const Estoque = () => {
   return (
     <div className="estoque-page">
-      <div className="page-header">
+      <div className="estoque-header">
         <h1>Estoque</h1>
-        <p>Controle inteligente de inventário</p>
-      </div>
-      <div className="content-wrapper">
-        <div className="estoque-container">
-          <div className="estoque-message">
-            <h2>🚀 Controle de Estoque em Desenvolvimento</h2>
-            <p>Estamos construindo um sistema inteligente de estoque com:</p>
-            <ul>
-              <li>⚠️ Alertas de estoque baixo</li>
-              <li>📊 Previsão de demanda</li>
-              <li>🔄 Controle de entrada e saída</li>
-              <li>📅 Rastreamento de lotes</li>
-              <li>🔔 Notificações automáticas</li>
-              <li>📈 Relatórios de movimentação</li>
-            </ul>
-          </div>
+        <div className="estoque-nav">
+          <NavLink to="/app/estoque" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Inventário
+          </NavLink>
+          <NavLink to="/app/estoque/movimentacoes" className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
+            Movimentações
+          </NavLink>
         </div>
       </div>
+      <Outlet />
     </div>
   );
 };

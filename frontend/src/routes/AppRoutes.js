@@ -16,6 +16,13 @@ import Produtos from '../pages/Produtos';
 import ProdutosLista from '../pages/ProdutosLista';
 import ProdutosDetalhes from '../pages/ProdutosDetalhes';
 import ProdutosCadastro from '../pages/ProdutosCadastro';
+import Estoque from '../pages/Estoque';
+import EstoqueLista from '../pages/EstoqueLista';
+import EstoqueMovimentacoes from '../pages/EstoqueMovimentacoes';
+import Usuarios from '../pages/Usuarios';
+import UsuariosLista from '../pages/UsuariosLista';
+import UsuariosDetalhes from '../pages/UsuariosDetalhes';
+import UsuariosCadastro from '../pages/UsuariosCadastro';
 
 const AppRoutes = () => {
   return (
@@ -48,8 +55,16 @@ const AppRoutes = () => {
           <Route path="cadastro" element={<ProdutosCadastro />} />
           <Route path="cadastro/:id" element={<ProdutosCadastro />} />
         </Route>
-        <Route path="estoque" element={<div className="simple-page estoque-page"><h2>Estoque</h2><p>Em desenvolvimento...</p></div>} />
-        <Route path="usuarios" element={<div className="simple-page usuarios-page"><h2>Usuários</h2><p>Em desenvolvimento...</p></div>} />
+        <Route path="estoque" element={<Estoque />}>
+          <Route index element={<EstoqueLista />} />
+          <Route path="movimentacoes" element={<EstoqueMovimentacoes />} />
+        </Route>
+        <Route path="usuarios" element={<Usuarios />}>
+          <Route index element={<UsuariosLista />} />
+          <Route path=":id" element={<UsuariosDetalhes />} />
+          <Route path="cadastro" element={<UsuariosCadastro />} />
+          <Route path="cadastro/:id" element={<UsuariosCadastro />} />
+        </Route>
         <Route path="configuracoes" element={<div className="simple-page configuracoes-page"><h2>Configurações</h2><p>Em desenvolvimento...</p></div>} />
       </Route>
       

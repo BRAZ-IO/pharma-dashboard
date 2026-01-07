@@ -649,13 +649,40 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .pdv-content {
+  .pdv-main-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
   
+  .cart-section {
+    max-height: 500px;
+  }
+  
   .products-grid {
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    max-height: 400px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .pdv-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .pdv-nav {
+    gap: 1rem;
+  }
+  
+  .pdv-main-layout {
+    padding: 0 1.5rem 1.5rem;
+  }
+  
+  .pdv-main-grid {
+    gap: 1.5rem;
+  }
+  
+  .products-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   }
 }
 
@@ -671,14 +698,37 @@
     font-size: 1.5rem;
   }
   
-  .pdv-content {
+  .pdv-nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .pdv-nav .nav-link {
+    white-space: nowrap;
+  }
+  
+  .pdv-main-layout {
     padding: 0 1rem 1rem;
+  }
+  
+  .pdv-main-layout .pdv-actions {
+    margin-bottom: 1rem;
+  }
+  
+  .pdv-main-grid {
+    grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .products-section,
-  .cart-section {
+  .pdv-main-layout .products-section,
+  .pdv-main-layout .cart-section {
     padding: 1rem;
+  }
+  
+  .products-header h2 {
+    font-size: 1.125rem;
   }
   
   .products-controls {
@@ -686,41 +736,73 @@
     gap: 0.75rem;
   }
   
+  .search-input,
+  .category-select {
+    width: 100%;
+  }
+  
   .products-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
     gap: 0.75rem;
+    max-height: 350px;
   }
   
   .product-card {
     padding: 0.75rem;
   }
   
-  .cart-item {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+  .product-info h3 {
+    font-size: 0.9rem;
   }
   
-  .cart-item-info {
-    width: 100%;
+  .product-price {
+    font-size: 1.125rem;
+  }
+  
+  .cart-section {
+    max-height: 400px;
+  }
+  
+  .cart-header h2 {
+    font-size: 1.125rem;
+  }
+  
+  .cart-item {
+    padding: 0.875rem;
+    position: relative;
+  }
+  
+  .cart-item-info h4 {
+    font-size: 0.875rem;
+    padding-right: 2rem;
   }
   
   .cart-item-quantity {
-    align-self: flex-end;
-  }
-  
-  .cart-item-total {
-    align-self: flex-end;
+    margin-top: 0.5rem;
   }
   
   .btn-remove {
     position: absolute;
-    top: 0.75rem;
-    right: 0.75rem;
+    top: 0.875rem;
+    right: 0.875rem;
+  }
+  
+  .cart-total h3 {
+    font-size: 1.25rem;
+  }
+  
+  .payment-modal {
+    padding: 1rem;
+  }
+  
+  .payment-content {
+    padding: 1.5rem;
+    max-width: 100%;
   }
   
   .payment-methods {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
   }
   
   .payment-actions {
@@ -729,34 +811,147 @@
 }
 
 @media (max-width: 480px) {
+  .pdv-header {
+    padding: 1rem;
+  }
+  
   .pdv-header h1 {
     font-size: 1.25rem;
   }
   
+  .pdv-nav {
+    gap: 0.5rem;
+  }
+  
+  .pdv-nav .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .pdv-main-layout {
+    padding: 0 0.75rem 0.75rem;
+  }
+  
+  .pdv-main-layout .pdv-actions {
+    margin-bottom: 0.75rem;
+  }
+  
+  .btn-secondary {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .pdv-main-layout .products-section,
+  .pdv-main-layout .cart-section {
+    padding: 0.875rem;
+    border-radius: 12px;
+  }
+  
+  .products-header h2,
+  .cart-header h2 {
+    font-size: 1rem;
+  }
+  
+  .products-controls {
+    gap: 0.625rem;
+  }
+  
+  .search-input,
+  .category-select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
   .products-grid {
     grid-template-columns: 1fr;
+    gap: 0.625rem;
+    max-height: 300px;
   }
   
   .product-card {
-    padding: 0.5rem;
+    padding: 0.75rem;
   }
   
   .product-info h3 {
     font-size: 0.875rem;
   }
   
+  .product-category {
+    font-size: 0.7rem;
+  }
+  
   .product-price {
-    font-size: 1.125rem;
+    font-size: 1rem;
+  }
+  
+  .product-stock,
+  .product-barcode {
+    font-size: 0.7rem;
+  }
+  
+  .btn-add-cart {
+    padding: 0.625rem;
+    font-size: 0.875rem;
+  }
+  
+  .cart-section {
+    max-height: 350px;
   }
   
   .cart-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+  
+  .cart-header h2 {
+    font-size: 1rem;
   }
   
   .btn-clear-cart {
-    align-self: flex-end;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .cart-item {
+    padding: 0.75rem;
+    margin-bottom: 0.625rem;
+  }
+  
+  .cart-item-info h4 {
+    font-size: 0.8rem;
+  }
+  
+  .cart-item-info p {
+    font-size: 0.8rem;
+  }
+  
+  .cart-item-quantity {
+    margin-top: 0.5rem;
+  }
+  
+  .btn-quantity {
+    width: 28px;
+    height: 28px;
+    font-size: 0.875rem;
+  }
+  
+  .cart-item-quantity span {
+    font-size: 0.875rem;
+  }
+  
+  .btn-remove {
+    width: 28px;
+    height: 28px;
+    top: 0.75rem;
+    right: 0.75rem;
+    font-size: 1rem;
+  }
+  
+  .cart-total h3 {
+    font-size: 1.125rem;
+    margin-bottom: 0.75rem;
   }
   
   .btn-payment {
@@ -765,16 +960,52 @@
   }
   
   .payment-content {
-    padding: 1.5rem;
+    padding: 1.25rem;
+  }
+  
+  .payment-content h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
   }
   
   .payment-methods {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 0.625rem;
+    margin-bottom: 1.25rem;
   }
   
   .payment-method-btn {
     padding: 0.75rem;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .payment-summary {
+    padding: 0.875rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .payment-summary h3 {
+    font-size: 1.125rem;
+  }
+  
+  .payment-actions button {
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .success-content {
+    padding: 1.5rem;
+  }
+  
+  .success-icon {
+    font-size: 2.5rem;
+  }
+  
+  .success-content h2 {
+    font-size: 1.25rem;
+  }
+  
+  .success-content p {
+    font-size: 0.875rem;
   }
 }

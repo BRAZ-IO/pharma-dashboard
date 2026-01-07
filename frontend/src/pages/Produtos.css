@@ -641,8 +641,40 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
+  .produtos-header {
+    padding: 1.5rem 1.5rem 1rem;
+  }
+  
+  .produtos-nav {
+    gap: 1rem;
+  }
+  
+  .produtos-lista {
+    padding: 1.5rem;
+  }
+  
+  .produtos-stats {
+    gap: 1rem;
+  }
+  
+  .stat-card {
+    min-width: 120px;
+  }
+  
+  .produtos-table {
+    font-size: 0.875rem;
+  }
+  
+  .produto-detalhes {
+    padding: 1.5rem;
+  }
+  
   .produto-detalhes-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .produto-cadastro {
+    padding: 1.5rem;
   }
 }
 
@@ -657,6 +689,17 @@
   .produtos-header h1 {
     font-size: 1.5rem;
   }
+  
+  .produtos-nav {
+    width: 100%;
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+  
+  .produtos-nav .nav-link {
+    white-space: nowrap;
+  }
 
   .produtos-lista {
     padding: 1rem;
@@ -670,46 +713,371 @@
 
   .produtos-stats {
     flex-wrap: wrap;
+    gap: 1rem;
   }
 
   .stat-card {
     flex: 1;
     min-width: 100px;
+    padding: 0.875rem 1.25rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.7rem;
+  }
+  
+  .btn-novo-produto {
+    width: 100%;
+    justify-content: center;
   }
 
   .produtos-controls {
     flex-direction: column;
+    gap: 0.75rem;
   }
 
   .produtos-controls .search-input {
     max-width: none;
   }
+  
+  .produtos-controls .category-select {
+    width: 100%;
+  }
 
   .produtos-table-container {
     overflow-x: auto;
+    border-radius: 12px;
   }
 
   .produtos-table {
     min-width: 700px;
+    font-size: 0.8rem;
+  }
+  
+  .produtos-table th,
+  .produtos-table td {
+    padding: 0.75rem;
+  }
+  
+  .barcode-cell {
+    font-size: 0.75rem;
+  }
+  
+  .actions-cell {
+    gap: 0.375rem;
+  }
+  
+  .btn-action {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
   }
 
-  .form-grid {
-    grid-template-columns: 1fr;
+  .produto-detalhes {
+    padding: 1rem;
   }
-
-  .info-grid {
-    grid-template-columns: 1fr;
-  }
-
+  
   .produto-detalhes-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-
+  
+  .produto-title h2 {
+    font-size: 1.5rem;
+  }
+  
+  .produto-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+  
+  .produto-actions button {
+    flex: 1;
+  }
+  
+  .produto-detalhes-grid {
+    gap: 1rem;
+  }
+  
+  .produto-info-card,
+  .produto-preco-card,
+  .produto-estoque-card {
+    padding: 1.25rem;
+  }
+  
+  .info-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .preco-valor {
+    font-size: 2rem;
+  }
+  
   .estoque-info {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+  
+  .estoque-valor {
+    font-size: 1.75rem;
+  }
+
+  .produto-cadastro {
+    padding: 1rem;
+  }
+  
+  .produto-cadastro-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .produto-cadastro-header h2 {
+    font-size: 1.5rem;
+  }
+  
+  .produto-cadastro-header button {
+    width: 100%;
+  }
+  
+  .form-section {
+    padding: 1.25rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .produtos-header {
+    padding: 1rem;
+  }
+  
+  .produtos-header h1 {
+    font-size: 1.25rem;
+  }
+  
+  .produtos-nav {
+    gap: 0.5rem;
+  }
+  
+  .produtos-nav .nav-link {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  
+  .produtos-lista {
+    padding: 0.75rem;
+  }
+  
+  .produtos-lista-header {
+    gap: 0.875rem;
+  }
+  
+  .produtos-stats {
+    gap: 0.75rem;
+  }
+  
+  .stat-card {
+    min-width: 90px;
+    padding: 0.75rem 1rem;
+  }
+  
+  .stat-value {
+    font-size: 1.125rem;
+  }
+  
+  .stat-label {
+    font-size: 0.65rem;
+  }
+  
+  .btn-novo-produto {
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+  }
+  
+  .produtos-controls {
+    gap: 0.625rem;
+  }
+  
+  .produtos-controls .search-input,
+  .produtos-controls .category-select {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .produtos-table-container {
+    border-radius: 10px;
+  }
+  
+  .produtos-table {
+    min-width: 650px;
+    font-size: 0.75rem;
+  }
+  
+  .produtos-table th,
+  .produtos-table td {
+    padding: 0.625rem;
+  }
+  
+  .produtos-table th {
+    font-size: 0.7rem;
+  }
+  
+  .category-badge,
+  .stock-badge,
+  .status-badge {
+    padding: 0.2rem 0.625rem;
+    font-size: 0.7rem;
+  }
+  
+  .btn-action {
+    width: 26px;
+    height: 26px;
+    font-size: 0.75rem;
+  }
+  
+  .produto-detalhes {
+    padding: 0.75rem;
+  }
+  
+  .produto-detalhes-header {
+    gap: 0.875rem;
+  }
+  
+  .produto-title h2 {
+    font-size: 1.25rem;
+  }
+  
+  .produto-actions {
+    flex-direction: column;
+    gap: 0.625rem;
+  }
+  
+  .produto-actions button {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .produto-info-card,
+  .produto-preco-card,
+  .produto-estoque-card {
+    padding: 1rem;
+  }
+  
+  .produto-info-card h3,
+  .produto-preco-card h3,
+  .produto-estoque-card h3 {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  .info-grid {
+    gap: 0.875rem;
+  }
+  
+  .info-label {
+    font-size: 0.7rem;
+  }
+  
+  .info-value {
+    font-size: 0.875rem;
+  }
+  
+  .preco-valor {
+    font-size: 1.75rem;
+  }
+  
+  .preco-unidade {
+    font-size: 0.8rem;
+  }
+  
+  .estoque-valor {
+    font-size: 1.5rem;
+  }
+  
+  .estoque-label {
+    font-size: 0.8rem;
+  }
+  
+  .limite-label {
+    font-size: 0.65rem;
+  }
+  
+  .limite-valor {
+    font-size: 0.8rem;
+  }
+  
+  .produto-cadastro {
+    padding: 0.75rem;
+  }
+  
+  .produto-cadastro-header {
+    gap: 0.875rem;
+  }
+  
+  .produto-cadastro-header h2 {
+    font-size: 1.25rem;
+  }
+  
+  .produto-cadastro-header button {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .form-section {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-section h3 {
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+  }
+  
+  .form-grid {
+    gap: 0.875rem;
+  }
+  
+  .form-group label {
+    font-size: 0.8rem;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.875rem;
+  }
+  
+  .error-message {
+    font-size: 0.7rem;
+  }
+  
+  .form-actions {
+    gap: 0.625rem;
+    margin-top: 0.75rem;
+  }
+  
+  .form-actions button {
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
   }
 }
