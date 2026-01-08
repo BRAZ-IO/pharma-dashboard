@@ -1,0 +1,74 @@
+.clientes-detalhes {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  background-color: #1a1a1a;
+  color: #e9ecef;
+  min-height: 100vh;
+}
+
+.detalhes-header {
+  margin-bottom: 2rem;
+}
+
+.detalhes-nav {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.detalhes-content {
+  display: grid;
+  gap: 2rem;
+}
+
+.detalhes-card {
+  background: #2d2d2d;
+  border: 1px solid #495057;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.detalhes-card h2 {
+  margin: 0 0 1.5rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e9ecef;
+  border-bottom: 1px solid #495057;
+  padding-bottom: 0.5rem;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.info-item label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #adb5bd;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.info-item span {
+  font-size: 1rem;
+  color: #e9ecef;
+  word-break: break-word;
+}
+
+/* Importando estilos do Clientes.css */
+@import './Clientes.css';

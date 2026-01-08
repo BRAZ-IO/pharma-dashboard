@@ -15,6 +15,14 @@ const Estoque = sequelize.define('Estoque', {
       key: 'id'
     }
   },
+  filial_id: {
+    type: DataTypes.UUID,
+    allowNull: false,
+    references: {
+      model: 'filiais',
+      key: 'id'
+    }
+  },
   produto_id: {
     type: DataTypes.UUID,
     allowNull: false,
@@ -53,13 +61,39 @@ const Estoque = sequelize.define('Estoque', {
   localizacao: {
     type: DataTypes.STRING(100),
     allowNull: true
+  },
+  custo_medio: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: true,
+    defaultValue: 0
+  },
+  ultima_atualizacao: {
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
+  },
+  usuario_atualizacao_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'usuarios',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'estoque',
   indexes: [
     {
       unique: true,
-      fields: ['produto_id', 'lote']
+      fields: ['filial_id', 'produto_id', 'lote']
+    },
+    {
+      fields: ['empresa_id']
+    },
+    {
+      fields: ['filial_id']
+    },
+    {
+      fields: ['produto_id']
     }
   ]
 });

@@ -9,6 +9,8 @@ const swaggerRoutes = require('./swagger');
 const fornecedoresRoutes = require('./fornecedores');
 const clientesRoutes = require('./clientes');
 const fluxoCaixaRoutes = require('./fluxoCaixa');
+const filiaisRoutes = require('./filiais');
+const transferenciasRoutes = require('./transferencias');
 
 // Documentação Swagger
 router.use('/docs', swaggerRoutes);
@@ -21,6 +23,8 @@ router.use('/produtos', produtosRoutes);
 router.use('/fornecedores', fornecedoresRoutes);
 router.use('/clientes', clientesRoutes);
 router.use('/fluxo-caixa', fluxoCaixaRoutes);
+router.use('/filiais', filiaisRoutes);
+router.use('/transferencias', transferenciasRoutes);
 
 // Rota de health check
 router.get('/health', (req, res) => {

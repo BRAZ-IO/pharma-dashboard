@@ -1,0 +1,118 @@
+// Associações entre modelos
+const Empresa = require('./Empresa');
+const Filial = require('./Filial');
+const Usuario = require('./Usuario');
+const Produto = require('./Produto');
+const Estoque = require('./Estoque');
+const TransferenciaEstoque = require('./TransferenciaEstoque');
+
+// Associações da Empresa
+Empresa.hasMany(Filial, {
+  foreignKey: 'empresa_id',
+  as: 'filiais'
+});
+
+// Associações da Filial
+Filial.belongsTo(Empresa, {
+  foreignKey: 'empresa_id',
+  as: 'empresa'
+});
+
+Filial.hasMany(Estoque, {
+  foreignKey: 'filial_id',
+  as: 'estoques'
+});
+
+// Associações do Usuário
+Usuario.belongsTo(Empresa, {
+  foreignKey: 'empresa_id',
+  as: 'empresa'
+});
+
+// Associações do Produto
+Produto.hasMany(Estoque, {
+  foreignKey: 'produto_id',
+  as: 'estoques'
+});
+
+// Associações do Estoque
+Estoque.belongsTo(Filial, {
+  foreignKey: 'filial_id',
+  as: 'filial'
+});
+
+Estoque.belongsTo(Produto, {
+  foreignKey: 'produto_id',
+  as: 'produto'
+});
+
+Estoque.belongsTo(Empresa, {
+  foreignKey: 'empresa_id',
+  as: 'empresa'
+});
+
+// Associações da TransferenciaEstoque
+TransferenciaEstoque.belongsTo(Empresa, {
+  foreignKey: 'empresa_id',
+  as: 'empresa'
+});
+
+TransferenciaEstoque.belongsTo(Filial, {
+  foreignKey: 'filial_origem_id',
+  as: 'filialOrigem'
+});
+
+TransferenciaEstoque.belongsTo(Filial, {
+  foreignKey: 'filial_destino_id',
+  as: 'filialDestino'
+});
+
+TransferenciaEstoque.belongsTo(Produto, {
+  foreignKey: 'produto_id',
+  as: 'produto'
+});
+
+TransferenciaEstoque.belongsTo(Usuario, {
+  foreignKey: 'usuario_solicitante_id',
+  as: 'usuarioSolicitante'
+});
+
+TransferenciaEstoque.belongsTo(Usuario, {
+  foreignKey: 'usuario_aprovador_id',
+  as: 'usuarioAprovador'
+});
+
+// Associações inversas para TransferenciaEstoque
+Filial.hasMany(TransferenciaEstoque, {
+  foreignKey: 'filial_origem_id',
+  as: 'transferenciasOrigem'
+});
+
+Filial.hasMany(TransferenciaEstoque, {
+  foreignKey: 'filial_destino_id',
+  as: 'transferenciasDestino'
+});
+
+Produto.hasMany(TransferenciaEstoque, {
+  foreignKey: 'produto_id',
+  as: 'transferencias'
+});
+
+Usuario.hasMany(TransferenciaEstoque, {
+  foreignKey: 'usuario_solicitante_id',
+  as: 'transferenciasSolicitadas'
+});
+
+Usuario.hasMany(TransferenciaEstoque, {
+  foreignKey: 'usuario_aprovador_id',
+  as: 'transferenciasAprovadas'
+});
+
+module.exports = {
+  Empresa,
+  Filial,
+  Usuario,
+  Produto,
+  Estoque,
+  TransferenciaEstoque
+};

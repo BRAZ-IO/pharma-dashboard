@@ -4,7 +4,12 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const slowDown = require('express-slow-down');
-const { FRONTEND_URL, RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS } = require('./config/env');
+
+// Carregar configuração de ambiente primeiro
+const path = require('path');
+const envPath = path.resolve(__dirname, 'config', 'env.js');
+const { FRONTEND_URL, RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS } = require(envPath);
+
 const { errorHandler, notFound } = require('./middlewares/errorHandler');
 const { sanitizeAll } = require('./middlewares/sanitize');
 const { 
@@ -155,4 +160,5 @@ app.get('/', (req, res) => {
 app.use(notFound);
 app.use(errorHandler);
 
+// Exportar para uso em testes e servidor
 module.exports = app;

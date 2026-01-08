@@ -1,12 +1,12 @@
-/* Fornecedores Page Styles - Baseado no estilo de Usuarios */
-.fornecedores-page {
+/* Clientes Page Styles - Baseado no estilo de Usuarios e Fornecedores */
+.clientes-page {
   padding: 0;
   min-height: 100vh;
   background: #0b1220;
   color: #e8eaed;
 }
 
-.fornecedores-header {
+.clientes-header {
   padding: 2rem 2rem 1rem;
   background: linear-gradient(180deg, #0f1a2e 0%, #0b1220 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -15,7 +15,7 @@
   justify-content: space-between;
 }
 
-.fornecedores-header h1 {
+.clientes-header h1 {
   font-size: 2rem;
   font-weight: 600;
   color: #e8eaed;
@@ -23,17 +23,17 @@
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.fornecedores-nav {
+.clientes-nav {
   display: flex;
   gap: 1rem;
 }
 
-/* Fornecedores Lista */
-.fornecedores-lista {
+/* Clientes Lista */
+.clientes-lista {
   padding: 2rem;
 }
 
-.fornecedores-lista-header {
+.clientes-lista-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -41,13 +41,13 @@
   gap: 1rem;
 }
 
-.fornecedores-stats {
+.clientes-stats {
   display: flex;
   gap: 1.5rem;
   flex-wrap: wrap;
 }
 
-.fornecedores-stats .stat-card {
+.clientes-stats .stat-card {
   background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 12px;
@@ -58,12 +58,12 @@
   min-width: 140px;
 }
 
-.fornecedores-stats .stat-card.success {
+.clientes-stats .stat-card.success {
   border-color: rgba(38, 222, 129, 0.3);
   background: linear-gradient(135deg, rgba(38, 222, 129, 0.1) 0%, #0f1a2e 100%);
 }
 
-.fornecedores-stats .stat-card.warning {
+.clientes-stats .stat-card.warning {
   border-color: rgba(255, 152, 0, 0.3);
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.1) 0%, #0f1a2e 100%);
 }
@@ -74,11 +74,11 @@
   color: #64b5f6;
 }
 
-.fornecedores-stats .stat-card.success .stat-value {
+.clientes-stats .stat-card.success .stat-value {
   color: #26de81;
 }
 
-.fornecedores-stats .stat-card.warning .stat-value {
+.clientes-stats .stat-card.warning .stat-value {
   color: #ff9800;
 }
 
@@ -89,7 +89,7 @@
   letter-spacing: 0.5px;
 }
 
-.btn-novo-fornecedor {
+.btn-novo-cliente {
   background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
   border: none;
   border-radius: 8px;
@@ -101,20 +101,20 @@
   white-space: nowrap;
 }
 
-.btn-novo-fornecedor:hover {
+.btn-novo-cliente:hover {
   background: linear-gradient(135deg, #20bf6b 0%, #1ea862 100%);
   transform: translateY(-1px);
 }
 
-.fornecedores-controls {
+.clientes-controls {
   display: flex;
   gap: 1rem;
   margin-bottom: 1.5rem;
   flex-wrap: wrap;
 }
 
-.fornecedores-controls .search-input,
-.fornecedores-controls .status-select {
+.clientes-controls .search-input,
+.clientes-controls .status-select {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 8px;
@@ -125,38 +125,38 @@
   transition: all 0.3s ease;
 }
 
-.fornecedores-controls .search-input {
+.clientes-controls .search-input {
   flex: 1;
   min-width: 300px;
 }
 
-.fornecedores-controls .search-input::placeholder {
+.clientes-controls .search-input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.fornecedores-controls .search-input:focus,
-.fornecedores-controls .status-select:focus {
+.clientes-controls .search-input:focus,
+.clientes-controls .status-select:focus {
   border-color: #64b5f6;
   background: rgba(255, 255, 255, 0.15);
 }
 
-.fornecedores-controls select {
+.clientes-controls select {
   cursor: pointer;
 }
 
-.fornecedores-controls select option {
+.clientes-controls select option {
   background: #0f1a2e;
   color: #e8eaed;
 }
 
-/* Fornecedores Grid */
-.fornecedores-grid {
+/* Clientes Grid */
+.clientes-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 1.5rem;
 }
 
-.fornecedor-card {
+.cliente-card {
   background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
@@ -164,14 +164,14 @@
   transition: all 0.3s ease;
 }
 
-.fornecedor-card:hover {
+.cliente-card:hover {
   background: linear-gradient(135deg, #1a2332 0%, #0f1a2e 100%);
   border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-4px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
-.fornecedor-header {
+.cliente-header {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
@@ -180,7 +180,7 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.fornecedor-avatar {
+.cliente-avatar {
   width: 48px;
   height: 48px;
   border-radius: 50%;
@@ -192,12 +192,12 @@
   flex-shrink: 0;
 }
 
-.fornecedor-info {
+.cliente-info {
   flex: 1;
   min-width: 0;
 }
 
-.fornecedor-info h3 {
+.cliente-info h3 {
   font-size: 1rem;
   font-weight: 600;
   color: #e8eaed;
@@ -207,7 +207,7 @@
   white-space: nowrap;
 }
 
-.fornecedor-cnpj {
+.cliente-cpf {
   font-size: 0.75rem;
   color: #78909c;
   overflow: hidden;
@@ -234,7 +234,7 @@
   color: #e74c3c;
 }
 
-.fornecedor-details {
+.cliente-details {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -258,7 +258,7 @@
   color: #e8eaed;
 }
 
-.fornecedor-actions {
+.cliente-actions {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
@@ -316,66 +316,66 @@
 
 /* Responsive */
 @media (max-width: 1024px) {
-  .fornecedores-header {
+  .clientes-header {
     padding: 1.5rem 1.5rem 1rem;
   }
   
-  .fornecedores-lista {
+  .clientes-lista {
     padding: 1.5rem;
   }
   
-  .fornecedores-stats {
+  .clientes-stats {
     gap: 1rem;
   }
   
-  .fornecedores-stats .stat-card {
+  .clientes-stats .stat-card {
     min-width: 130px;
   }
 
-  .fornecedores-grid {
+  .clientes-grid {
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 1.25rem;
   }
 }
 
 @media (max-width: 768px) {
-  .fornecedores-header {
+  .clientes-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
     padding: 1.5rem 1rem 1rem;
   }
 
-  .fornecedores-header h1 {
+  .clientes-header h1 {
     font-size: 1.5rem;
   }
   
-  .fornecedores-nav {
+  .clientes-nav {
     width: 100%;
     justify-content: stretch;
   }
   
-  .btn-novo-fornecedor {
+  .btn-novo-cliente {
     width: 100%;
     justify-content: center;
   }
 
-  .fornecedores-lista {
+  .clientes-lista {
     padding: 1rem;
   }
 
-  .fornecedores-lista-header {
+  .clientes-lista-header {
     flex-direction: column;
     align-items: stretch;
     gap: 1rem;
   }
 
-  .fornecedores-stats {
+  .clientes-stats {
     flex-wrap: wrap;
     gap: 0.875rem;
   }
 
-  .fornecedores-stats .stat-card {
+  .clientes-stats .stat-card {
     flex: 1;
     min-width: 110px;
     padding: 0.875rem 1.25rem;
@@ -389,46 +389,46 @@
     font-size: 0.7rem;
   }
 
-  .fornecedores-controls {
+  .clientes-controls {
     flex-direction: column;
     gap: 0.75rem;
   }
 
-  .fornecedores-controls .search-input {
+  .clientes-controls .search-input {
     min-width: auto;
     width: 100%;
   }
   
-  .fornecedores-controls .status-select {
+  .clientes-controls .status-select {
     width: 100%;
   }
 
-  .fornecedores-grid {
+  .clientes-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
   
-  .fornecedor-card {
+  .cliente-card {
     padding: 1.25rem;
   }
   
-  .fornecedor-header {
+  .cliente-header {
     gap: 0.875rem;
     padding-bottom: 0.875rem;
     margin-bottom: 0.875rem;
   }
   
-  .fornecedor-avatar {
+  .cliente-avatar {
     width: 44px;
     height: 44px;
     font-size: 1.375rem;
   }
   
-  .fornecedor-info h3 {
+  .cliente-info h3 {
     font-size: 0.9rem;
   }
   
-  .fornecedor-cnpj {
+  .cliente-cpf {
     font-size: 0.7rem;
   }
   
@@ -437,7 +437,7 @@
     padding: 0.2rem 0.625rem;
   }
   
-  .fornecedor-details {
+  .cliente-details {
     gap: 0.625rem;
     margin-bottom: 0.875rem;
   }
@@ -450,7 +450,7 @@
     font-size: 0.8rem;
   }
   
-  .fornecedor-actions {
+  .cliente-actions {
     gap: 0.375rem;
   }
   
@@ -461,27 +461,27 @@
 }
 
 @media (max-width: 480px) {
-  .fornecedores-header {
+  .clientes-header {
     padding: 1rem;
   }
   
-  .fornecedores-header h1 {
+  .clientes-header h1 {
     font-size: 1.25rem;
   }
   
-  .fornecedores-lista {
+  .clientes-lista {
     padding: 0.75rem;
   }
   
-  .fornecedores-lista-header {
+  .clientes-lista-header {
     gap: 0.875rem;
   }
   
-  .fornecedores-stats {
+  .clientes-stats {
     gap: 0.75rem;
   }
   
-  .fornecedores-stats .stat-card {
+  .clientes-stats .stat-card {
     min-width: 90px;
     padding: 0.75rem 1rem;
   }
@@ -494,46 +494,46 @@
     font-size: 0.65rem;
   }
   
-  .btn-novo-fornecedor {
+  .btn-novo-cliente {
     padding: 0.625rem 1.25rem;
     font-size: 0.875rem;
   }
   
-  .fornecedores-controls {
+  .clientes-controls {
     gap: 0.625rem;
   }
   
-  .fornecedores-controls .search-input,
-  .fornecedores-controls .status-select {
+  .clientes-controls .search-input,
+  .clientes-controls .status-select {
     padding: 0.625rem 0.875rem;
     font-size: 0.875rem;
   }
   
-  .fornecedores-grid {
+  .clientes-grid {
     gap: 0.875rem;
   }
   
-  .fornecedor-card {
+  .cliente-card {
     padding: 1rem;
   }
   
-  .fornecedor-header {
+  .cliente-header {
     gap: 0.75rem;
     padding-bottom: 0.75rem;
     margin-bottom: 0.75rem;
   }
   
-  .fornecedor-avatar {
+  .cliente-avatar {
     width: 40px;
     height: 40px;
     font-size: 1.25rem;
   }
   
-  .fornecedor-info h3 {
+  .cliente-info h3 {
     font-size: 0.875rem;
   }
   
-  .fornecedor-cnpj {
+  .cliente-cpf {
     font-size: 0.65rem;
   }
   
@@ -542,7 +542,7 @@
     padding: 0.2rem 0.5rem;
   }
   
-  .fornecedor-details {
+  .cliente-details {
     gap: 0.5rem;
     margin-bottom: 0.75rem;
   }
@@ -555,7 +555,7 @@
     font-size: 0.75rem;
   }
   
-  .fornecedor-actions {
+  .cliente-actions {
     gap: 0.375rem;
   }
   

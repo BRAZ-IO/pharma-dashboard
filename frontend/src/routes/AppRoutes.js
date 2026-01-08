@@ -31,11 +31,15 @@ import Perfil from '../pages/Perfil';
 import Ajuda from '../pages/Ajuda';
 import Fornecedores from '../pages/Fornecedores';
 import Clientes from '../pages/Clientes';
+import ClientesLista from '../pages/ClientesLista';
+import ClientesDetalhes from '../pages/ClientesDetalhes';
+import ClientesCadastro from '../pages/ClientesCadastro';
 import FluxoCaixa from '../pages/FluxoCaixa';
 import FluxoCaixaResumo from '../pages/FluxoCaixaResumo';
 import FluxoCaixaEntradas from '../pages/FluxoCaixaEntradas';
 import FluxoCaixaSaidas from '../pages/FluxoCaixaSaidas';
 import FluxoCaixaRelatorios from '../pages/FluxoCaixaRelatorios';
+import Transferencias from '../pages/Transferencias';
 
 const AppRoutes = () => {
   return (
@@ -84,13 +88,19 @@ const AppRoutes = () => {
           <Route path="notificacoes" element={<ConfiguracoesNotificacoes />} />
         </Route>
         <Route path="fornecedores" element={<Fornecedores />} />
-        <Route path="clientes" element={<Clientes />} />
+        <Route path="clientes" element={<Clientes />}>
+          <Route index element={<ClientesLista />} />
+          <Route path=":id" element={<ClientesDetalhes />} />
+          <Route path="cadastro" element={<ClientesCadastro />} />
+          <Route path="editar/:id" element={<ClientesCadastro />} />
+        </Route>
         <Route path="fluxo-caixa" element={<FluxoCaixa />}>
           <Route index element={<FluxoCaixaResumo />} />
           <Route path="entradas" element={<FluxoCaixaEntradas />} />
           <Route path="saidas" element={<FluxoCaixaSaidas />} />
           <Route path="relatorios" element={<FluxoCaixaRelatorios />} />
         </Route>
+        <Route path="transferencias" element={<Transferencias />} />
         <Route path="perfil" element={<Perfil />} />
         <Route path="ajuda" element={<Ajuda />} />
       </Route>

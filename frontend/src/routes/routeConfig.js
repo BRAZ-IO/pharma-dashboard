@@ -12,6 +12,9 @@ export const ROUTES = {
   ESTOQUE: '/app/estoque',
   USUARIOS: '/app/usuarios',
   CONFIGURACOES: '/app/configuracoes',
+  CLIENTES: '/app/clientes',
+  FORNECEDORES: '/app/fornecedores',
+  FLUXO_CAIXA: '/app/fluxo-caixa',
 };
 
 // Route metadata for navigation
@@ -61,6 +64,27 @@ export const ROUTE_METADATA = [
     icon: '⚙️',
     description: 'Configurações do sistema',
     section: 'Sistema'
+  },
+  {
+    path: ROUTES.CLIENTES,
+    name: 'Clientes',
+    icon: '👤',
+    description: 'Gestão de clientes',
+    section: 'Gestão'
+  },
+  {
+    path: ROUTES.FORNECEDORES,
+    name: 'Fornecedores',
+    icon: '🏢',
+    description: 'Gestão de fornecedores',
+    section: 'Gestão'
+  },
+  {
+    path: ROUTES.FLUXO_CAIXA,
+    name: 'Fluxo de Caixa',
+    icon: '💰',
+    description: 'Controle financeiro',
+    section: 'Financeiro'
   }
 ];
 
