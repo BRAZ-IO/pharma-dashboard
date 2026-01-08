@@ -5,12 +5,12 @@ test.describe('Sidebar - Navegação e Funcionalidades', () => {
   test.beforeEach(async ({ page }) => {
     // Fazer login antes de cada teste
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'demo@pharmadashboard.com');
-    await page.fill('input[name="password"]', 'demo123');
+    await page.fill('input[name="email"]', 'gerente@pharma.com');
+    await page.fill('input[name="password"]', '123456');
     await page.click('button:has-text("Entrar")');
     
     // Aguardar redirecionamento para dashboard
-    await page.waitForURL('**/app/**');
+    await page.waitForURL('**/app/dashboard**');
   });
 
   test('1. Sidebar está visível após login', async ({ page }) => {
@@ -19,7 +19,7 @@ test.describe('Sidebar - Navegação e Funcionalidades', () => {
     await expect(sidebar).toBeVisible();
     
     // Verificar logo/título
-    await expect(page.locator('text=PharmaDash').first()).toBeVisible();
+    await expect(page.locator('.brand-text-bootstrap').first()).toHaveText(/Farmácia Teste/);
   });
 
   test('2. Sidebar contém todos os links de navegação principais', async ({ page }) => {
@@ -30,6 +30,9 @@ test.describe('Sidebar - Navegação e Funcionalidades', () => {
     await expect(sidebar.locator('text=Produtos').first()).toBeVisible();
     await expect(sidebar.locator('text=Estoque').first()).toBeVisible();
     await expect(sidebar.locator('text=Usuários').first()).toBeVisible();
+    await expect(sidebar.locator('text=Fornecedores').first()).toBeVisible();
+    await expect(sidebar.locator('text=Clientes').first()).toBeVisible();
+    await expect(sidebar.locator('text=Fluxo de Caixa').first()).toBeVisible();
   });
 
   test('3. Navegação para Dashboard funciona', async ({ page }) => {
@@ -90,6 +93,42 @@ test.describe('Sidebar - Navegação e Funcionalidades', () => {
     
     // Verificar conteúdo da página (h1 no main)
     await expect(page.locator('main h1:has-text("Usuários")').first()).toBeVisible();
+  });
+
+  test('7b. Navegação para Fornecedores funciona', async ({ page }) => {
+    // Clicar em Fornecedores na sidebar
+    const sidebar = page.locator('.sidebar-bootstrap, nav[role="navigation"]').first();
+    await sidebar.locator('text=Fornecedores').first().click();
+    
+    // Verificar URL
+    await page.waitForURL('**/app/fornecedores**');
+    
+    // Verificar conteúdo da página (h1 no main)
+    await expect(page.locator('main h1:has-text("Fornecedores")').first()).toBeVisible();
+  });
+
+  test('7c. Navegação para Clientes funciona', async ({ page }) => {
+    // Clicar em Clientes na sidebar
+    const sidebar = page.locator('.sidebar-bootstrap, nav[role="navigation"]').first();
+    await sidebar.locator('text=Clientes').first().click();
+    
+    // Verificar URL
+    await page.waitForURL('**/app/clientes**');
+    
+    // Verificar conteúdo da página (h1 no main)
+    await expect(page.locator('main h1:has-text("Clientes")').first()).toBeVisible();
+  });
+
+  test('7d. Navegação para Fluxo de Caixa funciona', async ({ page }) => {
+    // Clicar em Fluxo de Caixa na sidebar
+    const sidebar = page.locator('.sidebar-bootstrap, nav[role="navigation"]').first();
+    await sidebar.locator('text=Fluxo de Caixa').first().click();
+    
+    // Verificar URL
+    await page.waitForURL('**/app/fluxo-caixa**');
+    
+    // Verificar conteúdo da página (h1 no main)
+    await expect(page.locator('main h1:has-text("Fluxo de Caixa")').first()).toBeVisible();
   });
 
   test('8. Link ativo é destacado visualmente', async ({ page }) => {

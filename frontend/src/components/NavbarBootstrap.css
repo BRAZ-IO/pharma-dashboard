@@ -1,4 +1,4 @@
-/* Navbar Bootstrap Styles */
+/* Navbar Bootstrap Styles - Fixed Dark Background */
 .navbar-bootstrap {
   position: fixed;
   top: 0;
@@ -80,6 +80,33 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+}
+
+/* Dark Mode Toggle Button */
+.dark-mode-toggle-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #e9ecef;
+}
+
+.dark-mode-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.05);
+}
+
+.dark-mode-toggle-btn svg {
+  transition: transform 0.3s ease;
+}
+
+.dark-mode-toggle-btn:hover svg {
+  transform: rotate(20deg);
 }
 
 /* Search */

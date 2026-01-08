@@ -1,6 +1,35 @@
 const { Usuario } = require('../models');
 const { Op } = require('sequelize');
 
+// Função para detectar XSS
+const containsXSS = (str) => {
+  if (!str || typeof str !== 'string') return false;
+  
+  const xssPatterns = [
+    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+    /javascript:/gi,
+    /on\w+\s*=/gi,
+    /<img[^>]*src[^>]*javascript:/gi,
+    /<iframe[^>]*src[^>]*javascript:/gi,
+    /<object[^>]*data[^>]*javascript:/gi,
+    /<embed[^>]*src[^>]*javascript:/gi,
+    /<link[^>]*href[^>]*javascript:/gi,
+    /<meta[^>]*http-equiv[^>]*refresh[^>]*url/gi,
+    /<\s*script/gi,
+    /<\s*img/gi,
+    /<\s*iframe/gi,
+    /<\s*object/gi,
+    /<\s*embed/gi,
+    /<\s*link/gi,
+    /<\s*meta/gi,
+    /expression\s*\(/gi,
+    /@import/gi,
+    /binding\s*:/gi
+  ];
+  
+  return xssPatterns.some(pattern => pattern.test(str));
+};
+
 const usuariosController = {
   // GET /api/usuarios
   async listar(req, res, next) {
@@ -53,8 +82,11 @@ const usuariosController = {
   async buscarPorId(req, res, next) {
     try {
       const { id } = req.params;
+      const { empresaId } = req;
 
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findOne({
+        where: { id, empresa_id: empresaId }
+      });
 
       if (!usuario) {
         return res.status(404).json({
@@ -72,6 +104,21 @@ const usuariosController = {
   async criar(req, res, next) {
     try {
       const { nome, email, senha, cpf, telefone, cargo, role } = req.body;
+      const { empresaId } = req;
+
+      // VALIDAÇÃO XSS - Detectar scripts maliciosos
+      const fieldsToCheck = [nome, email, cpf, telefone, cargo];
+      console.log('🔍 DEBUG: Verificando XSS nos campos:', fieldsToCheck);
+      for (const field of fieldsToCheck) {
+        if (containsXSS(field)) {
+          console.log('🚨 XSS DETECTED:', field);
+          return res.status(400).json({
+            error: 'Conteúdo não permitido detectado',
+            message: 'Os dados enviados contêm conteúdo potencialmente perigoso'
+          });
+        }
+      }
+      console.log('✅ XSS check passed');
 
       const usuario = await Usuario.create({
         nome,
@@ -80,7 +127,8 @@ const usuariosController = {
         cpf,
         telefone,
         cargo,
-        role: role || 'funcionario'
+        role: role || 'funcionario',
+        empresa_id: empresaId // ISOLAMENTO MULTI-TENANT
       });
 
       res.status(201).json({
@@ -97,8 +145,11 @@ const usuariosController = {
     try {
       const { id } = req.params;
       const { nome, email, cpf, telefone, cargo, role } = req.body;
+      const { empresaId } = req;
 
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findOne({
+        where: { id, empresa_id: empresaId }
+      });
 
       if (!usuario) {
         return res.status(404).json({
@@ -128,8 +179,11 @@ const usuariosController = {
   async deletar(req, res, next) {
     try {
       const { id } = req.params;
+      const { empresaId } = req;
 
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findOne({
+        where: { id, empresa_id: empresaId }
+      });
 
       if (!usuario) {
         return res.status(404).json({
@@ -153,8 +207,11 @@ const usuariosController = {
     try {
       const { id } = req.params;
       const { ativo } = req.body;
+      const { empresaId } = req;
 
-      const usuario = await Usuario.findByPk(id);
+      const usuario = await Usuario.findOne({
+        where: { id, empresa_id: empresaId }
+      });
 
       if (!usuario) {
         return res.status(404).json({

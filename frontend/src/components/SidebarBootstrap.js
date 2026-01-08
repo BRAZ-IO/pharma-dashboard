@@ -71,6 +71,42 @@ const SidebarBootstrap = ({ mobileOpen, onCloseMobile, isCollapsed, setIsCollaps
       )
     },
     { 
+      path: '/app/fornecedores', 
+      name: 'Fornecedores', 
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M20 7h-9" />
+          <path d="M14 17H5" />
+          <circle cx="7" cy="7" r="2" />
+          <circle cx="17" cy="17" r="2" />
+          <path d="M10 7v10" />
+        </svg>
+      )
+    },
+    { 
+      path: '/app/clientes', 
+      name: 'Clientes', 
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+          <circle cx="9" cy="7" r="4" />
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+          <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+        </svg>
+      )
+    },
+    { 
+      path: '/app/fluxo-caixa', 
+      name: 'Fluxo de Caixa', 
+      icon: (
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <line x1="12" y1="1" x2="12" y2="23"></line>
+          <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H17"></path>
+          <path d="M17 12H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H17"></path>
+        </svg>
+      )
+    },
+    { 
       path: '/app/configuracoes', 
       name: 'Configurações', 
       icon: (

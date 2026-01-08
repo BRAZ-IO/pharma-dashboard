@@ -119,12 +119,14 @@ app.use(express.urlencoded({
 // Sanitização de inputs (proteção XSS)
 app.use(sanitizeAll);
 
-// Proteção DoS adicional
-app.use(requestTimeout(30000)); // Timeout de 30 segundos
-app.use(concurrentRequestLimiter()); // Limitar requisições simultâneas
-app.use(suspiciousActivityDetector()); // Detectar atividade suspeita
-app.use(arrayLimiter(100)); // Limitar tamanho de arrays
-app.use(resourceMonitor()); // Monitorar recursos
+// Proteção DoS adicional (desabilitado em testes)
+if (process.env.DISABLE_MIDDLEWARES !== 'true') {
+  app.use(requestTimeout(30000)); // Timeout de 30 segundos
+  app.use(concurrentRequestLimiter()); // Limitar requisições simultâneas
+  app.use(suspiciousActivityDetector()); // Detectar atividade suspeita
+  app.use(arrayLimiter(100)); // Limitar tamanho de arrays
+  app.use(resourceMonitor()); // Monitorar recursos
+}
 
 // Logger
 if (process.env.NODE_ENV === 'development') {

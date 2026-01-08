@@ -5,12 +5,12 @@ test.describe('PDV - Scanner de Código de Barras (E2E)', () => {
   test.beforeEach(async ({ page }) => {
     // Fazer login antes de cada teste
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'demo@pharmadashboard.com');
-    await page.fill('input[name="password"]', 'demo123');
+    await page.fill('input[name="email"]', 'gerente@pharma.com');
+    await page.fill('input[name="password"]', '123456');
     await page.click('button:has-text("Entrar")');
     
     // Aguardar redirecionamento
-    await page.waitForURL('**/app/**');
+    await page.waitForURL('**/app/dashboard**');
     
     // Navegar para PDV
     await page.click('text=PDV');

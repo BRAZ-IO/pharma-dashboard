@@ -6,6 +6,9 @@ const usuariosRoutes = require('./usuarios');
 const produtosRoutes = require('./produtos');
 const twoFactorRoutes = require('./twoFactor');
 const swaggerRoutes = require('./swagger');
+const fornecedoresRoutes = require('./fornecedores');
+const clientesRoutes = require('./clientes');
+const fluxoCaixaRoutes = require('./fluxoCaixa');
 
 // Documentação Swagger
 router.use('/docs', swaggerRoutes);
@@ -15,6 +18,9 @@ router.use('/auth', authRoutes);
 router.use('/2fa', twoFactorRoutes);
 router.use('/usuarios', usuariosRoutes);
 router.use('/produtos', produtosRoutes);
+router.use('/fornecedores', fornecedoresRoutes);
+router.use('/clientes', clientesRoutes);
+router.use('/fluxo-caixa', fluxoCaixaRoutes);
 
 // Rota de health check
 router.get('/health', (req, res) => {

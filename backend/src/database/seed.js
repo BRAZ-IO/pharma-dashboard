@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { sequelize } = require('../config/database');
-const { Empresa, Usuario, Produto, Estoque } = require('../models');
+const { Empresa, Usuario, Produto, Estoque, Fornecedor, Cliente, FluxoCaixa } = require('../models');
 
 const seed = async () => {
   try {
@@ -152,109 +152,175 @@ const seed = async () => {
     console.log('✅ Produtos e estoque criados para Farmácia Teste');
 
     // ========================================
-    // CRIAR SEGUNDA EMPRESA (TESTE MULTI-TENANT)
+    // CRIAR FORNECEDORES
     // ========================================
     
-    const empresaPopular = await Empresa.create({
-      razao_social: 'Drogaria Popular Ltda',
-      nome_fantasia: 'Drogaria Popular',
-      cnpj: '11.111.111/0001-11',
-      inscricao_estadual: '111.111.111.111',
-      telefone: '(11) 1111-1111',
-      email: 'contato@drogariapopular.com',
-      endereco: {
-        rua: 'Av. Principal',
-        numero: '500',
-        bairro: 'Centro',
-        cidade: 'Rio de Janeiro',
-        estado: 'RJ',
-        cep: '20000-000'
-      },
-      plano: 'premium',
-      ativo: true
-    });
-    console.log('✅ Segunda empresa criada (Drogaria Popular)');
-
-    // Usuários da Drogaria Popular
-    const adminPopular = await Usuario.create({
-      empresa_id: empresaPopular.id,
-      nome: 'Carlos Souza',
-      email: 'admin@popular.com',
-      senha: '123456',
-      cpf: '111.222.333-44',
-      telefone: '(21) 98888-7777',
-      cargo: 'Diretor',
-      role: 'admin'
-    });
-
-    const gerentePopular = await Usuario.create({
-      empresa_id: empresaPopular.id,
-      nome: 'Ana Paula',
-      email: 'gerente@popular.com',
-      senha: '123456',
-      cpf: '555.666.777-88',
-      telefone: '(21) 97777-6666',
-      cargo: 'Gerente de Vendas',
-      role: 'gerente'
-    });
-    console.log('✅ Usuários da Drogaria Popular criados');
-
-    // Produtos da Drogaria Popular (diferentes da Farmácia Teste)
-    const produtosPopular = [
+    const fornecedores = await Fornecedor.bulkCreate([
       {
-        empresa_id: empresaPopular.id,
-        codigo_barras: '7899999999990',
-        nome: 'Ibuprofeno 600mg',
-        descricao: 'Anti-inflamatório',
-        categoria: 'Medicamento',
-        subcategoria: 'Anti-inflamatório',
-        fabricante: 'Aché',
-        principio_ativo: 'Ibuprofeno',
-        apresentacao: 'Comprimido',
-        dosagem: '600mg',
-        preco_custo: 12.00,
-        preco_venda: 28.90,
-        margem_lucro: 140.83,
-        requer_receita: false,
-        controlado: false,
-        generico: true
+        nome: 'Distribuidora Medicamentos Ltda',
+        cnpj: '12345678901234',
+        email: 'contato@distmed.com.br',
+        telefone: '1134567890',
+        contato: 'João Silva',
+        endereco: 'Rua das Indústrias, 1000 - São Paulo/SP',
+        status: 'ativo',
+        empresa_id: empresaPadrao.id
       },
       {
-        empresa_id: empresaPopular.id,
-        codigo_barras: '7899999999991',
-        nome: 'Omeprazol 20mg',
-        descricao: 'Protetor gástrico',
-        categoria: 'Medicamento',
-        subcategoria: 'Gastro',
-        fabricante: 'Eurofarma',
-        principio_ativo: 'Omeprazol',
-        apresentacao: 'Cápsula',
-        dosagem: '20mg',
-        preco_custo: 10.00,
-        preco_venda: 24.50,
-        margem_lucro: 145.00,
-        requer_receita: false,
-        controlado: false,
-        generico: true
+        nome: 'Laboratório Farma Brasil',
+        cnpj: '56789012345678',
+        email: 'vendas@farmabrasil.com',
+        telefone: '1123456789',
+        contato: 'Maria Santos',
+        endereco: 'Av. Brasil, 2000 - Rio de Janeiro/RJ',
+        status: 'ativo',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        nome: 'Distribuidora Central',
+        cnpj: '90123456789012',
+        email: null,
+        telefone: '11987654321',
+        contato: 'Carlos Oliveira',
+        endereco: 'Rua Central, 500 - São Paulo/SP',
+        status: 'inativo',
+        empresa_id: empresaPadrao.id
       }
-    ];
+    ]);
+    console.log('✅ Fornecedores criados');
 
-    for (const produtoData of produtosPopular) {
-      const produto = await Produto.create(produtoData);
-      
-      await Estoque.create({
-        empresa_id: empresaPopular.id,
-        produto_id: produto.id,
-        quantidade_atual: Math.floor(Math.random() * 150) + 30,
-        quantidade_minima: 15,
-        quantidade_maxima: 300,
-        lote: `POP${Math.floor(Math.random() * 10000)}`,
-        data_fabricacao: new Date('2024-01-01'),
-        data_validade: new Date('2027-06-30'),
-        localizacao: `Setor ${Math.floor(Math.random() * 5) + 1}`
-      });
-    }
-    console.log('✅ Produtos e estoque criados para Drogaria Popular');
+    // ========================================
+    // CRIAR CLIENTES
+    // ========================================
+    
+    const clientes = await Cliente.bulkCreate([
+      {
+        nome: 'Ana Silva',
+        cpf: '12345678901',
+        email: 'ana.silva@email.com',
+        telefone: '11987654321',
+        endereco: 'Rua das Flores, 123 - São Paulo/SP',
+        data_cadastro: '2024-01-15',
+        status: 'ativo',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        nome: 'Carlos Oliveira',
+        cpf: '98765432109',
+        email: 'carlos.oliveira@email.com',
+        telefone: '21912345678',
+        endereco: 'Av. Central, 456 - Rio de Janeiro/RJ',
+        data_cadastro: '2024-02-20',
+        status: 'ativo',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        nome: 'Mariana Costa',
+        cpf: '55566677788',
+        email: 'mariana.costa@email.com',
+        telefone: '31988765432',
+        endereco: 'Alameda dos Clientes, 789 - Belo Horizonte/MG',
+        data_cadastro: '2024-03-10',
+        status: 'inativo',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        nome: 'Posto de Saúde Central',
+        cnpj: '11122233344455',
+        email: 'compras@postosaude.gov.br',
+        telefone: '1131234567',
+        endereco: 'Rua da Saúde, 100 - São Paulo/SP',
+        data_cadastro: '2024-01-05',
+        status: 'ativo',
+        empresa_id: empresaPadrao.id
+      }
+    ]);
+    console.log('✅ Clientes criados');
+
+    // ========================================
+    // CRIAR FLUXO DE CAIXA
+    // ========================================
+    
+    const fluxoCaixa = await FluxoCaixa.bulkCreate([
+      {
+        descricao: 'Venda PDV - Pedido #1234',
+        tipo: 'entrada',
+        valor: 450.00,
+        categoria: 'Vendas',
+        forma_pagamento: 'Dinheiro',
+        data: '2026-01-08',
+        responsavel: 'João Silva',
+        observacoes: 'Venda de medicamentos diversos',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        descricao: 'Venda PDV - Pedido #1235',
+        tipo: 'entrada',
+        valor: 320.00,
+        categoria: 'Vendas',
+        forma_pagamento: 'Cartão Crédito',
+        data: '2026-01-08',
+        responsavel: 'Maria Santos',
+        observacoes: 'Venda de produtos de higiene',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        descricao: 'Recebimento de Cliente',
+        tipo: 'entrada',
+        valor: 1500.00,
+        categoria: 'Contas a Receber',
+        forma_pagamento: 'Transferência',
+        data: '2026-01-07',
+        responsavel: 'Carlos Oliveira',
+        observacoes: 'Pagamento de fatura em atraso',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        descricao: 'Compra de Medicamentos',
+        tipo: 'saida',
+        valor: 1200.00,
+        categoria: 'Compras',
+        forma_pagamento: 'Transferência',
+        data: '2026-01-08',
+        responsavel: 'Ana Costa',
+        observacoes: 'Compra mensal de estoque',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        descricao: 'Pagamento de Aluguel',
+        tipo: 'saida',
+        valor: 3500.00,
+        categoria: 'Despesas Fixas',
+        forma_pagamento: 'TED',
+        data: '2026-01-08',
+        responsavel: 'Carlos Oliveira',
+        observacoes: 'Aluguel do mês de janeiro',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        descricao: 'Conta de Luz',
+        tipo: 'saida',
+        valor: 450.00,
+        categoria: 'Despesas Fixas',
+        forma_pagamento: 'Boleto',
+        data: '2026-01-07',
+        responsavel: 'Maria Santos',
+        observacoes: 'Energia elétrica dezembro/2025',
+        empresa_id: empresaPadrao.id
+      },
+      {
+        descricao: 'Salário Funcionários',
+        tipo: 'saida',
+        valor: 8500.00,
+        categoria: 'Folha de Pagamento',
+        forma_pagamento: 'Transferência',
+        data: '2026-01-05',
+        responsavel: 'Administrador',
+        observacoes: 'Folha de pagamento janeiro/2026',
+        empresa_id: empresaPadrao.id
+      }
+    ]);
+    console.log('✅ Transações de fluxo de caixa criadas');
 
     console.log('');
     console.log('🎉 Seed concluído com sucesso!');
@@ -277,35 +343,6 @@ const seed = async () => {
     console.log('  Email: funcionario@pharma.com');
     console.log('  Senha: 123456');
     console.log('  Empresa: Farmácia Teste');
-    console.log('');
-    console.log('═══════════════════════════════════════════════════');
-    console.log('📝 CREDENCIAIS DE ACESSO - DROGARIA POPULAR');
-    console.log('═══════════════════════════════════════════════════');
-    console.log('');
-    console.log('Admin:');
-    console.log('  Email: admin@popular.com');
-    console.log('  Senha: 123456');
-    console.log('  Empresa: Drogaria Popular');
-    console.log('');
-    console.log('Gerente:');
-    console.log('  Email: gerente@popular.com');
-    console.log('  Senha: 123456');
-    console.log('  Empresa: Drogaria Popular');
-    console.log('');
-    console.log('═══════════════════════════════════════════════════');
-    console.log('🔒 TESTE DE ISOLAMENTO MULTI-TENANT');
-    console.log('═══════════════════════════════════════════════════');
-    console.log('');
-    console.log('✅ Farmácia Teste: 3 produtos (Dipirona, Paracetamol, Amoxicilina)');
-    console.log('✅ Drogaria Popular: 2 produtos (Ibuprofeno, Omeprazol)');
-    console.log('');
-    console.log('🧪 Para testar o isolamento:');
-    console.log('   1. Faça login com admin@pharma.com');
-    console.log('   2. Liste os produtos - deve ver apenas 3 produtos');
-    console.log('   3. Faça logout e login com admin@popular.com');
-    console.log('   4. Liste os produtos - deve ver apenas 2 produtos');
-    console.log('   5. Tente acessar produto da outra empresa - deve retornar 404');
-    console.log('');
 
     process.exit(0);
   } catch (error) {

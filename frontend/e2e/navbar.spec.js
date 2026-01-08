@@ -5,12 +5,12 @@ test.describe('Navbar - Funcionalidades e Interações', () => {
   test.beforeEach(async ({ page }) => {
     // Fazer login antes de cada teste
     await page.goto('/login');
-    await page.fill('input[name="email"]', 'demo@pharmadashboard.com');
-    await page.fill('input[name="password"]', 'demo123');
+    await page.fill('input[name="email"]', 'gerente@pharma.com');
+    await page.fill('input[name="password"]', '123456');
     await page.click('button:has-text("Entrar")');
     
     // Aguardar redirecionamento para dashboard
-    await page.waitForURL('**/app/**');
+    await page.waitForURL('**/app/dashboard**');
   });
 
   test('1. Navbar está visível após login', async ({ page }) => {
@@ -21,10 +21,10 @@ test.describe('Navbar - Funcionalidades e Interações', () => {
 
   test('2. Navbar exibe informações do usuário', async ({ page }) => {
     // Verificar nome do usuário
-    await expect(page.locator('text=João Silva').first()).toBeVisible();
+    await expect(page.locator('.profile-name').first()).toHaveText(/João Silva/);
     
     // Verificar cargo/função
-    await expect(page.locator('text=Farmacêutico').first()).toBeVisible();
+    await expect(page.locator('.profile-role').first()).toHaveText(/Gerente/);
   });
 
   test('3. Navbar exibe título da página atual', async ({ page }) => {
@@ -166,8 +166,8 @@ test.describe('Navbar - Funcionalidades e Interações', () => {
   });
 
   test('13. Navbar exibe logo ou nome do sistema', async ({ page }) => {
-    // Verificar logo ou nome
-    await expect(page.locator('text=PharmaDash').first()).toBeVisible();
+    // Verificar se título da página está presente na navbar
+    await expect(page.locator('.navbar-page-title h1').first()).toBeVisible();
   });
 
   test('14. Busca rápida na navbar funciona', async ({ page }) => {

@@ -29,6 +29,13 @@ import ConfiguracoesNotificacoes from '../pages/ConfiguracoesNotificacoes';
 import Registro from '../pages/Registro';
 import Perfil from '../pages/Perfil';
 import Ajuda from '../pages/Ajuda';
+import Fornecedores from '../pages/Fornecedores';
+import Clientes from '../pages/Clientes';
+import FluxoCaixa from '../pages/FluxoCaixa';
+import FluxoCaixaResumo from '../pages/FluxoCaixaResumo';
+import FluxoCaixaEntradas from '../pages/FluxoCaixaEntradas';
+import FluxoCaixaSaidas from '../pages/FluxoCaixaSaidas';
+import FluxoCaixaRelatorios from '../pages/FluxoCaixaRelatorios';
 
 const AppRoutes = () => {
   return (
@@ -75,6 +82,14 @@ const AppRoutes = () => {
           <Route index element={<ConfiguracoesGeral />} />
           <Route path="sistema" element={<ConfiguracoesSistema />} />
           <Route path="notificacoes" element={<ConfiguracoesNotificacoes />} />
+        </Route>
+        <Route path="fornecedores" element={<Fornecedores />} />
+        <Route path="clientes" element={<Clientes />} />
+        <Route path="fluxo-caixa" element={<FluxoCaixa />}>
+          <Route index element={<FluxoCaixaResumo />} />
+          <Route path="entradas" element={<FluxoCaixaEntradas />} />
+          <Route path="saidas" element={<FluxoCaixaSaidas />} />
+          <Route path="relatorios" element={<FluxoCaixaRelatorios />} />
         </Route>
         <Route path="perfil" element={<Perfil />} />
         <Route path="ajuda" element={<Ajuda />} />

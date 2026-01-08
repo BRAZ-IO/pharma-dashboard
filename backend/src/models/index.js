@@ -6,6 +6,11 @@ const Estoque = require('./Estoque');
 const Venda = require('./Venda');
 const ItemVenda = require('./ItemVenda');
 
+// Importar novos models
+const Fornecedor = require('./Fornecedor');
+const Cliente = require('./Cliente');
+const FluxoCaixa = require('./FluxoCaixa');
+
 // Relacionamentos Multi-Tenant
 
 // Empresa - Usuario (1:N)
@@ -40,6 +45,18 @@ ItemVenda.belongsTo(Venda, { foreignKey: 'venda_id', as: 'venda' });
 Produto.hasMany(ItemVenda, { foreignKey: 'produto_id', as: 'itens_venda' });
 ItemVenda.belongsTo(Produto, { foreignKey: 'produto_id', as: 'produto' });
 
+// Empresa - Fornecedor (1:N)
+Empresa.hasMany(Fornecedor, { foreignKey: 'empresa_id', as: 'fornecedores' });
+Fornecedor.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
+
+// Empresa - Cliente (1:N)
+Empresa.hasMany(Cliente, { foreignKey: 'empresa_id', as: 'clientes' });
+Cliente.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
+
+// Empresa - FluxoCaixa (1:N)
+Empresa.hasMany(FluxoCaixa, { foreignKey: 'empresa_id', as: 'fluxo_caixa' });
+FluxoCaixa.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
+
 module.exports = {
   sequelize,
   Empresa,
@@ -47,5 +64,8 @@ module.exports = {
   Produto,
   Estoque,
   Venda,
-  ItemVenda
+  ItemVenda,
+  Fornecedor,
+  Cliente,
+  FluxoCaixa
 };
