@@ -23,9 +23,6 @@ import UsuariosLista from '../pages/UsuariosLista';
 import UsuariosDetalhes from '../pages/UsuariosDetalhes';
 import UsuariosCadastro from '../pages/UsuariosCadastro';
 import Configuracoes from '../pages/Configuracoes';
-import ConfiguracoesGeral from '../pages/ConfiguracoesGeral';
-import ConfiguracoesSistema from '../pages/ConfiguracoesSistema';
-import ConfiguracoesNotificacoes from '../pages/ConfiguracoesNotificacoes';
 import Registro from '../pages/Registro';
 import Perfil from '../pages/Perfil';
 import Ajuda from '../pages/Ajuda';
@@ -82,11 +79,7 @@ const AppRoutes = () => {
           <Route path="cadastro" element={<UsuariosCadastro />} />
           <Route path="cadastro/:id" element={<UsuariosCadastro />} />
         </Route>
-        <Route path="configuracoes" element={<Configuracoes />}>
-          <Route index element={<ConfiguracoesGeral />} />
-          <Route path="sistema" element={<ConfiguracoesSistema />} />
-          <Route path="notificacoes" element={<ConfiguracoesNotificacoes />} />
-        </Route>
+        <Route path="configuracoes" element={<Configuracoes />} />
         <Route path="fornecedores" element={<Fornecedores />} />
         <Route path="clientes" element={<Clientes />}>
           <Route index element={<ClientesLista />} />

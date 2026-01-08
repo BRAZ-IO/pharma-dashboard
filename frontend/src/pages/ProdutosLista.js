@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import './Produtos.css';
 
 const ProdutosLista = () => {
   const navigate = useNavigate();
@@ -87,67 +88,69 @@ const ProdutosLista = () => {
         </select>
       </div>
 
-      <div className="produtos-table-container">
-        <table className="produtos-table">
-          <thead>
-            <tr>
-              <th>Código</th>
-              <th>Produto</th>
-              <th>Categoria</th>
-              <th>Preço</th>
-              <th>Estoque</th>
-              <th>Status</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredProducts.map(produto => {
-              const stockStatus = getStockStatus(produto.stock);
-              return (
-                <tr key={produto.id}>
-                  <td className="barcode-cell">{produto.barcode}</td>
-                  <td className="product-name-cell">{produto.name}</td>
-                  <td>
-                    <span className="category-badge">{produto.category}</span>
-                  </td>
-                  <td className="price-cell">{formatCurrency(produto.price)}</td>
-                  <td>
-                    <span className={`stock-badge ${stockStatus.class}`}>
-                      {produto.stock} un
-                    </span>
-                  </td>
-                  <td>
-                    <span className={`status-badge ${produto.status}`}>
-                      {produto.status === 'ativo' ? 'Ativo' : 'Inativo'}
-                    </span>
-                  </td>
-                  <td className="actions-cell">
-                    <button 
-                      className="btn-action btn-view"
-                      onClick={() => navigate(`/app/produtos/${produto.id}`)}
-                      title="Ver detalhes"
-                    >
-                      👁️
-                    </button>
-                    <button 
-                      className="btn-action btn-edit"
-                      onClick={() => navigate(`/app/produtos/cadastro/${produto.id}`)}
-                      title="Editar"
-                    >
-                      ✏️
-                    </button>
-                    <button 
-                      className="btn-action btn-delete"
-                      title="Excluir"
-                    >
-                      🗑️
-                    </button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="produtos-grid">
+        {filteredProducts.map(produto => {
+          const stockStatus = getStockStatus(produto.stock);
+          return (
+            <div key={produto.id} className="produto-card">
+              <div className="produto-header">
+                <div className="produto-info">
+                  <h3>{produto.name}</h3>
+                  <p className="produto-barcode">{produto.barcode}</p>
+                </div>
+                <span className={`status-badge ${produto.status}`}>
+                  {produto.status === 'ativo' ? '✓ Ativo' : '✗ Inativo'}
+                </span>
+              </div>
+
+              <div className="produto-details">
+                <div className="detail-row">
+                  <span className="detail-label">Categoria:</span>
+                  <span className="category-badge">{produto.category}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Preço:</span>
+                  <span className="detail-value price">{formatCurrency(produto.price)}</span>
+                </div>
+                <div className="detail-row">
+                  <span className="detail-label">Estoque:</span>
+                  <span className={`stock-badge ${stockStatus.class}`}>
+                    {produto.stock} un
+                  </span>
+                </div>
+              </div>
+
+              <div className="produto-actions">
+                <button 
+                  className="btn-action btn-view"
+                  onClick={() => navigate(`/app/produtos/${produto.id}`)}
+                  title="Ver detalhes"
+                >
+                  👁️ Ver
+                </button>
+                <button 
+                  className="btn-action btn-edit"
+                  onClick={() => navigate(`/app/produtos/cadastro/${produto.id}`)}
+                  title="Editar"
+                >
+                  ✏️ Editar
+                </button>
+                <button 
+                  className="btn-action btn-delete"
+                  onClick={() => {
+                    if (window.confirm(`Tem certeza que deseja excluir o produto ${produto.name}?`)) {
+                      console.log(`Excluindo produto ${produto.name}`);
+                      alert(`Produto excluído! (Funcionalidade em desenvolvimento)`);
+                    }
+                  }}
+                  title="Excluir"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          );
+        })}
 
         {filteredProducts.length === 0 && (
           <div className="no-results">

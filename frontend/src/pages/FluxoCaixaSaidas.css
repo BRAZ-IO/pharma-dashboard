@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding: 2rem;
 }
 
 .saidas-header {
@@ -16,7 +17,7 @@
   margin: 0;
   font-size: 1.5rem;
   font-weight: 600;
-  color: #e9ecef;
+  color: #e8eaed;
 }
 
 .saidas-stats {
@@ -26,12 +27,19 @@
 }
 
 .stat-card {
-  background: #2d2d2d;
-  border: 1px solid #495057;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   padding: 1.5rem;
   text-align: center;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  background: linear-gradient(135deg, #1a2332 0%, #0f1a2e 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
 }
 
 .stat-card h3 {
@@ -51,10 +59,17 @@
 }
 
 .saidas-table-container {
-  background: #2d2d2d;
-  border: 1px solid #495057;
-  border-radius: 8px;
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.saidas-table-container:hover {
+  background: linear-gradient(135deg, #1a2332 0%, #0f1a2e 100%);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .saidas-table {
@@ -64,27 +79,28 @@
 }
 
 .saidas-table th {
-  background: #343434;
+  background: rgba(255, 255, 255, 0.05);
   padding: 1rem;
   text-align: left;
   font-weight: 600;
-  color: #ced4da;
-  border-bottom: 2px solid #6c757d;
+  color: #e8eaed;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .saidas-table td {
   padding: 1rem;
-  border-bottom: 1px solid #6c757d;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   vertical-align: middle;
+  color: #e8eaed;
 }
 
 .saidas-table tbody tr:hover {
-  background: #3a3a3a;
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .descricao-col {
   font-weight: 500;
-  color: #e9ecef;
+  color: #e8eaed;
   min-width: 200px;
 }
 

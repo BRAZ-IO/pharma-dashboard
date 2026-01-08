@@ -11,8 +11,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f8f9fa;
-  color: #2c3e50;
+  background-color: #0b1220;
+  color: #e8eaed;
   line-height: 1.6;
 }
 
@@ -43,24 +43,24 @@ body {
 
 /* Content Cards */
 .content-card {
-  background: #ffffff;
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 1px solid #e9ecef;
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .content-card h3 {
   font-size: 1.25rem;
   font-weight: 600;
-  color: #2c3e50;
+  color: #e8eaed;
   margin-bottom: 1rem;
 }
 
 /* Stat Cards */
 .stat-card {
-  background: #ffffff;
+  background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
   border-radius: 8px;
   padding: 1.5rem;
   display: flex;

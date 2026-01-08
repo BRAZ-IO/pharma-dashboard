@@ -51,13 +51,13 @@
   padding-top: 65px;
 }
 
-.content-wrapper-bootstrap:has(.usuarios-page) {
+.content-wrapper-bootstrap:has(.configuracoes-page) {
   background: #0b1220;
   padding: 0;
   padding-top: 65px;
 }
 
-.content-wrapper-bootstrap:has(.configuracoes-page) {
+.content-wrapper-bootstrap:has(.usuarios-page) {
   background: #0b1220;
   padding: 0;
   padding-top: 65px;
@@ -81,15 +81,15 @@
   background: #0b1220;
 }
 
+.main-content-bootstrap:has(.configuracoes-page) {
+  background: #0b1220;
+}
+
 .main-content-bootstrap:has(.estoque-page) {
   background: #0b1220;
 }
 
 .main-content-bootstrap:has(.usuarios-page) {
-  background: #0b1220;
-}
-
-.main-content-bootstrap:has(.configuracoes-page) {
   background: #0b1220;
 }
 

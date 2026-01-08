@@ -74,6 +74,29 @@ const seed = async () => {
     console.log('✅ Usuário funcionário criado');
 
     // ========================================
+    // CRIAR FILIAL PADRÃO
+    // ========================================
+    
+    const filialPadrao = await sequelize.models.Filial.create({
+      empresa_id: empresaPadrao.id,
+      nome: 'Matriz',
+      nome_fantasia: 'Matriz - Farmácia Teste',
+      cnpj: '00.000.000/0002-00',
+      telefone: '(11) 0000-0001',
+      email: 'matriz@farmaciateste.local',
+      endereco: {
+        rua: 'Rua da Matriz',
+        numero: '456',
+        bairro: 'Centro',
+        cidade: 'São Paulo',
+        estado: 'SP',
+        cep: '00000-001'
+      },
+      ativo: true
+    });
+    console.log('✅ Filial matriz criada');
+
+    // ========================================
     // CRIAR PRODUTOS
     // ========================================
     
@@ -139,6 +162,7 @@ const seed = async () => {
       
       await Estoque.create({
         empresa_id: empresaPadrao.id,
+        filial_id: filialPadrao.id,
         produto_id: produto.id,
         quantidade_atual: Math.floor(Math.random() * 100) + 20,
         quantidade_minima: 10,
