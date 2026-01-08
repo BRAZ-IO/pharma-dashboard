@@ -149,27 +149,162 @@ const seed = async () => {
         localizacao: `Prateleira ${Math.floor(Math.random() * 10) + 1}`
       });
     }
-    console.log('✅ Produtos e estoque criados');
+    console.log('✅ Produtos e estoque criados para Farmácia Teste');
+
+    // ========================================
+    // CRIAR SEGUNDA EMPRESA (TESTE MULTI-TENANT)
+    // ========================================
+    
+    const empresaPopular = await Empresa.create({
+      razao_social: 'Drogaria Popular Ltda',
+      nome_fantasia: 'Drogaria Popular',
+      cnpj: '11.111.111/0001-11',
+      inscricao_estadual: '111.111.111.111',
+      telefone: '(11) 1111-1111',
+      email: 'contato@drogariapopular.com',
+      endereco: {
+        rua: 'Av. Principal',
+        numero: '500',
+        bairro: 'Centro',
+        cidade: 'Rio de Janeiro',
+        estado: 'RJ',
+        cep: '20000-000'
+      },
+      plano: 'premium',
+      ativo: true
+    });
+    console.log('✅ Segunda empresa criada (Drogaria Popular)');
+
+    // Usuários da Drogaria Popular
+    const adminPopular = await Usuario.create({
+      empresa_id: empresaPopular.id,
+      nome: 'Carlos Souza',
+      email: 'admin@popular.com',
+      senha: '123456',
+      cpf: '111.222.333-44',
+      telefone: '(21) 98888-7777',
+      cargo: 'Diretor',
+      role: 'admin'
+    });
+
+    const gerentePopular = await Usuario.create({
+      empresa_id: empresaPopular.id,
+      nome: 'Ana Paula',
+      email: 'gerente@popular.com',
+      senha: '123456',
+      cpf: '555.666.777-88',
+      telefone: '(21) 97777-6666',
+      cargo: 'Gerente de Vendas',
+      role: 'gerente'
+    });
+    console.log('✅ Usuários da Drogaria Popular criados');
+
+    // Produtos da Drogaria Popular (diferentes da Farmácia Teste)
+    const produtosPopular = [
+      {
+        empresa_id: empresaPopular.id,
+        codigo_barras: '7899999999990',
+        nome: 'Ibuprofeno 600mg',
+        descricao: 'Anti-inflamatório',
+        categoria: 'Medicamento',
+        subcategoria: 'Anti-inflamatório',
+        fabricante: 'Aché',
+        principio_ativo: 'Ibuprofeno',
+        apresentacao: 'Comprimido',
+        dosagem: '600mg',
+        preco_custo: 12.00,
+        preco_venda: 28.90,
+        margem_lucro: 140.83,
+        requer_receita: false,
+        controlado: false,
+        generico: true
+      },
+      {
+        empresa_id: empresaPopular.id,
+        codigo_barras: '7899999999991',
+        nome: 'Omeprazol 20mg',
+        descricao: 'Protetor gástrico',
+        categoria: 'Medicamento',
+        subcategoria: 'Gastro',
+        fabricante: 'Eurofarma',
+        principio_ativo: 'Omeprazol',
+        apresentacao: 'Cápsula',
+        dosagem: '20mg',
+        preco_custo: 10.00,
+        preco_venda: 24.50,
+        margem_lucro: 145.00,
+        requer_receita: false,
+        controlado: false,
+        generico: true
+      }
+    ];
+
+    for (const produtoData of produtosPopular) {
+      const produto = await Produto.create(produtoData);
+      
+      await Estoque.create({
+        empresa_id: empresaPopular.id,
+        produto_id: produto.id,
+        quantidade_atual: Math.floor(Math.random() * 150) + 30,
+        quantidade_minima: 15,
+        quantidade_maxima: 300,
+        lote: `POP${Math.floor(Math.random() * 10000)}`,
+        data_fabricacao: new Date('2024-01-01'),
+        data_validade: new Date('2027-06-30'),
+        localizacao: `Setor ${Math.floor(Math.random() * 5) + 1}`
+      });
+    }
+    console.log('✅ Produtos e estoque criados para Drogaria Popular');
 
     console.log('');
     console.log('🎉 Seed concluído com sucesso!');
     console.log('');
-    console.log('📝 Credenciais de acesso:');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('📝 CREDENCIAIS DE ACESSO - FARMÁCIA TESTE');
+    console.log('═══════════════════════════════════════════════════');
     console.log('');
     console.log('Admin:');
     console.log('  Email: admin@pharma.com');
     console.log('  Senha: 123456');
+    console.log('  Empresa: Farmácia Teste');
     console.log('');
     console.log('Gerente:');
     console.log('  Email: gerente@pharma.com');
     console.log('  Senha: 123456');
+    console.log('  Empresa: Farmácia Teste');
     console.log('');
     console.log('Funcionário:');
     console.log('  Email: funcionario@pharma.com');
     console.log('  Senha: 123456');
+    console.log('  Empresa: Farmácia Teste');
     console.log('');
-    console.log('💡 Sistema multi-tenant ativo!');
-    console.log('   Você pode cadastrar novas empresas via API');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('📝 CREDENCIAIS DE ACESSO - DROGARIA POPULAR');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('');
+    console.log('Admin:');
+    console.log('  Email: admin@popular.com');
+    console.log('  Senha: 123456');
+    console.log('  Empresa: Drogaria Popular');
+    console.log('');
+    console.log('Gerente:');
+    console.log('  Email: gerente@popular.com');
+    console.log('  Senha: 123456');
+    console.log('  Empresa: Drogaria Popular');
+    console.log('');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('🔒 TESTE DE ISOLAMENTO MULTI-TENANT');
+    console.log('═══════════════════════════════════════════════════');
+    console.log('');
+    console.log('✅ Farmácia Teste: 3 produtos (Dipirona, Paracetamol, Amoxicilina)');
+    console.log('✅ Drogaria Popular: 2 produtos (Ibuprofeno, Omeprazol)');
+    console.log('');
+    console.log('🧪 Para testar o isolamento:');
+    console.log('   1. Faça login com admin@pharma.com');
+    console.log('   2. Liste os produtos - deve ver apenas 3 produtos');
+    console.log('   3. Faça logout e login com admin@popular.com');
+    console.log('   4. Liste os produtos - deve ver apenas 2 produtos');
+    console.log('   5. Tente acessar produto da outra empresa - deve retornar 404');
     console.log('');
 
     process.exit(0);

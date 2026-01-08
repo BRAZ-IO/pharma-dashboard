@@ -1,3 +1,4 @@
+const { sequelize } = require('../config/database');
 const Empresa = require('./Empresa');
 const Usuario = require('./Usuario');
 const Produto = require('./Produto');
@@ -40,6 +41,7 @@ Produto.hasMany(ItemVenda, { foreignKey: 'produto_id', as: 'itens_venda' });
 ItemVenda.belongsTo(Produto, { foreignKey: 'produto_id', as: 'produto' });
 
 module.exports = {
+  sequelize,
   Empresa,
   Usuario,
   Produto,

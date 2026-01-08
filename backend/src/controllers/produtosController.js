@@ -73,7 +73,8 @@ const produtosController = {
         include: [{
           model: Estoque,
           as: 'estoques',
-          where: { empresa_id: req.empresaId }
+          where: { empresa_id: req.empresaId },
+          required: false // Não falhar se não houver estoque
         }]
       });
 
@@ -102,7 +103,8 @@ const produtosController = {
         include: [{
           model: Estoque,
           as: 'estoques',
-          where: { empresa_id: req.empresaId }
+          where: { empresa_id: req.empresaId },
+          required: false // Não falhar se não houver estoque
         }]
       });
 

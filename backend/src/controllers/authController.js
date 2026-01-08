@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const { Usuario } = require('../models');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/env');
 
@@ -27,9 +28,21 @@ const authController = {
         });
       }
 
-      const usuario = await Usuario.findOne({ where: { email } });
+      // Proteção contra timing attacks: sempre executar bcrypt mesmo se usuário não existir
+      const usuario = await Usuario.findOne({ 
+        where: { email },
+        include: ['empresa']
+      });
 
-      if (!usuario) {
+      // Gerar hash dummy para manter tempo constante (12 rounds)
+      const dummyHash = '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5NU7RvzVvUoBC'; // Hash de "dummy" com 12 rounds
+      const senhaHash = usuario?.senha || dummyHash;
+      
+      // Sempre executar bcrypt.compare, independente de usuário existir
+      const senhaValida = await bcrypt.compare(senha, senhaHash);
+
+      // Verificações após validação de senha (tempo constante mantido)
+      if (!usuario || !senhaValida) {
         return res.status(401).json({
           error: 'Credenciais inválidas',
           message: 'Email ou senha incorretos'
@@ -43,12 +56,12 @@ const authController = {
         });
       }
 
-      const senhaValida = await usuario.validarSenha(senha);
-
-      if (!senhaValida) {
-        return res.status(401).json({
-          error: 'Credenciais inválidas',
-          message: 'Email ou senha incorretos'
+      // Verificar se 2FA está ativado
+      if (usuario.two_factor_enabled) {
+        return res.status(200).json({
+          requires2FA: true,
+          userId: usuario.id,
+          message: 'Digite o código do seu autenticador'
         });
       }
 

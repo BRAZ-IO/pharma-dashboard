@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTE_METADATA } from '../routes/routeConfig';
 import './SidebarBootstrap.css';
 
-const SidebarBootstrap = ({ mobileOpen, onCloseMobile, isCollapsed, setIsCollapsed, userName = "João Silva", userRole = "Farmacêutico" }) => {
+const SidebarBootstrap = ({ mobileOpen, onCloseMobile, isCollapsed, setIsCollapsed, userName = "João Silva", userRole = "Farmacêutico", empresaNome = "Farmácia Teste" }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const navRef = useRef(null);
@@ -137,7 +137,12 @@ const SidebarBootstrap = ({ mobileOpen, onCloseMobile, isCollapsed, setIsCollaps
                   <path d="M12 7v10M7 12h10" stroke="white" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
               </span>
-              <span className="brand-text-bootstrap">{!isCollapsed && 'PharmaDash'}</span>
+              {!isCollapsed && (
+                <div className="brand-text-container">
+                  <span className="brand-text-bootstrap">{empresaNome}</span>
+                  <span className="brand-subtitle">Sistema de Gestão</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="sidebar-controls-bootstrap">

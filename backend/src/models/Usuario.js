@@ -69,18 +69,34 @@ const Usuario = sequelize.define('Usuario', {
   ultimo_login: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  two_factor_enabled: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+    allowNull: false
+  },
+  two_factor_secret: {
+    type: DataTypes.STRING(255),
+    allowNull: true
+  },
+  two_factor_backup_codes: {
+    type: DataTypes.JSONB,
+    allowNull: true,
+    defaultValue: []
   }
 }, {
   tableName: 'usuarios',
   hooks: {
     beforeCreate: async (usuario) => {
       if (usuario.senha) {
-        usuario.senha = await bcrypt.hash(usuario.senha, 10);
+        // 12 rounds = 2^12 = 4096 iterações (recomendado para 2024+)
+        usuario.senha = await bcrypt.hash(usuario.senha, 12);
       }
     },
     beforeUpdate: async (usuario) => {
       if (usuario.changed('senha')) {
-        usuario.senha = await bcrypt.hash(usuario.senha, 10);
+        // 12 rounds = 2^12 = 4096 iterações (recomendado para 2024+)
+        usuario.senha = await bcrypt.hash(usuario.senha, 12);
       }
     }
   }

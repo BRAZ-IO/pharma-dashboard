@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import SidebarBootstrap from '../components/SidebarBootstrap';
 import NavbarBootstrap from '../components/NavbarBootstrap';
+import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
 const LayoutBootstrap = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const { userName, userRole, empresaNome } = useAuth();
 
   useEffect(() => {
     const handleResize = () => {
@@ -25,8 +27,8 @@ const LayoutBootstrap = () => {
         isSidebarCollapsed={isSidebarCollapsed}
         setIsSidebarCollapsed={setIsSidebarCollapsed}
         onMobileMenuToggle={() => setIsMobileSidebarOpen(true)}
-        userName="João Silva"
-        userRole="Farmacêutico"
+        userName={userName}
+        userRole={userRole}
         notificationCount={3}
       />
       <SidebarBootstrap
@@ -34,8 +36,9 @@ const LayoutBootstrap = () => {
         onCloseMobile={() => setIsMobileSidebarOpen(false)}
         isCollapsed={isSidebarCollapsed}
         setIsCollapsed={setIsSidebarCollapsed}
-        userName="João Silva"
-        userRole="Farmacêutico"
+        userName={userName}
+        userRole={userRole}
+        empresaNome={empresaNome}
       />
       <main className="main-content-bootstrap">
         <div className="content-wrapper-bootstrap">

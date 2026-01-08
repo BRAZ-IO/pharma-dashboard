@@ -8,6 +8,7 @@
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.13.2",
     "bootstrap": "^5.3.8",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
@@ -16,11 +17,11 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "test:ci": "react-scripts test --watchAll=false --coverage",
-    "test:pdv": "react-scripts test PDVMain",
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "test:ci": "craco test --watchAll=false --coverage",
+    "test:pdv": "craco test PDVMain",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
@@ -47,6 +48,7 @@
     ]
   },
   "devDependencies": {
+    "@craco/craco": "^7.1.0",
     "@playwright/test": "^1.57.0"
   }
 }
