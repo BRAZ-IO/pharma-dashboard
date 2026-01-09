@@ -1,129 +1,358 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const UsuariosLista = () => {
   const navigate = useNavigate();
+  const [usuarios, setUsuarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('todos');
   const [filterStatus, setFilterStatus] = useState('todos');
 
-  const [usuarios] = useState([
-    { id: 1, name: 'João Silva', email: 'joao.silva@pharma.com', role: 'admin', status: 'ativo', avatar: '👨‍💼', lastLogin: '2026-01-07T14:30:00', createdAt: '2025-06-15' },
-    { id: 2, name: 'Maria Santos', email: 'maria.santos@pharma.com', role: 'gerente', status: 'ativo', avatar: '👩‍💼', lastLogin: '2026-01-07T13:15:00', createdAt: '2025-07-20' },
-    { id: 3, name: 'Pedro Costa', email: 'pedro.costa@pharma.com', role: 'vendedor', status: 'ativo', avatar: '👨', lastLogin: '2026-01-07T10:45:00', createdAt: '2025-08-10' },
-    { id: 4, name: 'Ana Oliveira', email: 'ana.oliveira@pharma.com', role: 'vendedor', status: 'ativo', avatar: '👩', lastLogin: '2026-01-06T16:20:00', createdAt: '2025-09-05' },
-    { id: 5, name: 'Carlos Mendes', email: 'carlos.mendes@pharma.com', role: 'estoquista', status: 'ativo', avatar: '👨‍🔧', lastLogin: '2026-01-07T09:00:00', createdAt: '2025-10-12' },
-    { id: 6, name: 'Juliana Ferreira', email: 'juliana.ferreira@pharma.com', role: 'vendedor', status: 'inativo', avatar: '👩', lastLogin: '2025-12-20T11:30:00', createdAt: '2025-05-08' },
-    { id: 7, name: 'Roberto Lima', email: 'roberto.lima@pharma.com', role: 'gerente', status: 'ativo', avatar: '👨‍💼', lastLogin: '2026-01-07T12:00:00', createdAt: '2025-06-25' },
-    { id: 8, name: 'Fernanda Alves', email: 'fernanda.alves@pharma.com', role: 'estoquista', status: 'ativo', avatar: '👩‍🔧', lastLogin: '2026-01-07T08:30:00', createdAt: '2025-11-18' },
-  ]);
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
 
-  const roles = {
-    admin: { label: 'Administrador', color: '#e74c3c' },
-    gerente: { label: 'Gerente', color: '#ff9800' },
-    vendedor: { label: 'Vendedor', color: '#64b5f6' },
-    estoquista: { label: 'Estoquista', color: '#26de81' },
+  const carregarUsuarios = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      const response = await api.get('/usuarios');
+      setUsuarios(response.data.usuarios || []);
+      setError('');
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+      if (error.response?.status === 401) {
+        setError('Não autorizado. Faça login novamente.');
+      } else if (error.response?.status === 403) {
+        setError('Acesso negado. Verifique suas permissões.');
+      } else if (error.response?.status === 500) {
+        setError('Erro no servidor. Tente novamente mais tarde.');
+      } else if (error.code === 'NETWORK_ERROR' || error.message === 'Network Error') {
+        setError('Erro de conexão. Verifique sua internet.');
+      } else {
+        setError('Não foi possível carregar os usuários');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const filteredUsers = usuarios.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = filterRole === 'todos' || user.role === filterRole;
-    const matchesStatus = filterStatus === 'todos' || user.status === filterStatus;
-    
+  const handleRetry = () => {
+    setUsuarios([]);
+    carregarUsuarios();
+  };
+
+  const filteredUsers = usuarios.filter(usuario => {
+    const matchesSearch = usuario.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         usuario.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole = filterRole === 'todos' || usuario.role === filterRole;
+    const matchesStatus = filterStatus === 'todos' || usuario.ativo === (filterStatus === 'ativo');
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const stats = {
-    total: usuarios.length,
-    ativos: usuarios.filter(u => u.status === 'ativo').length,
-    inativos: usuarios.filter(u => u.status === 'inativo').length,
-    admins: usuarios.filter(u => u.role === 'admin').length,
-  };
+  if (loading) {
+    return (
+      <div style={{ 
+        padding: '20px', 
+        textAlign: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#0b1220',
+        color: '#e8eaed',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <div style={{ 
+          width: '40px', 
+          height: '40px', 
+          border: '4px solid #64b5f6', 
+          borderTop: '4px solid transparent',
+          borderRadius: '50%',
+          animation: 'spin 1s linear infinite',
+          marginBottom: '20px'
+        }}></div>
+        <p>Carregando...</p>
+        <style>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
-  const formatDateTime = (dateString) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) {
-      return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    } else if (diffDays === 1) {
-      return 'Ontem';
-    } else if (diffDays < 7) {
-      return `${diffDays} dias atrás`;
-    } else {
-      return date.toLocaleDateString('pt-BR');
-    }
-  };
-
-  const handleToggleStatus = (user) => {
-    const newStatus = user.status === 'ativo' ? 'inativo' : 'ativo';
-    console.log(`Alterando status de ${user.name} para ${newStatus}`);
-    alert(`Status alterado! (Funcionalidade em desenvolvimento)`);
-  };
-
-  const handleDeleteUser = (user) => {
-    if (window.confirm(`Tem certeza que deseja excluir o usuário ${user.name}?`)) {
-      console.log(`Excluindo usuário ${user.name}`);
-      alert(`Usuário excluído! (Funcionalidade em desenvolvimento)`);
-    }
-  };
+  if (error) {
+    return (
+      <div style={{ 
+        padding: '20px', 
+        textAlign: 'center',
+        minHeight: '100vh',
+        backgroundColor: '#0b1220',
+        color: '#e8eaed',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <p>{error}</p>
+        <button 
+          onClick={handleRetry}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#64b5f6',
+            color: 'white',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            marginTop: '10px'
+          }}
+        >
+          🔄 Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
-    <div className="usuarios-lista">
-      <div className="usuarios-lista-header">
-        <div className="usuarios-stats">
-          <div className="stat-card">
-            <span className="stat-value">{stats.total}</span>
-            <span className="stat-label">Total de Usuários</span>
+    <div style={{ padding: '2rem' }}>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'flex-start',
+        marginBottom: '2rem',
+        gap: '1rem'
+      }}>
+        <div style={{
+          display: 'flex',
+          gap: '1.5rem',
+          flexWrap: 'wrap',
+          flex: 1
+        }}>
+          <div style={{
+            background: 'linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '12px',
+            padding: '1rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.25rem',
+            minWidth: '140px'
+          }}>
+            <span style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#64b5f6'
+            }}>
+              {filteredUsers.length}
+            </span>
+            <span style={{
+              fontSize: '0.9rem',
+              color: '#78909c',
+              fontWeight: '500'
+            }}>
+              Total de Usuários
+            </span>
           </div>
-          <div className="stat-card success">
-            <span className="stat-value">{stats.ativos}</span>
-            <span className="stat-label">Usuários Ativos</span>
+
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(231, 76, 60, 0.1) 0%, #0f1a2e 100%)',
+            border: '1px solid rgba(231, 76, 60, 0.3)',
+            borderRadius: '12px',
+            padding: '1rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.25rem',
+            minWidth: '140px'
+          }}>
+            <span style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#e74c3c'
+            }}>
+              {filteredUsers.filter(u => !u.ativo).length}
+            </span>
+            <span style={{
+              fontSize: '0.9rem',
+              color: '#78909c',
+              fontWeight: '500'
+            }}>
+              Inativos
+            </span>
           </div>
-          <div className="stat-card warning">
-            <span className="stat-value">{stats.inativos}</span>
-            <span className="stat-label">Usuários Inativos</span>
+
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(38, 222, 129, 0.1) 0%, #0f1a2e 100%)',
+            border: '1px solid rgba(38, 222, 129, 0.3)',
+            borderRadius: '12px',
+            padding: '1rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.25rem',
+            minWidth: '140px'
+          }}>
+            <span style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#26de81'
+            }}>
+              {filteredUsers.filter(u => u.ativo).length}
+            </span>
+            <span style={{
+              fontSize: '0.9rem',
+              color: '#78909c',
+              fontWeight: '500'
+            }}>
+              Ativos
+            </span>
           </div>
-          <div className="stat-card info">
-            <span className="stat-value">{stats.admins}</span>
-            <span className="stat-label">Administradores</span>
+
+          <div style={{
+            background: 'linear-gradient(135deg, rgba(100, 181, 246, 0.1) 0%, #0f1a2e 100%)',
+            border: '1px solid rgba(100, 181, 246, 0.3)',
+            borderRadius: '12px',
+            padding: '1rem 1.5rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.25rem',
+            minWidth: '140px'
+          }}>
+            <span style={{
+              fontSize: '1.5rem',
+              fontWeight: '700',
+              color: '#64b5f6'
+            }}>
+              {filteredUsers.filter(u => u.role === 'admin').length}
+            </span>
+            <span style={{
+              fontSize: '0.9rem',
+              color: '#78909c',
+              fontWeight: '500'
+            }}>
+              Administradores
+            </span>
           </div>
         </div>
 
         <button 
-          className="btn-novo-usuario"
-          onClick={() => navigate('/app/usuarios/cadastro')}
+          onClick={() => navigate('/app/usuarios/cadastrar')}
+          style={{ 
+            padding: '12px 24px', 
+            backgroundColor: '#64b5f6', 
+            color: 'white', 
+            border: 'none', 
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: '500',
+            transition: 'all 0.3s ease',
+            boxShadow: '0 4px 12px rgba(100, 181, 246, 0.3)',
+            whiteSpace: 'nowrap'
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = '#42a5f5';
+            e.target.style.transform = 'translateY(-2px)';
+            e.target.style.boxShadow = '0 6px 20px rgba(100, 181, 246, 0.4)';
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = '#64b5f6';
+            e.target.style.transform = 'translateY(0)';
+            e.target.style.boxShadow = '0 4px 12px rgba(100, 181, 246, 0.3)';
+          }}
         >
-          + Novo Usuário
+          + Adicionar Usuário
         </button>
       </div>
 
-      <div className="usuarios-controls">
+      <div style={{
+        display: 'flex',
+        gap: '1rem',
+        marginBottom: '2rem',
+        flexWrap: 'wrap'
+      }}>
         <input
           type="text"
-          placeholder="Buscar por nome ou e-mail..."
+          placeholder="Buscar por nome ou email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="search-input"
+          style={{
+            flex: 1,
+            minWidth: '200px',
+            padding: '12px 16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            color: '#e8eaed',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s ease'
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = '#64b5f6';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          }}
         />
+
         <select
           value={filterRole}
           onChange={(e) => setFilterRole(e.target.value)}
-          className="role-select"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            color: '#e8eaed',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = '#64b5f6';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          }}
         >
           <option value="todos">Todos os Cargos</option>
           <option value="admin">Administrador</option>
           <option value="gerente">Gerente</option>
-          <option value="vendedor">Vendedor</option>
-          <option value="estoquista">Estoquista</option>
+          <option value="funcionario">Funcionário</option>
         </select>
+
         <select
           value={filterStatus}
           onChange={(e) => setFilterStatus(e.target.value)}
-          className="status-select"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(255, 255, 255, 0.05)',
+            border: '1px solid rgba(255, 255, 255, 0.1)',
+            borderRadius: '8px',
+            color: '#e8eaed',
+            fontSize: '14px',
+            outline: 'none',
+            transition: 'all 0.3s ease',
+            cursor: 'pointer'
+          }}
+          onFocus={(e) => {
+            e.target.style.borderColor = '#64b5f6';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.08)';
+          }}
+          onBlur={(e) => {
+            e.target.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+          }}
         >
           <option value="todos">Todos os Status</option>
           <option value="ativo">Ativos</option>
@@ -131,86 +360,200 @@ const UsuariosLista = () => {
         </select>
       </div>
 
-      <div className="usuarios-grid">
-        {filteredUsers.map(user => {
-          const roleInfo = roles[user.role];
-          
-          return (
-            <div key={user.id} className="usuario-card">
-              <div className="usuario-header">
-                <div className="usuario-avatar">{user.avatar}</div>
-                <div className="usuario-info">
-                  <h3>{user.name}</h3>
-                  <p className="usuario-email">{user.email}</p>
-                </div>
-                <span className={`status-badge ${user.status}`}>
-                  {user.status === 'ativo' ? '✓ Ativo' : '✗ Inativo'}
+      <div style={{ display: 'grid', gap: '20px' }}>
+        {filteredUsers.map(usuario => (
+          <div 
+            key={usuario.id} 
+            style={{ 
+              border: '1px solid rgba(255, 255, 255, 0.1)', 
+              padding: '20px', 
+              borderRadius: '12px',
+              backgroundColor: 'rgba(26, 35, 50, 0.8)',
+              backdropFilter: 'blur(10px)',
+              transition: 'all 0.3s ease',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '20px'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)';
+              e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.3)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)';
+              e.currentTarget.style.boxShadow = 'none';
+            }}
+          >
+            <div style={{
+              width: '50px',
+              height: '50px',
+              borderRadius: '50%',
+              backgroundColor: '#64b5f6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px',
+              fontWeight: '700',
+              color: 'white',
+              boxShadow: '0 4px 12px rgba(100, 181, 246, 0.3)'
+            }}>
+              {usuario.nome?.charAt(0)?.toUpperCase() || 'U'}
+            </div>
+            
+            <div style={{ flex: 1 }}>
+              <h3 style={{ 
+                color: '#e8eaed',
+                margin: '0 0 8px 0',
+                fontSize: '1.2rem',
+                fontWeight: '600'
+              }}>
+                {usuario.nome || 'Sem nome'}
+              </h3>
+              
+              <p style={{ 
+                color: '#78909c',
+                margin: '0 0 8px 0',
+                fontSize: '0.9rem'
+              }}>
+                {usuario.email || 'Sem email'}
+              </p>
+              
+              <div style={{ 
+                display: 'flex', 
+                gap: '8px', 
+                flexWrap: 'wrap'
+              }}>
+                <span style={{
+                  padding: '4px 12px',
+                  backgroundColor: usuario.role === 'admin' ? '#e74c3c' : 
+                                 usuario.role === 'gerente' ? '#f39c12' : '#3498db',
+                  color: 'white',
+                  borderRadius: '16px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {usuario.role || 'Sem cargo'}
+                </span>
+                
+                <span style={{
+                  padding: '4px 12px',
+                  backgroundColor: usuario.ativo ? '#27ae60' : '#e74c3c',
+                  color: 'white',
+                  borderRadius: '16px',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.5px'
+                }}>
+                  {usuario.ativo ? 'Ativo' : 'Inativo'}
                 </span>
               </div>
-
-              <div className="usuario-details">
-                <div className="detail-row">
-                  <span className="detail-label">Cargo:</span>
-                  <span 
-                    className="role-badge"
-                    style={{ 
-                      background: `${roleInfo.color}20`,
-                      color: roleInfo.color 
-                    }}
-                  >
-                    {roleInfo.label}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Último acesso:</span>
-                  <span className="detail-value">{formatDateTime(user.lastLogin)}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Cadastrado em:</span>
-                  <span className="detail-value">{new Date(user.createdAt).toLocaleDateString('pt-BR')}</span>
-                </div>
-              </div>
-
-              <div className="usuario-actions">
-                <button 
-                  className="btn-action btn-view"
-                  onClick={() => navigate(`/app/usuarios/${user.id}`)}
-                  title="Ver detalhes"
-                >
-                  👁️ Ver
-                </button>
-                <button 
-                  className="btn-action btn-edit"
-                  onClick={() => navigate(`/app/usuarios/cadastro/${user.id}`)}
-                  title="Editar"
-                >
-                  ✏️ Editar
-                </button>
-                <button 
-                  className="btn-action btn-toggle"
-                  onClick={() => handleToggleStatus(user)}
-                  title={user.status === 'ativo' ? 'Desativar' : 'Ativar'}
-                >
-                  {user.status === 'ativo' ? '🔒' : '🔓'}
-                </button>
-                <button 
-                  className="btn-action btn-delete"
-                  onClick={() => handleDeleteUser(user)}
-                  title="Excluir"
-                >
-                  🗑️
-                </button>
-              </div>
             </div>
-          );
-        })}
-
-        {filteredUsers.length === 0 && (
-          <div className="no-results">
-            <p>Nenhum usuário encontrado</p>
+            
+            <div style={{ 
+              display: 'flex', 
+              gap: '8px'
+            }}>
+              <button 
+                onClick={() => navigate(`/app/usuarios/editar/${usuario.id}`)}
+                style={{ 
+                  padding: '8px 16px',
+                  backgroundColor: '#27ae60',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#229954';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = '#27ae60';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Editar
+              </button>
+              
+              <button 
+                onClick={() => {
+                  if (window.confirm('Tem certeza que deseja excluir este usuário?')) {
+                    setUsuarios(prev => prev.filter(u => u.id !== usuario.id));
+                    
+                    api.delete(`/usuarios/${usuario.id}`).catch(err => {
+                      console.error('Erro ao excluir usuário:', err);
+                      alert('Erro ao excluir usuário');
+                      carregarUsuarios();
+                    });
+                  }
+                }}
+                style={{ 
+                  padding: '8px 16px',
+                  backgroundColor: '#e74c3c',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                  fontWeight: '500',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseOver={(e) => {
+                  e.target.style.backgroundColor = '#c0392b';
+                  e.target.style.transform = 'translateY(-1px)';
+                }}
+                onMouseOut={(e) => {
+                  e.target.style.backgroundColor = '#e74c3c';
+                  e.target.style.transform = 'translateY(0)';
+                }}
+              >
+                Excluir
+              </button>
+            </div>
           </div>
-        )}
+        ))}
       </div>
+
+      {filteredUsers.length === 0 && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '60px 40px',
+          backgroundColor: 'rgba(26, 35, 50, 0.5)',
+          borderRadius: '12px',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <div style={{ 
+            fontSize: '3rem', 
+            marginBottom: '20px',
+            opacity: '0.7'
+          }}>
+            👥
+          </div>
+          <h3 style={{ 
+            color: '#e8eaed',
+            marginBottom: '10px',
+            fontSize: '1.3rem',
+            fontWeight: '600'
+          }}>
+            Nenhum usuário encontrado
+          </h3>
+          <p style={{ 
+            color: '#78909c',
+            fontSize: '1rem'
+          }}>
+            {searchTerm || filterRole !== 'todos' || filterStatus !== 'todos'
+              ? 'Tente ajustar os filtros para ver mais usuários.'
+              : 'Clique em "Adicionar Usuário" para criar o primeiro usuário.'}
+          </p>
+        </div>
+      )}
     </div>
   );
 };

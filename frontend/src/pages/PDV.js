@@ -8,7 +8,7 @@ const PDV = () => {
       <div className="pdv-header">
         <h1>Ponto de Venda</h1>
         <div className="pdv-nav">
-          <Link to="/app/pdv" className="nav-link">Vendas</Link>
+          <Link to="/app/pdv" className="nav-link active">Vendas</Link>
           <Link to="/app/pdv/vendas" className="nav-link">Histórico</Link>
           <Link to="/app/pdv/relatorios" className="nav-link">Relatórios</Link>
         </div>

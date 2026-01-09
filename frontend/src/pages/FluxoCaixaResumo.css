@@ -223,21 +223,201 @@
   font-weight: 600;
 }
 
-/* Responsive */
+/* Estilos para Gráficos */
+.chart-container {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.chart-line {
+  width: 100%;
+  height: 100%;
+}
+
+.chart-svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+}
+
+.chart-point {
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.chart-point:hover {
+  r: 7;
+  filter: drop-shadow(0 0 8px rgba(100, 181, 246, 0.6));
+}
+
+.chart-point-hover {
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.chart-point:hover + .chart-point-hover {
+  opacity: 1;
+}
+
+/* Gráfico de Pizza */
+.pie-chart {
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+}
+
+.pie-segment {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.pie-segment:hover {
+  filter: brightness(1.2);
+  transform: scale(1.05);
+}
+
+.pie-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.legend-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  flex: 1;
+  color: #e8eaed;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.legend-value {
+  color: #78909c;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* Layout dos gráficos */
+.grafico-linha .chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.grafico-pizza .chart-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.grafico-pizza .chart-container > div:first-child {
+  display: flex;
+  justify-content: center;
+}
+
+/* Animações */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.grafico-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.chart-point {
+  animation: fadeIn 0.8s ease-out;
+}
+
+.pie-segment {
+  animation: fadeIn 0.6s ease-out;
+}
+
+.legend-item {
+  animation: fadeIn 0.7s ease-out;
+}
+
+/* Responsive para gráficos */
 @media (max-width: 768px) {
-  .resumo-cards {
-    grid-template-columns: 1fr;
+  .chart-container {
+    height: 200px;
   }
-
-  .resumo-graficos {
-    grid-template-columns: 1fr;
+  
+  .chart-svg {
+    font-size: 10px;
   }
-
-  .tabela-container {
-    overflow-x: auto;
+  
+  .pie-chart {
+    width: 150px;
+    height: 150px;
   }
+  
+  .pie-legend {
+    margin-top: 1rem;
+    gap: 0.5rem;
+  }
+  
+  .legend-item {
+    padding: 0.375rem;
+  }
+  
+  .legend-text,
+  .legend-value {
+    font-size: 0.75rem;
+  }
+}
 
-  .transacoes-table {
-    min-width: 600px;
+@media (max-width: 480px) {
+  .chart-container {
+    height: 180px;
+  }
+  
+  .pie-chart {
+    width: 120px;
+    height: 120px;
+  }
+  
+  .chart-svg {
+    font-size: 9px;
+  }
+  
+  .legend-color {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .legend-text,
+  .legend-value {
+    font-size: 0.7rem;
   }
 }

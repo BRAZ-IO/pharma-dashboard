@@ -11,11 +11,15 @@ const clientesRoutes = require('./clientes');
 const fluxoCaixaRoutes = require('./fluxoCaixa');
 const filiaisRoutes = require('./filiais');
 const transferenciasRoutes = require('./transferencias');
+const empresasRoutes = require('./empresas');
 
 // Documentação Swagger
 router.use('/docs', swaggerRoutes);
 
-// Rotas da API
+// Rotas públicas
+router.use('/empresas', empresasRoutes);
+
+// Rotas da API (protegidas)
 router.use('/auth', authRoutes);
 router.use('/2fa', twoFactorRoutes);
 router.use('/usuarios', usuariosRoutes);

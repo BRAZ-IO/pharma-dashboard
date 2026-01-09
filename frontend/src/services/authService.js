@@ -1,4 +1,8 @@
 import api from './api';
+import mockAuthService from './mockAuthService';
+
+// Detectar se estamos em modo de desenvolvimento sem backend
+const USE_MOCK_SERVICE = false; // Desativado para usar backend real
 
 const authService = {
   /**
@@ -8,6 +12,11 @@ const authService = {
    * @returns {Promise<{token: string, usuario: object, requires2FA?: boolean}>}
    */
   async login(email, senha) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.login(email, senha);
+    }
+
     try {
       const { data } = await api.post('/auth/login', { email, senha });
       
@@ -38,6 +47,11 @@ const authService = {
    * @returns {Promise<{token: string, usuario: object}>}
    */
   async validate2FA(userId, token, isBackupCode = false) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.validate2FA(userId, token, isBackupCode);
+    }
+
     try {
       const { data } = await api.post('/2fa/validate', {
         userId,
@@ -63,6 +77,11 @@ const authService = {
    * @returns {Promise<{token: string, usuario: object}>}
    */
   async register(userData) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.register(userData);
+    }
+
     try {
       const { data } = await api.post('/auth/register', userData);
       
@@ -80,6 +99,11 @@ const authService = {
    * @returns {Promise<object>}
    */
   async me() {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.me();
+    }
+
     try {
       const { data } = await api.get('/auth/me');
       localStorage.setItem('usuario', JSON.stringify(data.usuario));
@@ -93,6 +117,11 @@ const authService = {
    * Logout
    */
   logout() {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return mockAuthService.logout();
+    }
+
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('usuario');
@@ -104,6 +133,11 @@ const authService = {
    * @returns {boolean}
    */
   isAuthenticated() {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return mockAuthService.isAuthenticated();
+    }
+
     return !!localStorage.getItem('token');
   },
 
@@ -112,6 +146,11 @@ const authService = {
    * @returns {object|null}
    */
   getUser() {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return mockAuthService.getUser();
+    }
+
     const user = localStorage.getItem('usuario');
     return user ? JSON.parse(user) : null;
   },
@@ -122,11 +161,74 @@ const authService = {
    * @returns {boolean}
    */
   hasRole(roles) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return mockAuthService.hasRole(roles);
+    }
+
     const user = this.getUser();
     if (!user) return false;
     
     const allowedRoles = Array.isArray(roles) ? roles : [roles];
     return allowedRoles.includes(user.role);
+  },
+
+  /**
+   * Solicitar recuperação de senha
+   * @param {string} email 
+   * @returns {Promise<{success: boolean, message: string}>}
+   */
+  async forgotPassword(email) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.forgotPassword(email);
+    }
+
+    try {
+      const { data } = await api.post('/auth/forgot-password', { email });
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  },
+
+  /**
+   * Redefinir senha com token
+   * @param {string} token 
+   * @param {string} novaSenha 
+   * @returns {Promise<{success: boolean, message: string}>}
+   */
+  async resetPassword(token, novaSenha) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.resetPassword(token, novaSenha);
+    }
+
+    try {
+      const { data } = await api.post('/auth/reset-password', { token, novaSenha });
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
+  },
+
+  /**
+   * Verificar token de recuperação
+   * @param {string} token 
+   * @returns {Promise<{valid: boolean, message: string}>}
+   */
+  async verifyResetToken(token) {
+    // Usar mock service se estiver em modo desenvolvimento
+    if (USE_MOCK_SERVICE) {
+      return await mockAuthService.verifyResetToken(token);
+    }
+
+    try {
+      const { data } = await api.post('/auth/verify-reset-token', { token });
+      return data;
+    } catch (error) {
+      throw this.handleError(error);
+    }
   },
 
   /**

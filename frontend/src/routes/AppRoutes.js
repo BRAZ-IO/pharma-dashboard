@@ -6,6 +6,8 @@ import { ROUTES } from './routeConfig';
 
 // Page imports
 import Login from '../pages/Login';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import Dashboard from '../pages/Dashboard';
 import PDV from '../pages/PDV';
 import PDVMain from '../pages/PDVMain';
@@ -22,11 +24,14 @@ import Usuarios from '../pages/Usuarios';
 import UsuariosLista from '../pages/UsuariosLista';
 import UsuariosDetalhes from '../pages/UsuariosDetalhes';
 import UsuariosCadastro from '../pages/UsuariosCadastro';
+import Fornecedores from '../pages/Fornecedores';
+import FornecedoresLista from '../pages/FornecedoresLista';
+import FornecedoresDetalhes from '../pages/FornecedoresDetalhes';
+import FornecedoresCadastro from '../pages/FornecedoresCadastro';
 import Configuracoes from '../pages/Configuracoes';
 import Registro from '../pages/Registro';
 import Perfil from '../pages/Perfil';
 import Ajuda from '../pages/Ajuda';
-import Fornecedores from '../pages/Fornecedores';
 import Clientes from '../pages/Clientes';
 import ClientesLista from '../pages/ClientesLista';
 import ClientesDetalhes from '../pages/ClientesDetalhes';
@@ -43,6 +48,8 @@ const AppRoutes = () => {
     <Routes>
       {/* Public Routes */}
       <Route path={ROUTES.LOGIN} element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/registro" element={<Registro />} />
       
       {/* Default route - redirects to login page */}
@@ -80,7 +87,12 @@ const AppRoutes = () => {
           <Route path="cadastro/:id" element={<UsuariosCadastro />} />
         </Route>
         <Route path="configuracoes" element={<Configuracoes />} />
-        <Route path="fornecedores" element={<Fornecedores />} />
+        <Route path="fornecedores" element={<Fornecedores />}>
+          <Route index element={<FornecedoresLista />} />
+          <Route path=":id" element={<FornecedoresDetalhes />} />
+          <Route path="cadastro" element={<FornecedoresCadastro />} />
+          <Route path="cadastro/:id" element={<FornecedoresCadastro />} />
+        </Route>
         <Route path="clientes" element={<Clientes />}>
           <Route index element={<ClientesLista />} />
           <Route path=":id" element={<ClientesDetalhes />} />

@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configuração base da API
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api', // Backend real na porta 5000
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

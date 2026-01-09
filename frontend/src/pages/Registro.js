@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import api from '../services/api';
 import './Registro.css';
 
 const Registro = () => {
@@ -11,7 +12,7 @@ const Registro = () => {
     cnpj: '',
     razaoSocial: '',
     telefone: '',
-    email: '',
+    email: '', // Campo vazio para preencher
     endereco: '',
     cidade: '',
     estado: '',
@@ -19,7 +20,7 @@ const Registro = () => {
     
     // Dados do Administrador
     nomeAdmin: '',
-    emailAdmin: '',
+    emailAdmin: '', // Campo vazio para preencher
     telefoneAdmin: '',
     cpfAdmin: '',
     senha: '',
@@ -33,6 +34,8 @@ const Registro = () => {
   });
 
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState('');
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -94,14 +97,68 @@ const Registro = () => {
     setStep(step - 1);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateStep3()) return;
 
-    console.log('Registro de empresa:', formData);
-    alert('Empresa registrada com sucesso! Você receberá um e-mail de confirmação.');
-    navigate('/login');
+    try {
+      setLoading(true);
+      setSubmitError('');
+
+      // Preparar dados para envio
+      const dadosRegistro = {
+        // Dados da Empresa
+        nomeEmpresa: formData.nomeEmpresa,
+        cnpj: formData.cnpj,
+        razaoSocial: formData.razaoSocial,
+        telefone: formData.telefone,
+        email: formData.email,
+        endereco: {
+          rua: formData.endereco,
+          numero: '',
+          bairro: '',
+          cidade: formData.cidade,
+          estado: formData.estado,
+          cep: formData.cep
+        },
+        plano: formData.plano,
+        
+        // Dados do Administrador
+        nomeAdmin: formData.nomeAdmin,
+        emailAdmin: formData.emailAdmin,
+        telefoneAdmin: formData.telefoneAdmin,
+        cpfAdmin: formData.cpfAdmin,
+        senha: formData.senha
+      };
+
+      const response = await api.post('/empresas/registrar', dadosRegistro);
+      
+      if (response.data.sucesso) {
+        alert('Empresa registrada com sucesso! Você já pode fazer login.');
+        navigate('/login');
+      } else {
+        setSubmitError('Erro ao registrar empresa. Tente novamente.');
+      }
+    } catch (error) {
+      console.error('Erro ao registrar empresa:', error);
+      
+      if (error.response?.data?.erro) {
+        setSubmitError(error.response.data.erro);
+      } else if (error.response?.data?.detalhes) {
+        // Erros de validação
+        const validationErrors = {};
+        error.response.data.detalhes.forEach(err => {
+          validationErrors[err.path] = err.msg;
+        });
+        setErrors(validationErrors);
+        setSubmitError('Por favor, corrija os erros destacados.');
+      } else {
+        setSubmitError('Ocorreu um erro ao registrar sua empresa. Tente novamente mais tarde.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const planos = [
@@ -157,6 +214,12 @@ const Registro = () => {
           <h1>Registrar Nova Empresa</h1>
           <p>Crie sua conta e comece a usar o Pharma Dashboard</p>
         </div>
+
+        {submitError && (
+          <div className="error-message">
+            {submitError}
+          </div>
+        )}
 
         <div className="registro-steps">
           <div className={`step ${step >= 1 ? 'active' : ''} ${step > 1 ? 'completed' : ''}`}>
@@ -461,8 +524,8 @@ const Registro = () => {
                 Próximo
               </button>
             ) : (
-              <button type="submit" className="btn-primary">
-                Finalizar Registro
+              <button type="submit" className="btn-primary" disabled={loading}>
+                {loading ? 'Registrando...' : 'Finalizar Registro'}
               </button>
             )}
           </div>

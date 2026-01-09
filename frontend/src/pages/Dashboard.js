@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import api from '../services/api';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -6,42 +7,92 @@ const Dashboard = () => {
     totalVendas: 0,
     totalProdutos: 0,
     clientesAtivos: 0,
-    pedidosPendentes: 0
+    pedidosPendentes: 0,
+    usuariosAtivos: 0,
+    fornecedores: 0
   });
 
   const [vendasRecentes, setVendasRecentes] = useState([]);
   const [produtosBaixoEstoque, setProdutosBaixoEstoque] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Simular carregamento de dados
-    setTimeout(() => {
-      setStats({
-        totalVendas: 45820,
-        totalProdutos: 1247,
-        clientesAtivos: 892,
-        pedidosPendentes: 23
-      });
-
-      setVendasRecentes([
-        { id: 1, cliente: 'João Silva', produto: 'Paracetamol 750mg', valor: 45.90, status: 'concluido', data: '2024-01-07 14:30' },
-        { id: 2, cliente: 'Maria Santos', produto: 'Dipirona 500mg', valor: 12.50, status: 'concluido', data: '2024-01-07 14:15' },
-        { id: 3, cliente: 'Carlos Oliveira', produto: 'Amoxicilina 500mg', valor: 35.80, status: 'pendente', data: '2024-01-07 14:00' },
-        { id: 4, cliente: 'Ana Costa', produto: 'Ibuprofeno 400mg', valor: 28.90, status: 'concluido', data: '2024-01-07 13:45' },
-        { id: 5, cliente: 'Pedro Lima', produto: 'Vitamina D3', valor: 67.50, status: 'concluido', data: '2024-01-07 13:30' }
-      ]);
-
-      setProdutosBaixoEstoque([
-        { id: 1, nome: 'Paracetamol 750mg', estoque: 12, minimo: 50, status: 'critico' },
-        { id: 2, nome: 'Dipirona 500mg', estoque: 28, minimo: 30, status: 'baixo' },
-        { id: 3, nome: 'Amoxicilina 500mg', estoque: 8, minimo: 40, status: 'critico' },
-        { id: 4, nome: 'Ibuprofeno 400mg', estoque: 35, minimo: 60, status: 'baixo' },
-        { id: 5, nome: 'Vitamina C', estoque: 15, minimo: 25, status: 'baixo' }
-      ]);
-
-      setLoading(false);
-    }, 1500);
+    carregarDadosDashboard();
   }, []);
+
+  const carregarDadosDashboard = async () => {
+    try {
+      setLoading(true);
+      setError('');
+
+      // Buscar dados reais do backend
+      const [
+        usuariosResponse,
+        produtosResponse,
+        clientesResponse,
+        fornecedoresResponse
+      ] = await Promise.all([
+        api.get('/usuarios'),
+        api.get('/produtos'),
+        api.get('/clientes'),
+        api.get('/fornecedores')
+      ]);
+
+      const usuarios = usuariosResponse.data.usuarios || [];
+      const produtos = produtosResponse.data.produtos || [];
+      const clientes = clientesResponse.data.clientes || [];
+      const fornecedores = fornecedoresResponse.data.fornecedores || [];
+
+      // Calcular estatísticas reais
+      const statsCalculados = {
+        totalVendas: 0, // TODO: Implementar quando tiver rota de vendas
+        totalProdutos: produtos.length,
+        clientesAtivos: clientes.filter(c => c.ativo !== false).length,
+        pedidosPendentes: 0, // TODO: Implementar quando tiver rota de pedidos
+        usuariosAtivos: usuarios.filter(u => u.ativo === true).length,
+        fornecedores: fornecedores.filter(f => f.ativo !== false).length
+      };
+
+      setStats(statsCalculados);
+
+      // Produtos com estoque baixo
+      const produtosBaixos = produtos
+        .filter(p => p.estoque_atual < p.estoque_minimo)
+        .slice(0, 5)
+        .map(p => ({
+          id: p.id,
+          nome: p.nome,
+          estoque: p.estoque_atual,
+          minimo: p.estoque_minimo,
+          status: p.estoque_atual === 0 ? 'critico' : 'baixo'
+        }));
+
+      setProdutosBaixoEstoque(produtosBaixos);
+
+      // Vendas recentes (mock por enquanto, até implementar rota)
+      setVendasRecentes([]);
+
+      setError('');
+    } catch (error) {
+      console.error('Erro ao carregar dashboard:', error);
+      setError('Não foi possível carregar os dados do dashboard');
+      
+      // Em caso de erro, mostrar valores zerados
+      setStats({
+        totalVendas: 0,
+        totalProdutos: 0,
+        clientesAtivos: 0,
+        pedidosPendentes: 0,
+        usuariosAtivos: 0,
+        fornecedores: 0
+      });
+      setVendasRecentes([]);
+      setProdutosBaixoEstoque([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -79,11 +130,26 @@ const Dashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="dashboard-page">
+        <div className="dashboard-error">
+          <div className="error-icon">⚠️</div>
+          <h3>Erro ao carregar dashboard</h3>
+          <p>{error}</p>
+          <button onClick={carregarDadosDashboard} className="btn-retry">
+            🔄 Tentar novamente
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="dashboard-page">
+    <div className="dashboard">
       <div className="dashboard-header">
         <h1>Dashboard</h1>
-        <p>Visão geral do sistema</p>
+        <p>Visão geral da Farmácia C</p>
       </div>
 
       {/* Stats Cards */}
@@ -127,6 +193,26 @@ const Dashboard = () => {
             <p>Pedidos Pendentes</p>
           </div>
         </div>
+
+        <div className="stat-card secondary">
+          <div className="stat-icon">
+            <span className="icon-employee">👤</span>
+          </div>
+          <div className="stat-content">
+            <h3>{stats.usuariosAtivos}</h3>
+            <p>Usuários Ativos</p>
+          </div>
+        </div>
+
+        <div className="stat-card accent">
+          <div className="stat-icon">
+            <span className="icon-supplier">🏢</span>
+          </div>
+          <div className="stat-content">
+            <h3>{stats.fornecedores}</h3>
+            <p>Fornecedores</p>
+          </div>
+        </div>
       </div>
 
       {/* Charts and Tables */}
@@ -140,35 +226,43 @@ const Dashboard = () => {
             </div>
             <div className="card-content">
               <div className="vendas-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Cliente</th>
-                      <th>Produto</th>
-                      <th>Valor</th>
-                      <th>Status</th>
-                      <th>Data</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {vendasRecentes.map(venda => (
-                      <tr key={venda.id}>
-                        <td>{venda.cliente}</td>
-                        <td>{venda.produto}</td>
-                        <td>{formatCurrency(venda.valor)}</td>
-                        <td>
-                          <span 
-                            className="status-badge" 
-                            style={{ backgroundColor: getStatusColor(venda.status) }}
-                          >
-                            {venda.status}
-                          </span>
-                        </td>
-                        <td>{venda.data}</td>
+                {vendasRecentes.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">💰</div>
+                    <h4>Nenhuma venda registrada</h4>
+                    <p>As vendas realizadas aparecerão aqui</p>
+                  </div>
+                ) : (
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Cliente</th>
+                        <th>Produto</th>
+                        <th>Valor</th>
+                        <th>Status</th>
+                        <th>Data</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {vendasRecentes.map(venda => (
+                        <tr key={venda.id}>
+                          <td>{venda.cliente}</td>
+                          <td>{venda.produto}</td>
+                          <td>{formatCurrency(venda.valor)}</td>
+                          <td>
+                            <span 
+                              className="status-badge" 
+                              style={{ backgroundColor: getStatusColor(venda.status) }}
+                            >
+                              {venda.status}
+                            </span>
+                          </td>
+                          <td>{venda.data}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
               </div>
             </div>
           </div>
@@ -181,22 +275,30 @@ const Dashboard = () => {
             </div>
             <div className="card-content">
               <div className="estoque-list">
-                {produtosBaixoEstoque.map(produto => (
-                  <div key={produto.id} className="estoque-item">
-                    <div className="estoque-info">
-                      <h4>{produto.nome}</h4>
-                      <p>Estoque: {produto.estoque} / Mínimo: {produto.minimo}</p>
-                    </div>
-                    <div className="estoque-status">
-                      <span 
-                        className="estoque-badge"
-                        style={{ backgroundColor: getEstoqueStatus(produto.status) }}
-                      >
-                        {produto.status}
-                      </span>
-                    </div>
+                {produtosBaixoEstoque.length === 0 ? (
+                  <div className="empty-state">
+                    <div className="empty-icon">📦</div>
+                    <h4>Estoque em dia</h4>
+                    <p>Nenhum produto com estoque baixo no momento</p>
                   </div>
-                ))}
+                ) : (
+                  produtosBaixoEstoque.map(produto => (
+                    <div key={produto.id} className="estoque-item">
+                      <div className="estoque-info">
+                        <h4>{produto.nome}</h4>
+                        <p>Estoque: {produto.estoque} / Mínimo: {produto.minimo}</p>
+                      </div>
+                      <div className="estoque-status">
+                        <span 
+                          className="estoque-badge"
+                          style={{ backgroundColor: getEstoqueStatus(produto.status) }}
+                        >
+                          {produto.status}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>

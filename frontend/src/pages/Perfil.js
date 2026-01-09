@@ -1,21 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import './Perfil.css';
 
 const Perfil = () => {
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('informacoes');
   const [formData, setFormData] = useState({
-    nome: 'João Silva',
-    email: 'joao.silva@pharma.com',
-    telefone: '(11) 98765-4321',
-    cargo: 'Administrador',
-    departamento: 'TI',
-    dataAdmissao: '2023-01-15',
-    cpf: '123.456.789-00',
-    endereco: 'Rua das Flores, 123',
-    cidade: 'São Paulo',
-    estado: 'SP',
-    cep: '01234-567'
+    nome: '',
+    email: '',
+    telefone: '',
+    cargo: '',
+    departamento: '',
+    dataAdmissao: '',
+    cpf: '',
+    endereco: '',
+    cidade: '',
+    estado: '',
+    cep: ''
   });
+
+  // Carregar dados do usuário quando o componente montar
+  useEffect(() => {
+    if (user) {
+      setFormData(prev => ({
+        ...prev,
+        nome: user.nome || '',
+        email: user.email || '',
+        telefone: user.telefone || '',
+        cargo: user.cargo || '',
+        departamento: user.departamento || '',
+        dataAdmissao: user.dataAdmissao || '',
+        cpf: user.cpf || '',
+        endereco: user.endereco || '',
+        cidade: user.cidade || '',
+        estado: user.estado || '',
+        cep: user.cep || ''
+      }));
+    }
+  }, [user]);
 
   const [senhaData, setSenhaData] = useState({
     senhaAtual: '',

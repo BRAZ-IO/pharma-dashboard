@@ -31,9 +31,75 @@
 }
 
 .registro-header p {
+  color: #78909c;
+  margin: 0;
+  font-size: 1rem;
+}
+
+.error-message {
+  background: rgba(231, 76, 60, 0.1);
+  border: 1px solid rgba(231, 76, 60, 0.3);
+  color: #e74c3c;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.registro-header p {
   font-size: 1rem;
   color: #78909c;
   margin: 0;
+}
+
+.welcome-message {
+  background: linear-gradient(135deg, rgba(100, 181, 246, 0.1) 0%, rgba(38, 222, 129, 0.1) 100%);
+  border: 1px solid rgba(100, 181, 246, 0.2);
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.welcome-message p {
+  color: #e8eaed;
+  font-size: 0.875rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.welcome-message strong {
+  color: #64b5f6;
+  font-weight: 600;
+}
+
+.form-group input[readonly] {
+  background: rgba(100, 181, 246, 0.05);
+  border-color: rgba(100, 181, 246, 0.2);
+  cursor: not-allowed;
+}
+
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-hint {
+  position: absolute;
+  right: 1rem;
+  color: #26de81;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: rgba(38, 222, 129, 0.1);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  pointer-events: none;
+}
+
+.form-group input[readonly] + .input-hint {
+  color: #26de81;
 }
 
 /* Steps */

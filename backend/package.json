@@ -9,6 +9,9 @@
     "reset": "node src/database/reset.js",
     "migrate": "node src/database/migrate.js",
     "seed": "node src/database/seed.js",
+    "register-farmacia-c": "node scripts/registrar-farmacia-c.js",
+    "test-permissions": "node scripts/testar-permissoes.js",
+    "limpar-banco": "node scripts/limpar-banco.js",
     "generate-secret": "node scripts/generate-secret.js",
     "test": "jest"
   },
@@ -22,6 +25,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.13.2",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",

@@ -1,24 +1,34 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import './Produtos.css';
 
 const ProdutosLista = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
+  const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const [produtos] = useState([
-    { id: 1, name: 'Paracetamol 750mg', price: 12.50, stock: 45, category: 'Analgésico', barcode: '7891234567890', status: 'ativo' },
-    { id: 2, name: 'Dipirona 500mg', price: 8.90, stock: 32, category: 'Analgésico', barcode: '7891234567891', status: 'ativo' },
-    { id: 3, name: 'Amoxicilina 500mg', price: 15.80, stock: 28, category: 'Antibiótico', barcode: '7891234567892', status: 'ativo' },
-    { id: 4, name: 'Ibuprofeno 400mg', price: 18.50, stock: 15, category: 'Anti-inflamatório', barcode: '7891234567893', status: 'ativo' },
-    { id: 5, name: 'Vitamina D3', price: 35.90, stock: 22, category: 'Vitamina', barcode: '7891234567894', status: 'ativo' },
-    { id: 6, name: 'Omeprazol 20mg', price: 22.30, stock: 18, category: 'Antiácido', barcode: '7891234567895', status: 'ativo' },
-    { id: 7, name: 'Loratadina 10mg', price: 25.80, stock: 35, category: 'Antialérgico', barcode: '7891234567896', status: 'ativo' },
-    { id: 8, name: 'Ácido Fólico 5mg', price: 28.90, stock: 12, category: 'Vitamina', barcode: '7891234567897', status: 'inativo' },
-    { id: 9, name: 'Azitromicina 500mg', price: 32.50, stock: 8, category: 'Antibiótico', barcode: '7891234567898', status: 'ativo' },
-    { id: 10, name: 'Dorflex', price: 14.90, stock: 50, category: 'Analgésico', barcode: '7891234567899', status: 'ativo' },
-  ]);
+  useEffect(() => {
+    carregarProdutos();
+  }, []);
+
+  const carregarProdutos = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/produtos');
+      setProdutos(response.data.produtos || []);
+      setError('');
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+      setError('Não foi possível carregar os produtos');
+      setProdutos([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -27,21 +37,41 @@ const ProdutosLista = () => {
     }).format(value);
   };
 
-  const categories = ['Todos', ...new Set(produtos.map(p => p.category))];
+  const categories = ['Todos', ...new Set(produtos.map(p => p.categoria || 'Sem categoria'))];
 
   const filteredProducts = produtos.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.barcode.includes(searchTerm);
-    const matchesCategory = selectedCategory === 'Todos' || product.category === selectedCategory;
+    const matchesSearch = product.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.codigo_barras?.includes(searchTerm);
+    const matchesCategory = selectedCategory === 'Todos' || product.categoria === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const getStockStatus = (stock) => {
-    if (stock === 0) return { label: 'Sem estoque', class: 'stock-empty' };
-    if (stock < 10) return { label: 'Estoque baixo', class: 'stock-low' };
-    if (stock < 20) return { label: 'Estoque médio', class: 'stock-medium' };
+  const getStockStatus = (estoque_atual, estoque_minimo) => {
+    if (estoque_atual === 0) return { label: 'Sem estoque', class: 'stock-empty' };
+    if (estoque_atual < estoque_minimo) return { label: 'Estoque baixo', class: 'stock-low' };
+    if (estoque_atual < estoque_minimo * 2) return { label: 'Estoque médio', class: 'stock-medium' };
     return { label: 'Em estoque', class: 'stock-ok' };
   };
+
+  if (loading) {
+    return (
+      <div className="loading-container">
+        <div className="loading-spinner"></div>
+        <p>Carregando produtos...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="error-container">
+        <p>{error}</p>
+        <button onClick={carregarProdutos} className="btn-retry">
+          🔄 Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="produtos-lista">
@@ -52,11 +82,11 @@ const ProdutosLista = () => {
             <span className="stat-label">Total de Produtos</span>
           </div>
           <div className="stat-card">
-            <span className="stat-value">{produtos.filter(p => p.status === 'ativo').length}</span>
+            <span className="stat-value">{produtos.filter(p => p.ativo !== false).length}</span>
             <span className="stat-label">Produtos Ativos</span>
           </div>
           <div className="stat-card">
-            <span className="stat-value">{produtos.filter(p => p.stock < 10).length}</span>
+            <span className="stat-value">{produtos.filter(p => p.estoque_atual < (p.estoque_minimo || 10)).length}</span>
             <span className="stat-label">Estoque Baixo</span>
           </div>
         </div>
@@ -90,33 +120,38 @@ const ProdutosLista = () => {
 
       <div className="produtos-grid">
         {filteredProducts.map(produto => {
-          const stockStatus = getStockStatus(produto.stock);
+          const stockStatus = getStockStatus(produto.estoque_atual, produto.estoque_minimo);
           return (
             <div key={produto.id} className="produto-card">
               <div className="produto-header">
                 <div className="produto-info">
-                  <h3>{produto.name}</h3>
-                  <p className="produto-barcode">{produto.barcode}</p>
+                  <h3>{produto.nome}</h3>
+                  <p className="produto-barcode">{produto.codigo_barras || 'Sem código'}</p>
                 </div>
-                <span className={`status-badge ${produto.status}`}>
-                  {produto.status === 'ativo' ? '✓ Ativo' : '✗ Inativo'}
-                </span>
+                <div className={`produto-status ${produto.ativo !== false ? 'ativo' : 'inativo'}`}>
+                  {produto.ativo !== false ? '✓' : '✗'}
+                </div>
               </div>
 
-              <div className="produto-details">
-                <div className="detail-row">
-                  <span className="detail-label">Categoria:</span>
-                  <span className="category-badge">{produto.category}</span>
+              <div className="produto-body">
+                <div className="produto-price">
+                  <span className="price-label">Preço</span>
+                  <span className="price-value">{formatCurrency(produto.preco_venda || 0)}</span>
                 </div>
-                <div className="detail-row">
-                  <span className="detail-label">Preço:</span>
-                  <span className="detail-value price">{formatCurrency(produto.price)}</span>
-                </div>
-                <div className="detail-row">
-                  <span className="detail-label">Estoque:</span>
-                  <span className={`stock-badge ${stockStatus.class}`}>
-                    {produto.stock} un
+
+                <div className="produto-stock">
+                  <span className="stock-label">Estoque</span>
+                  <span className={`stock-value ${stockStatus.class}`}>
+                    {produto.estoque_atual || 0} unid.
                   </span>
+                  <span className={`stock-status ${stockStatus.class}`}>
+                    {stockStatus.label}
+                  </span>
+                </div>
+
+                <div className="produto-category">
+                  <span className="category-label">Categoria</span>
+                  <span className="category-value">{produto.categoria || 'Sem categoria'}</span>
                 </div>
               </div>
 
@@ -126,26 +161,21 @@ const ProdutosLista = () => {
                   onClick={() => navigate(`/app/produtos/${produto.id}`)}
                   title="Ver detalhes"
                 >
-                  👁️ Ver
+                  👁️
                 </button>
                 <button 
                   className="btn-action btn-edit"
                   onClick={() => navigate(`/app/produtos/cadastro/${produto.id}`)}
                   title="Editar"
                 >
-                  ✏️ Editar
+                  ✏️
                 </button>
                 <button 
-                  className="btn-action btn-delete"
-                  onClick={() => {
-                    if (window.confirm(`Tem certeza que deseja excluir o produto ${produto.name}?`)) {
-                      console.log(`Excluindo produto ${produto.name}`);
-                      alert(`Produto excluído! (Funcionalidade em desenvolvimento)`);
-                    }
-                  }}
-                  title="Excluir"
+                  className="btn-action btn-stock"
+                  onClick={() => navigate(`/app/estoque/movimentacoes?produto=${produto.id}`)}
+                  title="Gerenciar estoque"
                 >
-                  🗑️
+                  �
                 </button>
               </div>
             </div>

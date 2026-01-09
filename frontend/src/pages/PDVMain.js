@@ -1,41 +1,58 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 import './PDV.css';
 
 const PDVMain = () => {
+  const navigate = useNavigate();
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState('');
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [saleId, setSaleId] = useState('');
-  const navigate = useNavigate();
-
-  // Produtos mock
-  const [products] = useState([
-    { id: 1, name: 'Paracetamol 750mg', price: 12.50, stock: 45, category: 'Analgésico', barcode: '7891234567890' },
-    { id: 2, name: 'Dipirona 500mg', price: 8.90, stock: 32, category: 'Analgésico', barcode: '7891234567891' },
-    { id: 3, name: 'Amoxicilina 500mg', price: 15.80, stock: 28, category: 'Antibiótico', barcode: '7891234567892' },
-    { id: 4, name: 'Ibuprofeno 400mg', price: 18.50, stock: 15, category: 'Anti-inflamatório', barcode: '7891234567893' },
-    { id: 5, name: 'Vitamina D3', price: 35.90, stock: 22, category: 'Vitamina', barcode: '7891234567894' },
-    { id: 6, name: 'Omeprazol 20mg', price: 22.30, stock: 18, category: 'Antiácido', barcode: '7891234567895' },
-    { id: 7, name: 'Loratadina 10mg', price: 25.80, stock: 35, category: 'Antialérgico', barcode: '7891234567896' },
-    { id: 8, name: 'Ácido Fólico 5mg', price: 28.90, stock: 12, category: 'Vitamina', barcode: '7891234567897' }
-  ]);
-
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [barcodeInput, setBarcodeInput] = useState('');
   const [scannerActive, setScannerActive] = useState(false);
   const [lastScannedProduct, setLastScannedProduct] = useState(null);
 
+  // Carregar produtos do backend
+  const carregarDados = async () => {
+    try {
+      setLoading(true);
+      setError('');
+      
+      // Buscar produtos em uma única requisição
+      const response = await api.get('/produtos');
+      setProducts(response.data.produtos || []);
+      setError('');
+    } catch (error) {
+      console.error('Erro ao carregar produtos:', error);
+      setError('Não foi possível carregar os produtos');
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const newTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    // Carregar dados apenas uma vez no início
+    if (products.length === 0) {
+      carregarDados();
+    }
+  }, [products.length]);
+
+  useEffect(() => {
+    const newTotal = cart.reduce((sum, item) => sum + (item.preco_venda * item.quantity), 0);
     setTotal(newTotal);
   }, [cart]);
 
   const addToCart = (product) => {
-    if (product.stock === 0) {
+    if (!product.estoque_atual || product.estoque_atual === 0) {
       alert('Produto sem estoque!');
       return;
     }
@@ -43,7 +60,7 @@ const PDVMain = () => {
     const existingItem = cart.find(item => item.id === product.id);
     
     if (existingItem) {
-      if (existingItem.quantity >= product.stock) {
+      if (existingItem.quantity >= product.estoque_atual) {
         alert('Estoque insuficiente!');
         return;
       }
@@ -53,7 +70,10 @@ const PDVMain = () => {
           : item
       ));
     } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
+      setCart([...cart, { 
+        ...product, 
+        quantity: 1
+      }]);
     }
     
     // Feedback visual ao escanear
@@ -63,7 +83,7 @@ const PDVMain = () => {
 
   const handleBarcodeScanner = (e) => {
     if (e.key === 'Enter' && barcodeInput.trim()) {
-      const product = products.find(p => p.barcode === barcodeInput.trim());
+      const product = products.find(p => p.codigo_barras === barcodeInput.trim());
       
       if (product) {
         addToCart(product);
@@ -89,7 +109,7 @@ const PDVMain = () => {
     }
 
     const product = products.find(p => p.id === productId);
-    if (quantity > product.stock) {
+    if (quantity > product.estoque_atual) {
       alert('Estoque insuficiente!');
       return;
     }
@@ -137,13 +157,33 @@ const PDVMain = () => {
   };
 
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.barcode.includes(searchTerm);
-    const matchesCategory = selectedCategory === 'Todos' || product.category === selectedCategory;
+    const matchesSearch = product.nome?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         product.codigo_barras?.includes(searchTerm);
+    const matchesCategory = selectedCategory === 'Todos' || product.categoria === selectedCategory;
     return matchesSearch && matchesCategory;
   });
 
-  const categories = ['Todos', ...new Set(products.map(p => p.category))];
+  const categories = ['Todos', ...new Set(products.map(p => p.categoria || 'Sem categoria'))];
+
+  if (loading) {
+    return (
+      <div className="pdv-loading">
+        <div className="loading-spinner"></div>
+        <p>Carregando produtos...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="pdv-error">
+        <p>{error}</p>
+        <button onClick={carregarDados} className="btn-retry">
+          🔄 Tentar novamente
+        </button>
+      </div>
+    );
+  }
 
   if (showSuccessModal) {
     return (
@@ -166,12 +206,6 @@ const PDVMain = () => {
 
   return (
     <div className="pdv-main-layout">
-      <div className="pdv-actions">
-        <button className="btn-secondary" onClick={() => navigate('/app/dashboard')}>
-          Voltar
-        </button>
-      </div>
-      
       <div className="pdv-main-grid">
         {/* Scanner de Código de Barras */}
         <div className="barcode-scanner-section">
@@ -200,7 +234,7 @@ const PDVMain = () => {
               {lastScannedProduct && (
                 <div className="scan-feedback">
                   <span className="scan-success">✓</span>
-                  <span>{lastScannedProduct.name} adicionado!</span>
+                  <span>{lastScannedProduct.nome} adicionado!</span>
                 </div>
               )}
             </div>
@@ -235,23 +269,35 @@ const PDVMain = () => {
             {filteredProducts.map(product => (
               <div key={product.id} className="product-card">
                 <div className="product-info">
-                  <h3>{product.name}</h3>
-                  <p className="product-category">{product.category}</p>
-                  <p className="product-price">{formatCurrency(product.price)}</p>
-                  <p className="product-stock">Estoque: {product.stock}</p>
-                  <p className="product-barcode">{product.barcode}</p>
+                  <h3>{product.nome}</h3>
+                  <p className="product-category">{product.categoria || 'Sem categoria'}</p>
+                  <p className="product-price">{formatCurrency(product.preco_venda || 0)}</p>
+                  <p className="product-stock">Estoque: {product.estoque_atual || 0}</p>
+                  <p className="product-barcode">{product.codigo_barras || 'Sem código'}</p>
                 </div>
                 <div className="product-actions">
                   <button 
                     className="btn-add-cart"
                     onClick={() => addToCart(product)}
-                    disabled={product.stock === 0}
+                    disabled={!product.estoque_atual || product.estoque_atual === 0}
                   >
-                    {product.stock === 0 ? 'Sem Estoque' : 'Adicionar'}
+                    {!product.estoque_atual || product.estoque_atual === 0 ? 'Sem Estoque' : 'Adicionar'}
                   </button>
                 </div>
               </div>
             ))}
+            
+            {filteredProducts.length === 0 && !loading && !error && (
+              <div className="no-products">
+                <div className="no-products-icon">📦</div>
+                <h3>Nenhum produto encontrado</h3>
+                <p>
+                  {searchTerm || selectedCategory !== 'Todos'
+                    ? 'Tente ajustar os filtros de busca.'
+                    : 'Nenhum produto cadastrado no sistema.'}
+                </p>
+              </div>
+            )}
           </div>
         </div>
 
@@ -270,55 +316,60 @@ const PDVMain = () => {
 
           <div className="cart-items">
             {cart.length === 0 ? (
-              <div className="cart-empty">
-                <p>Carrinho vazio</p>
+              <div className="empty-cart">
+                <div className="empty-cart-icon">🛒</div>
+                <h3>Carrinho vazio</h3>
+                <p>Adicione produtos para começar</p>
               </div>
             ) : (
               cart.map(item => (
                 <div key={item.id} className="cart-item">
                   <div className="cart-item-info">
-                    <h4>{item.name}</h4>
-                    <p>{formatCurrency(item.price)}</p>
+                    <h4>{item.nome}</h4>
+                    <p className="cart-item-price">{formatCurrency(item.preco_venda)}</p>
+                    <p className="cart-item-barcode">{item.codigo_barras || 'Sem código'}</p>
                   </div>
                   <div className="cart-item-quantity">
                     <button 
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       className="btn-quantity"
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
                     >
                       -
                     </button>
-                    <span>{item.quantity}</span>
+                    <span className="quantity">{item.quantity}</span>
                     <button 
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       className="btn-quantity"
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
                     >
                       +
                     </button>
                   </div>
                   <div className="cart-item-total">
-                    <p>{formatCurrency(item.price * item.quantity)}</p>
+                    <span>{formatCurrency(item.preco_venda * item.quantity)}</span>
                   </div>
-                  <button 
-                    className="btn-remove"
-                    onClick={() => removeFromCart(item.id)}
-                  >
-                    ×
-                  </button>
+                  <div className="cart-item-actions">
+                    <button 
+                      className="btn-remove"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
               ))
             )}
           </div>
-
-          <div className="cart-summary">
+          
+          <div className="cart-footer">
             <div className="cart-total">
               <h3>Total: {formatCurrency(total)}</h3>
             </div>
             <button 
-              className="btn-payment"
+              className="btn-checkout"
               onClick={handlePayment}
               disabled={cart.length === 0}
             >
-              Finalizar Compra
+              Finalizar Venda
             </button>
           </div>
         </div>
@@ -326,51 +377,85 @@ const PDVMain = () => {
 
       {/* Modal de Pagamento */}
       {showPaymentModal && (
-        <div className="payment-modal">
-          <div className="payment-content">
-            <h2>Forma de Pagamento</h2>
-            <div className="payment-methods">
+        <div className="payment-modal-overlay">
+          <div className="payment-modal">
+            <div className="payment-modal-header">
+              <h2>Finalizar Venda</h2>
               <button 
-                className={`payment-method-btn ${paymentMethod === 'Dinheiro' ? 'active' : ''}`}
-                onClick={() => setPaymentMethod('Dinheiro')}
-              >
-                💵 Dinheiro
-              </button>
-              <button 
-                className={`payment-method-btn ${paymentMethod === 'Cartão' ? 'active' : ''}`}
-                onClick={() => setPaymentMethod('Cartão')}
-              >
-                💳 Cartão
-              </button>
-              <button 
-                className={`payment-method-btn ${paymentMethod === 'PIX' ? 'active' : ''}`}
-                onClick={() => setPaymentMethod('PIX')}
-              >
-                📱 PIX
-              </button>
-              <button 
-                className={`payment-method-btn ${paymentMethod === 'Débito' ? 'active' : ''}`}
-                onClick={() => setPaymentMethod('Débito')}
-              >
-                💰 Débito
-              </button>
-            </div>
-            <div className="payment-summary">
-              <h3>Total: {formatCurrency(total)}</h3>
-            </div>
-            <div className="payment-actions">
-              <button 
-                className="btn-secondary"
+                className="btn-close"
                 onClick={() => setShowPaymentModal(false)}
               >
-                Cancelar
+                ✕
               </button>
-              <button 
-                className="btn-primary"
-                onClick={confirmPayment}
-              >
-                Confirmar Pagamento
-              </button>
+            </div>
+            
+            <div className="payment-modal-content">
+              <div className="payment-summary">
+                <h3>Resumo da Venda</h3>
+                <div className="summary-items">
+                  {cart.map(item => (
+                    <div key={item.id} className="summary-item">
+                      <span>{item.quantity}x {item.nome}</span>
+                      <span>{formatCurrency(item.preco_venda * item.quantity)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="summary-total">
+                  <strong>Total:</strong>
+                  <strong>{formatCurrency(total)}</strong>
+                </div>
+              </div>
+              
+              <div className="payment-methods">
+                <h3>Forma de Pagamento</h3>
+                <div className="payment-options">
+                  <label className="payment-option">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="dinheiro"
+                      checked={paymentMethod === 'dinheiro'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <span>💵 Dinheiro</span>
+                  </label>
+                  <label className="payment-option">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="cartao"
+                      checked={paymentMethod === 'cartao'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <span>💳️ Cartão</span>
+                  </label>
+                  <label className="payment-option">
+                    <input
+                      type="radio"
+                      name="payment"
+                      value="pix"
+                      checked={paymentMethod === 'pix'}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                    />
+                    <span>📱 PIX</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="payment-modal-actions">
+                <button 
+                  className="btn-secondary"
+                  onClick={() => setShowPaymentModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button 
+                  className="btn-primary"
+                  onClick={confirmPayment}
+                >
+                  Confirmar Pagamento
+                </button>
+              </div>
             </div>
           </div>
         </div>

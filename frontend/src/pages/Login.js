@@ -9,14 +9,18 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [requires2FA, setRequires2FA] = useState(false);
-  const [userId, setUserId] = useState('');
   const [codigo2FA, setCodigo2FA] = useState('');
+  const [userId, setUserId] = useState('');
   
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Evitar múltiplas requisições simultâneas
+    if (loading) return;
+    
     setLoading(true);
     setError('');
 
@@ -26,11 +30,26 @@ const Login = () => {
       if (result.requires2FA) {
         setRequires2FA(true);
         setUserId(result.userId);
+        setError('');
       } else {
+        // Login bem sucedido sem 2FA
         navigate('/app/dashboard');
       }
     } catch (err) {
-      setError(err.message || 'Erro ao fazer login');
+      console.error('Erro no login:', err);
+      
+      // Tratar diferentes tipos de erro
+      if (err.response?.status === 401) {
+        setError('Email ou senha incorretos.');
+      } else if (err.response?.status === 403) {
+        setError('Acesso negado. Verifique suas permissões.');
+      } else if (err.response?.status === 500) {
+        setError('Erro no servidor. Tente novamente mais tarde.');
+      } else if (err.code === 'NETWORK_ERROR' || err.message === 'Network Error') {
+        setError('Erro de conexão. Verifique sua internet.');
+      } else {
+        setError('Ocorreu um erro ao fazer login. Tente novamente.');
+      }
     } finally {
       setLoading(false);
     }
@@ -38,15 +57,28 @@ const Login = () => {
 
   const handleValidate2FA = async (e) => {
     e.preventDefault();
+    
+    // Evitar múltiplas requisições simultâneas
+    if (loading) return;
+    
     setLoading(true);
     setError('');
 
     try {
       // Implementar validação 2FA
       // await authService.validate2FA(userId, codigo2FA);
-      navigate('/app/dashboard');
+      navigate('/app/perfil');
     } catch (err) {
-      setError(err.message || 'Código inválido');
+      console.error('Erro na validação 2FA:', err);
+      
+      // Tratar diferentes tipos de erro
+      if (err.response?.status === 401) {
+        setError('Código inválido.');
+      } else if (err.response?.status === 500) {
+        setError('Erro no servidor. Tente novamente mais tarde.');
+      } else {
+        setError(err.message || 'Código inválido');
+      }
     } finally {
       setLoading(false);
     }
@@ -130,7 +162,7 @@ const Login = () => {
               value={credentials.email}
               onChange={handleChange}
               className="form-input"
-              placeholder="admin@pharma.com"
+              placeholder="usuario@demo.com"
               required
               disabled={loading}
             />
@@ -154,12 +186,17 @@ const Login = () => {
           <button type="submit" className="btn-login" disabled={loading}>
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
+          
+          <div className="login-links">
+            <Link to="/forgot-password" className="link">
+              Esqueci minha senha
+            </Link>
+          </div>
         </form>
         
         <div className="login-footer">
-          <p><strong>Contas de teste:</strong></p>
-          <p>Admin: admin@pharma.com / 123456</p>
-          <p>Gerente: gerente@pharma.com / 123456</p>
+          <p><strong>Conta de Demonstração:</strong></p>
+          <p>Usuario Demo: usuario@demo.com / 123456</p>
           <p className="registro-link">
             Não tem uma conta? <Link to="/registro">Registre sua empresa</Link>
           </p>
