@@ -18,7 +18,7 @@ const Usuarios = () => {
   return (
     <div className="usuarios-page">
       <div className="usuarios-header">
-        <h1>Usuários</h1>
+        <h1>👥 Usuários</h1>
         <div className="usuarios-nav">
           <NavLink to="/app/usuarios" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             Lista

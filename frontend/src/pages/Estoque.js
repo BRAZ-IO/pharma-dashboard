@@ -6,7 +6,7 @@ const Estoque = () => {
   return (
     <div className="estoque-page">
       <div className="estoque-header">
-        <h1>Estoque</h1>
+        <h1>📦 Estoque</h1>
         <div className="estoque-nav">
           <NavLink to="/app/estoque" end className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}>
             Inventário
