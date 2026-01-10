@@ -4,7 +4,9 @@ const { Usuario } = require('../models');
 
 const authMiddleware = async (req, res, next) => {
   try {
+    console.log('🔐 Auth middleware chamado para:', req.method, req.url);
     const authHeader = req.headers.authorization;
+    console.log('📋 Authorization header:', authHeader);
 
     if (!authHeader) {
       return res.status(401).json({ 

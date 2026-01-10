@@ -68,8 +68,20 @@ if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
 
+// Log de requisições para debug (antes das rotas)
+app.use((req, res, next) => {
+  console.log(`📝 ${req.method} ${req.url} - Headers:`, req.headers);
+  next();
+});
+
 // Rotas
 app.use('/api', routes);
+
+// Log de requisições para debug
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url} - ${new Date().toISOString()}`);
+  next();
+});
 
 // Rota raiz
 app.get('/', (req, res) => {

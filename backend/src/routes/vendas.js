@@ -78,6 +78,131 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Criar nova venda
+router.post('/', async (req, res) => {
+  console.log('🔄 POST /api/vendas chamado');
+  console.log('📋 Body completo:', JSON.stringify(req.body, null, 2));
+  console.log('👤 Usuario:', req.user);
+  console.log('🏢 Empresa ID:', req.empresaId);
+  
+  try {
+    const {
+      cliente_id,
+      cliente_nome,
+      cliente_cpf,
+      items,
+      subtotal,
+      total,
+      forma_pagamento
+    } = req.body;
+    
+    console.log('📦 Dados extraídos:', { cliente_id, cliente_nome, cliente_cpf, items, subtotal, total, forma_pagamento });
+    
+    // Validar dados obrigatórios
+    if (!items || items.length === 0) {
+      console.log('❌ Validação falhou: Items são obrigatórios');
+      return res.status(400).json({ error: 'Items são obrigatórios' });
+    }
+
+    if (!total || total <= 0) {
+      return res.status(400).json({ error: 'Total da venda é inválido' });
+    }
+
+    const empresa_id = req.empresaId;
+    const usuario_id = req.user.id;
+
+    // Gerar número da venda
+    const numero_venda = `VND-${Date.now()}`;
+
+    // Iniciar transação
+    const transaction = await sequelize.transaction();
+
+    try {
+      // Criar venda
+      const venda = await Venda.create({
+        empresa_id,
+        usuario_id,
+        cliente_id,
+        cliente_nome: cliente_nome || 'Consumidor Final',
+        cliente_cpf: cliente_cpf || null,
+        numero_venda,
+        tipo: 'venda',
+        status: 'pendente',
+        subtotal: subtotal || total,
+        total,
+        forma_pagamento: forma_pagamento || 'dinheiro',
+        observacoes: null
+      }, { transaction });
+
+      // Criar itens da venda
+      console.log('📦 Criando itens da venda:', items);
+      
+      // Verificar se produtos existem antes de criar
+      for (const item of items) {
+        const produto = await Produto.findByPk(item.produto_id);
+        if (!produto) {
+          console.log(`❌ Produto não encontrado: ${item.produto_id}`);
+          throw new Error(`Produto com ID ${item.produto_id} não encontrado`);
+        }
+        console.log(`✅ Produto encontrado: ${produto.nome} (ID: ${item.produto_id})`);
+      }
+      
+      const itensVenda = items.map(item => ({
+        venda_id: venda.id,
+        produto_id: item.produto_id,
+        quantidade: item.quantidade,
+        preco_unitario: item.preco_unitario,
+        desconto: item.desconto || 0,
+        subtotal: item.subtotal
+      }));
+      
+      console.log('📦 Itens mapeados para criação:', itensVenda);
+      
+      await ItemVenda.bulkCreate(itensVenda, { transaction });
+
+      // Commit da transação
+      await transaction.commit();
+
+      // Buscar venda completa com relacionamentos
+      const vendaCompleta = await Venda.findOne({
+        where: { id: venda.id },
+        include: [
+          {
+            model: ItemVenda,
+            as: 'itens',
+            include: [
+              {
+                model: Produto,
+                as: 'produto',
+                attributes: ['id', 'nome', 'codigo_barras']
+              }
+            ]
+          },
+          {
+            model: Usuario,
+            as: 'vendedor',
+            attributes: ['id', 'nome', 'email']
+          }
+        ]
+      });
+
+      res.status(201).json(vendaCompleta);
+
+    } catch (error) {
+      // Rollback em caso de erro
+      await transaction.rollback();
+      throw error;
+    }
+
+  } catch (error) {
+    console.error('Erro ao criar venda:', error);
+    res.status(500).json({ 
+      error: 'Erro ao criar venda',
+      details: error.message 
+    });
+  }
+});
+
 // Análise de vendas por período
 router.get('/analise/periodo', async (req, res) => {
   try {

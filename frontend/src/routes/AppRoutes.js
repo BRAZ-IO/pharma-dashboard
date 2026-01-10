@@ -10,8 +10,10 @@ import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 import Dashboard from '../pages/Dashboard';
 import PDV from '../pages/PDV';
+import PDVVenda from '../pages/PDVVenda';
 import PDVVendas from '../pages/PDVVendas';
 import PDVRelatorios from '../pages/PDVRelatorios';
+import PDVPagamento from '../pages/PDVPagamento';
 import Produtos from '../pages/Produtos';
 import ProdutosLista from '../pages/ProdutosLista';
 import ProdutosDetalhes from '../pages/ProdutosDetalhes';
@@ -65,8 +67,10 @@ const AppRoutes = () => {
       >
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="pdv" element={<PDV />}>
-          <Route index element={<PDVVendas />} />
-          <Route path="vendas" element={<PDVVendas />} />
+          <Route index element={<PDVVenda />} />
+          <Route path="venda" element={<PDVVenda />} />
+          <Route path="pagamento" element={<PDVPagamento />} />
+          <Route path="historico" element={<PDVVendas />} />
           <Route path="relatorios" element={<PDVRelatorios />} />
         </Route>
         <Route path="produtos" element={<Produtos />}>
