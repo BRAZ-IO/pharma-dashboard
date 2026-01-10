@@ -9,8 +9,6 @@ const swaggerRoutes = require('./swagger');
 const fornecedoresRoutes = require('./fornecedores');
 const clientesRoutes = require('./clientes');
 const fluxoCaixaRoutes = require('./fluxoCaixa');
-const filiaisRoutes = require('./filiais');
-const transferenciasRoutes = require('./transferencias');
 const empresasRoutes = require('./empresas');
 const vendasRoutes = require('./vendas');
 const paymentsRoutes = require('./payments');
@@ -29,8 +27,6 @@ router.use('/produtos', produtosRoutes);
 router.use('/fornecedores', fornecedoresRoutes);
 router.use('/clientes', clientesRoutes);
 router.use('/fluxo-caixa', fluxoCaixaRoutes);
-router.use('/filiais', filiaisRoutes);
-router.use('/transferencias', transferenciasRoutes);
 router.use('/vendas', vendasRoutes);
 router.use('/payments', paymentsRoutes);
 

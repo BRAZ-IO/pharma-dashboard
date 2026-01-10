@@ -10,8 +10,6 @@ const ItemVenda = require('./ItemVenda');
 const Fornecedor = require('./Fornecedor');
 const Cliente = require('./Cliente');
 const FluxoCaixa = require('./FluxoCaixa');
-const Filial = require('./Filial');
-const TransferenciaEstoque = require('./TransferenciaEstoque');
 
 // Importar models de pagamento apenas se não estiver em ambiente de teste
 let Pagamento, PagamentoLog;
@@ -77,32 +75,6 @@ Venda.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
 Empresa.hasMany(FluxoCaixa, { foreignKey: 'empresa_id', as: 'fluxo_caixa' });
 FluxoCaixa.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
 
-// Relacionamentos de Filiais
-Empresa.hasMany(Filial, { foreignKey: 'empresa_id', as: 'filiais' });
-Filial.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
-
-Filial.hasMany(Estoque, { foreignKey: 'filial_id', as: 'estoques' });
-Estoque.belongsTo(Filial, { foreignKey: 'filial_id', as: 'filial' });
-
-// Relacionamentos de Transferências
-Empresa.hasMany(TransferenciaEstoque, { foreignKey: 'empresa_id', as: 'transferencias' });
-TransferenciaEstoque.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
-
-TransferenciaEstoque.belongsTo(Filial, { foreignKey: 'filial_origem_id', as: 'filialOrigem' });
-TransferenciaEstoque.belongsTo(Filial, { foreignKey: 'filial_destino_id', as: 'filialDestino' });
-
-TransferenciaEstoque.belongsTo(Produto, { foreignKey: 'produto_id', as: 'produto' });
-TransferenciaEstoque.belongsTo(Usuario, { foreignKey: 'usuario_solicitante_id', as: 'usuarioSolicitante' });
-TransferenciaEstoque.belongsTo(Usuario, { foreignKey: 'usuario_aprovador_id', as: 'usuarioAprovador' });
-
-// Associações inversas
-Filial.hasMany(TransferenciaEstoque, { foreignKey: 'filial_origem_id', as: 'transferenciasOrigem' });
-Filial.hasMany(TransferenciaEstoque, { foreignKey: 'filial_destino_id', as: 'transferenciasDestino' });
-
-Produto.hasMany(TransferenciaEstoque, { foreignKey: 'produto_id', as: 'transferencias' });
-Usuario.hasMany(TransferenciaEstoque, { foreignKey: 'usuario_solicitante_id', as: 'transferenciasSolicitadas' });
-Usuario.hasMany(TransferenciaEstoque, { foreignKey: 'usuario_aprovador_id', as: 'transferenciasAprovadas' });
-
 // Relacionamentos de Pagamentos (apenas se não estiver em teste e os models existirem)
 if (Pagamento && PagamentoLog && typeof Pagamento === 'function' && typeof PagamentoLog === 'function') {
   try {
@@ -135,8 +107,6 @@ module.exports = {
   Fornecedor,
   Cliente,
   FluxoCaixa,
-  Filial,
-  TransferenciaEstoque,
   ...(Pagamento && { Pagamento }),
   ...(PagamentoLog && { PagamentoLog })
 };

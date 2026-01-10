@@ -40,7 +40,6 @@ import FluxoCaixaResumo from '../pages/FluxoCaixaResumo';
 import FluxoCaixaEntradas from '../pages/FluxoCaixaEntradas';
 import FluxoCaixaSaidas from '../pages/FluxoCaixaSaidas';
 import FluxoCaixaRelatorios from '../pages/FluxoCaixaRelatorios';
-import Transferencias from '../pages/Transferencias';
 import VendasPage from '../pages/VendasPage';
 
 const AppRoutes = () => {
@@ -105,7 +104,6 @@ const AppRoutes = () => {
           <Route path="saidas" element={<FluxoCaixaSaidas />} />
           <Route path="relatorios" element={<FluxoCaixaRelatorios />} />
         </Route>
-        <Route path="transferencias" element={<Transferencias />} />
         <Route path="vendas" element={<VendasPage />} />
         <Route path="perfil" element={<Perfil />} />
         <Route path="ajuda" element={<Ajuda />} />

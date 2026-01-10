@@ -15,14 +15,6 @@ const Estoque = sequelize.define('Estoque', {
       key: 'id'
     }
   },
-  filial_id: {
-    type: DataTypes.UUID,
-    allowNull: false,
-    references: {
-      model: 'filiais',
-      key: 'id'
-    }
-  },
   produto_id: {
     type: DataTypes.UUID,
     allowNull: false,
@@ -84,13 +76,10 @@ const Estoque = sequelize.define('Estoque', {
   indexes: [
     {
       unique: true,
-      fields: ['filial_id', 'produto_id', 'lote']
+      fields: ['empresa_id', 'produto_id', 'lote']
     },
     {
       fields: ['empresa_id']
-    },
-    {
-      fields: ['filial_id']
     },
     {
       fields: ['produto_id']

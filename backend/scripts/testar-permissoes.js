@@ -24,8 +24,8 @@ async function testarPermissoes() {
         
         // Testar permissões baseadas no role
         const permissions = {
-          admin: ['configuracoes', 'usuarios', 'fluxo-caixa', 'transferencias'],
-          gerente: ['usuarios', 'fluxo-caixa', 'transferencias'],
+          admin: ['configuracoes', 'usuarios', 'fluxo-caixa'],
+          gerente: ['usuarios', 'fluxo-caixa'],
           funcionario: ['dashboard', 'pdv', 'estoque', 'produtos', 'clientes', 'fornecedores']
         };
 
@@ -39,7 +39,7 @@ async function testarPermissoes() {
     console.log('\n🎯 Teste de permissões concluído!');
     console.log('\n📊 Resumo dos acessos:');
     console.log('🔴 Admin: Acesso total ao sistema');
-    console.log('🟡 Gerente: Acesso a usuários, fluxo de caixa e transferências');
+    console.log('🟡 Gerente: Acesso a usuários e fluxo de caixa');
     console.log('🟢 Funcionário: Acesso a PDV, estoque, produtos, clientes e fornecedores');
     
   } catch (error) {
