@@ -10,7 +10,7 @@ function App() {
   return (
     <AuthProvider>
       <Router>
-        <div className="App">
+        <div className="app-container">
           <AppRoutes />
         </div>
       </Router>

@@ -23,6 +23,18 @@ const Venda = sequelize.define('Venda', {
       key: 'id'
     }
   },
+  cliente_id: {
+    type: DataTypes.UUID,
+    allowNull: true
+  },
+  cliente_nome: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  cliente_cpf: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   numero_venda: {
     type: DataTypes.STRING(50),
     unique: true,

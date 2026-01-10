@@ -69,6 +69,10 @@ Fornecedor.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
 Empresa.hasMany(Cliente, { foreignKey: 'empresa_id', as: 'clientes' });
 Cliente.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
 
+// Cliente - Venda (1:N)
+Cliente.hasMany(Venda, { foreignKey: 'cliente_id', as: 'vendas' });
+Venda.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
+
 // Empresa - FluxoCaixa (1:N)
 Empresa.hasMany(FluxoCaixa, { foreignKey: 'empresa_id', as: 'fluxo_caixa' });
 FluxoCaixa.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });

@@ -1,6 +1,7 @@
 require('dotenv').config();
 const { sequelize } = require('../config/database');
 const { Empresa, Usuario, Produto, Estoque, Fornecedor, Cliente, FluxoCaixa, Venda, ItemVenda } = require('../models');
+const { v4: uuidv4 } = require('uuid');
 
 const seed = async () => {
   try {
@@ -360,6 +361,12 @@ const seed = async () => {
 
     console.log('📊 Criando vendas de teste...');
 
+    // Buscar clientes para associar às vendas
+    const clientesDb = await Cliente.findAll({
+      where: { empresa_id: empresaPadrao.id },
+      limit: 10
+    });
+
     // Criar vendas para os últimos dias
     const vendasTeste = [];
     const diasParaCriar = 7;
@@ -368,47 +375,43 @@ const seed = async () => {
       const dataVenda = new Date();
       dataVenda.setDate(dataVenda.getDate() - i);
 
-      // Criar 2-4 vendas por dia
-      const vendasDoDia = Math.floor(Math.random() * 3) + 2;
-
-      for (let j = 0; j < vendasDoDia; j++) {
-        const numeroVenda = `V${Date.now()}${i}${j}`;
+      // Criar 3 vendas por dia
+      for (let j = 0; j < 3; j++) {
+        const numeroVenda = `V${String(dataVenda.getDate()).padStart(2, '0')}${String(dataVenda.getMonth() + 1).padStart(2, '0')}${String(dataVenda.getFullYear()).slice(-2)}${String(j + 1).padStart(3, '0')}`;
+        
+        // Selecionar produtos aleatórios
         const itensVenda = [];
-
-        // Selecionar produtos aleatórios para a venda
-        const numItens = Math.floor(Math.random() * 3) + 1;
-        const produtosSelecionados = [];
-
-        for (let k = 0; k < numItens; k++) {
+        const numProdutos = Math.floor(Math.random() * 3) + 1; // 1 a 3 produtos
+        
+        for (let k = 0; k < numProdutos; k++) {
           const produtoAleatorio = produtosCriados[Math.floor(Math.random() * produtosCriados.length)];
-          if (!produtosSelecionados.find(p => p.id === produtoAleatorio.id)) {
-            produtosSelecionados.push(produtoAleatorio);
-          }
-        }
-        
-        let subtotal = 0;
-        
-        produtosSelecionados.forEach(produto => {
-          const quantidade = Math.floor(Math.random() * 3) + 1;
-          const precoUnitario = produto.preco_venda;
-          const subtotalItem = quantidade * precoUnitario;
+          const quantidade = Math.floor(Math.random() * 3) + 1; // 1 a 3 unidades
+          const precoUnitario = produtoAleatorio.preco_venda;
+          const subtotalItem = precoUnitario * quantidade;
           
           itensVenda.push({
-            produto_id: produto.id,
+            id: uuidv4(),
+            produto_id: produtoAleatorio.id,
             quantidade,
             preco_unitario: precoUnitario,
             subtotal: subtotalItem
           });
-          
-          subtotal += subtotalItem;
-        });
-
+        }
+        
+        const subtotal = itensVenda.reduce((sum, item) => sum + item.subtotal, 0);
         const desconto = Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0;
         const total = subtotal - desconto;
+
+        // Selecionar cliente aleatório ou deixar como consumidor final
+        const clienteSelecionado = clientesDb.length > 0 && Math.random() > 0.3 ? 
+          clientesDb[Math.floor(Math.random() * clientesDb.length)] : null;
 
         const venda = await Venda.create({
           empresa_id: empresaPadrao.id,
           usuario_id: admin.id,
+          cliente_id: clienteSelecionado?.id || null,
+          cliente_nome: clienteSelecionado?.nome || null,
+          cliente_cpf: clienteSelecionado?.cpf || clienteSelecionado?.cnpj || null,
           numero_venda: numeroVenda,
           tipo: 'venda',
           status: 'finalizada',

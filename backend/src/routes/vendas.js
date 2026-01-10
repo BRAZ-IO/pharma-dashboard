@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { Venda, ItemVenda, Produto, Usuario, Empresa } = require('../models');
+const { Venda, ItemVenda, Produto, Usuario, Empresa, Cliente } = require('../models');
 const { authMiddleware } = require('../middlewares/auth');
 const { sequelize } = require('../config/database');
 const { Op } = require('sequelize');
@@ -27,9 +27,9 @@ router.get('/', async (req, res) => {
     
     if (status) whereClause.status = status;
     if (dataInicio || dataFim) {
-      whereClause.createdAt = {};
-      if (dataInicio) whereClause.createdAt[Op.gte] = new Date(dataInicio);
-      if (dataFim) whereClause.createdAt[Op.lte] = new Date(dataFim);
+      whereClause.created_at = {};
+      if (dataInicio) whereClause.created_at[Op.gte] = new Date(dataInicio);
+      if (dataFim) whereClause.created_at[Op.lte] = new Date(dataFim);
     }
 
     const { count, rows: vendas } = await Venda.findAndCountAll({
@@ -50,9 +50,15 @@ router.get('/', async (req, res) => {
           model: Usuario,
           as: 'vendedor',
           attributes: ['id', 'nome', 'email']
+        },
+        {
+          model: Cliente,
+          as: 'cliente',
+          attributes: ['id', 'nome', 'cpf', 'cnpj'],
+          required: false
         }
       ],
-      order: [['createdAt', 'DESC']],
+      order: [['created_at', 'DESC']],
       limit: parseInt(limit),
       offset
     });
@@ -282,6 +288,55 @@ router.get('/:id', async (req, res) => {
   } catch (error) {
     console.error('Erro ao buscar venda:', error);
     res.status(500).json({ error: 'Erro ao buscar venda' });
+  }
+});
+
+router.delete('/:id/cancelar', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuarioId = req.usuario.id;
+
+    const venda = await Venda.findOne({
+      where: { 
+        id,
+        empresa_id: req.usuario.empresa_id 
+      },
+      include: [
+        {
+          model: ItemVenda,
+          as: 'itens'
+        }
+      ]
+    });
+
+    if (!venda) {
+      return res.status(404).json({ error: 'Venda não encontrada' });
+    }
+
+    if (venda.status !== 'pendente') {
+      return res.status(400).json({ 
+        error: 'Apenas vendas pendentes podem ser canceladas' 
+      });
+    }
+
+    // Atualizar status para cancelada
+    await venda.update({ 
+      status: 'cancelada',
+      observacoes: (venda.observacoes || '') + '\n\n[CANCELADA em ' + new Date().toLocaleString('pt-BR') + ']'
+    });
+
+    res.json({ 
+      message: 'Venda cancelada com sucesso',
+      venda: {
+        id: venda.id,
+        numero_venda: venda.numero_venda,
+        status: venda.status
+      }
+    });
+
+  } catch (error) {
+    console.error('Erro ao cancelar venda:', error);
+    res.status(500).json({ error: 'Erro ao cancelar venda' });
   }
 });
 

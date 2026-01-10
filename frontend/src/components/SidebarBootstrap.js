@@ -59,16 +59,6 @@ const SidebarBootstrap = ({ mobileOpen, onCloseMobile, isCollapsed, setIsCollaps
       )
     },
     { 
-      path: '/app/vendas', 
-      name: 'Vendas', 
-      icon: (
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <path d="M9 14L3 9V3h6v5l6 5v6h-6v-5z"/>
-          <path d="M21 12l-6-6v12l6 6V12z"/>
-        </svg>
-      )
-    },
-    { 
       path: '/app/transferencias', 
       name: 'Transferências', 
       icon: (

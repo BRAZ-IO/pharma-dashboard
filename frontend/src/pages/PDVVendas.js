@@ -50,18 +50,18 @@ const PDVVendas = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'concluido': return '#26de81';
+      case 'finalizada': return '#26de81';
       case 'pendente': return '#ffa502';
-      case 'cancelado': return '#e74c3c';
+      case 'cancelada': return '#e74c3c';
       default: return '#95a5a6';
     }
   };
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'concluido': return '✅';
+      case 'finalizada': return '✅';
       case 'pendente': return '⏳';
-      case 'cancelado': return '❌';
+      case 'cancelada': return '❌';
       default: return '📋';
     }
   };
@@ -78,12 +78,13 @@ const PDVVendas = () => {
 
   const filteredVendas = vendas.filter(venda => {
     const matchesStatus = filtroStatus === 'todos' || venda.status === filtroStatus;
-    const matchesDataInicio = !dataInicio || new Date(venda.data) >= new Date(dataInicio);
-    const matchesDataFim = !dataFim || new Date(venda.data) <= new Date(dataFim);
+    const matchesDataInicio = !dataInicio || new Date(venda.created_at) >= new Date(dataInicio);
+    const matchesDataFim = !dataFim || new Date(venda.created_at) <= new Date(dataFim);
     const matchesSearch = !searchTerm || 
-      venda.cliente?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      venda.id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      venda.cupomFiscal?.toLowerCase().includes(searchTerm.toLowerCase());
+      (venda.cliente?.nome && venda.cliente.nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (venda.cliente_nome && venda.cliente_nome.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (venda.id && venda.id.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (venda.numero_venda && venda.numero_venda.toLowerCase().includes(searchTerm.toLowerCase()));
     
     return matchesStatus && matchesDataInicio && matchesDataFim && matchesSearch;
   });
@@ -93,13 +94,15 @@ const PDVVendas = () => {
     
     switch (sortBy) {
       case 'data':
-        comparison = new Date(a.data) - new Date(b.data);
+        comparison = new Date(a.created_at) - new Date(b.created_at);
         break;
       case 'total':
-        comparison = a.total - b.total;
+        const totalA = parseFloat(a.total) || 0;
+        const totalB = parseFloat(b.total) || 0;
+        comparison = totalA - totalB;
         break;
       case 'cliente':
-        comparison = a.cliente.localeCompare(b.cliente);
+        comparison = (a.cliente?.nome || a.cliente_nome || '').localeCompare(b.cliente?.nome || b.cliente_nome || '');
         break;
       case 'status':
         comparison = a.status.localeCompare(b.status);
@@ -118,10 +121,13 @@ const PDVVendas = () => {
 
   const totalPages = Math.ceil(sortedVendas.length / itemsPerPage);
 
-  const totalVendas = filteredVendas.reduce((sum, venda) => sum + venda.total, 0);
-  const totalConcluidas = filteredVendas.filter(v => v.status === 'concluido').length;
+  const totalVendas = filteredVendas.reduce((sum, venda) => {
+  const total = parseFloat(venda.total) || 0;
+  return sum + total;
+}, 0);
+  const totalConcluidas = filteredVendas.filter(v => v.status === 'finalizada').length;
   const totalPendentes = filteredVendas.filter(v => v.status === 'pendente').length;
-  const totalCanceladas = filteredVendas.filter(v => v.status === 'cancelado').length;
+  const totalCanceladas = filteredVendas.filter(v => v.status === 'cancelada').length;
 
   const handleSort = (field) => {
     if (sortBy === field) {
@@ -135,18 +141,16 @@ const PDVVendas = () => {
   };
 
   const handleExportCSV = () => {
-    const header = ['ID', 'Cliente', 'CPF', 'Produtos', 'Total', 'Forma Pagamento', 'Status', 'Data', 'Vendedor', 'Cupom Fiscal'].join(',');
+    const header = ['ID', 'Cliente', 'Produtos', 'Total', 'Forma Pagamento', 'Status', 'Data', 'Vendedor'].join(',');
     const rows = filteredVendas.map(venda => [
-      venda.id,
-      venda.cliente,
-      venda.cpf,
-      venda.produtos.map(p => `${p.quantidade}x ${p.nome} (${p.codigo})`).join('; '),
-      venda.total.toFixed(2),
-      venda.formaPagamento,
-      venda.status,
-      new Date(venda.data).toLocaleString('pt-BR'),
-      venda.vendedor,
-      venda.cupomFiscal
+      venda.id || '',
+      venda.cliente?.nome || venda.cliente_nome || 'Não informado',
+      venda.itens ? venda.itens.map(p => `${p.quantidade}x ${p.produto?.nome || 'Produto'} (${p.produto?.codigo_barras || 'N/A'})`).join('; ') : 'Sem produtos',
+      (parseFloat(venda.total) || 0).toFixed(2),
+      venda.forma_pagamento || 'Não informado',
+      venda.status || 'Não informado',
+      venda.created_at ? new Date(venda.created_at).toLocaleString('pt-BR') : 'Não informado',
+      venda.vendedor?.nome || 'Não informado'
     ].join(','));
     
     const csvContent = header + '\n' + rows.join('\n');
@@ -246,9 +250,9 @@ const PDVVendas = () => {
             className="filter-select"
           >
             <option value="todos">Todos</option>
-            <option value="concluido">Concluídas</option>
+            <option value="finalizada">Concluídas</option>
             <option value="pendente">Pendentes</option>
-            <option value="cancelado">Canceladas</option>
+            <option value="cancelada">Canceladas</option>
           </select>
         </div>
         
@@ -316,20 +320,20 @@ const PDVVendas = () => {
             {paginatedVendas.map(venda => (
               <tr key={venda.id}>
                 <td className="venda-id">{venda.id}</td>
-                <td className="venda-cliente">{venda.cliente || 'Não informado'}</td>
+                <td className="venda-cliente">{venda.cliente?.nome || venda.cliente_nome || 'Não informado'}</td>
                 <td className="venda-produtos">
                   <div className="produtos-list">
-                    {venda.produtos?.map((produto, index) => (
+                    {venda.itens?.map((item, index) => (
                       <div key={index} className="produto-item">
-                        <span>{produto.quantidade}x {produto.nome}</span>
-                        <span>{formatCurrency(produto.preco)}</span>
+                        <span>{item.quantidade}x {item.produto?.nome || 'Produto'}</span>
+                        <span>{formatCurrency(parseFloat(item.preco_unitario) || 0)}</span>
                       </div>
                     )) || <span className="sem-produtos">Sem produtos</span>}
                   </div>
                 </td>
-                <td className="venda-total">{formatCurrency(venda.total)}</td>
+                <td className="venda-total">{formatCurrency(parseFloat(venda.total) || 0)}</td>
                 <td className="venda-pagamento">
-                  <span>{getPaymentIcon(venda.formaPagamento)} {venda.formaPagamento}</span>
+                  <span>{getPaymentIcon(venda.forma_pagamento)} {venda.forma_pagamento}</span>
                 </td>
                 <td className="venda-status">
                   <span 
@@ -339,8 +343,8 @@ const PDVVendas = () => {
                     {getStatusIcon(venda.status)} {venda.status}
                   </span>
                 </td>
-                <td className="venda-data">{new Date(venda.data).toLocaleString('pt-BR')}</td>
-                <td className="venda-vendedor">{venda.vendedor || 'Não informado'}</td>
+                <td className="venda-data">{new Date(venda.created_at).toLocaleString('pt-BR')}</td>
+                <td className="venda-vendedor">{venda.vendedor?.nome || 'Não informado'}</td>
               </tr>
             ))}
           </tbody>

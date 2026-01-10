@@ -1280,6 +1280,39 @@
   margin: 0;
 }
 
+.cart-actions {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.btn-cancel {
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-cancel:hover:not(:disabled) {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+.btn-cancel:disabled {
+  background: linear-gradient(135deg, #7f8c8d 0%, #95a5a6 100%);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .btn-checkout {
   padding: 15px 30px;
   background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
@@ -1571,19 +1604,23 @@
     gap: 15px;
   }
   
+  .cart-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-cancel,
+  .btn-checkout {
+    width: 100%;
+    justify-content: center;
+  }
+  
   .btn-checkout {
     width: 100%;
   }
 }
 
 /* Header do PDV - Estilos corrigidos */
-.pdv-page {
-  padding: 0;
-  min-height: 100vh;
-  background: #0b1220;
-  color: #e8eaed;
-}
-
 .pdv-header {
   padding: 2rem 2rem 1rem;
   background: linear-gradient(180deg, #0f1a2e 0%, #0b1220 100%);
@@ -1597,12 +1634,161 @@
   backdrop-filter: blur(10px);
 }
 
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
 .pdv-header h1 {
   font-size: 2rem;
   font-weight: 600;
   color: #e8eaed;
   margin: 0;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.pdv-nav {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  color: #b0bec5;
+  text-decoration: none;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: #64b5f6;
+  background: rgba(100, 181, 246, 0.1);
+}
+
+.nav-link.active {
+  color: #64b5f6;
+  background: rgba(100, 181, 246, 0.2);
+}
+
+/* Menu de Ações */
+.actions-menu {
+  position: relative;
+}
+
+.btn-actions {
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-actions:hover {
+  background: linear-gradient(135deg, #42a5f5 0%, #2196f3 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(100, 181, 246, 0.3);
+}
+
+.actions-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: linear-gradient(135deg, #1a2332 0%, #0f1a2e 100%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  min-width: 200px;
+  z-index: 1000;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.action-item {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: #e8eaed;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.action-item:hover {
+  background: rgba(100, 181, 246, 0.1);
+  color: #64b5f6;
+}
+
+.action-item:first-child {
+  border-radius: 0;
+}
+
+.action-item:last-child {
+  border-radius: 0;
+}
+
+/* Modal de Estorno */
+.estorno-modal {
+  max-width: 400px;
+}
+
+.estorno-info {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.estorno-info p {
+  margin: 0.5rem 0;
+  color: #e8eaed;
+}
+
+.estorno-warning {
+  color: #ffa502 !important;
+  font-weight: 600;
+  padding: 1rem;
+  background: rgba(255, 165, 2, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 165, 2, 0.3);
+}
+
+.btn-danger {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-danger:hover {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
 }
 
 .pdv-nav {
