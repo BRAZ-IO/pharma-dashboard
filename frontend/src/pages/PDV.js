@@ -3,11 +3,36 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import api from '../services/api';
 import PDVVendas from './PDVVendas';
 import PDVRelatorios from './PDVRelatorios';
+import { useSwipeCart } from '../hooks/useSwipeGesture';
 import './PDV.css';
 
 const PDV = () => {
   const location = useLocation();
   const isMainPage = location.pathname === '/app/pdv' || location.pathname === '/app/pdv/';
+  
+  // Hook de swipe para o carrinho
+  const {
+    isCartVisible,
+    cartPosition,
+    showCart,
+    hideCart,
+    peekCart,
+    toggleCart,
+    swipeGesture
+  } = useSwipeCart();
+  
+  // Detectar se é mobile
+  const [isMobile, setIsMobile] = useState(false);
+  
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
   
   const [cart, setCart] = useState([]);
   const [total, setTotal] = useState(0);
@@ -22,9 +47,11 @@ const PDV = () => {
   const [showActionsMenu, setShowActionsMenu] = useState(false);
   const [showEstornoModal, setShowEstornoModal] = useState(false);
   const [vendaIdEstorno, setVendaIdEstorno] = useState('');
-  const [selectedClient, setSelectedClient] = useState(null);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showClientModal, setShowClientModal] = useState(false);
   const [showNewClientModal, setShowNewClientModal] = useState(false);
+  const [showConsumerModal, setShowConsumerModal] = useState(false);
+  const [selectedClient, setSelectedClient] = useState(null);
   const [clients, setClients] = useState([]);
   const [clientSearch, setClientSearch] = useState('');
   const [newClient, setNewClient] = useState({
@@ -157,13 +184,17 @@ const PDV = () => {
       return;
     }
 
-    // Gerar ID da venda e mostrar confirmação direta
+    // Mostrar modal de opções de pagamento
+    setShowConsumerModal(true);
+  };
+
+  const handleConsumerPayment = (withClient) => {
     const newSaleId = `VND-${Date.now()}`;
-    const clientName = selectedClient ? selectedClient.nome : 'Consumidor Final';
+    const clientName = withClient && selectedClient ? selectedClient.nome : 'Consumidor Final';
     
     // Usar window.confirm para evitar ESLint error
     const confirmed = window.confirm(
-      `Confirmar venda para ${clientName}?\n\nValor: ${formatCurrency(total)}`
+      `Confirmar venda para ${clientName}?\n\nValor: ${formatCurrency(total)}\n\n${withClient ? 'Cliente cadastrado será vinculado à venda.' : 'Cupom não fiscal para consumidor final.'}`
     );
     
     if (confirmed) {
@@ -174,10 +205,22 @@ const PDV = () => {
         
         // Mostrar mensagem simples de sucesso
         window.alert(
-          `✅ Venda concluída com sucesso!\n\nID: ${newSaleId}\nCliente: ${clientName}\nValor: ${formatCurrency(total)}`
+          `✅ Venda concluída com sucesso!\n\nID: ${newSaleId}\nCliente: ${clientName}\nValor: ${formatCurrency(total)}\n\n${withClient ? '📋 Cupom fiscal emitido' : '🧾 Cupom não fiscal emitido'}`
         );
+        
+        setShowConsumerModal(false);
       }, 500);
     }
+  };
+
+  const selectClient = (client) => {
+    setSelectedClient(client);
+    setShowClientModal(false);
+    setClientSearch('');
+  };
+
+  const clearClient = () => {
+    setSelectedClient(null);
   };
 
   const handleCancelSale = () => {
@@ -266,16 +309,8 @@ const PDV = () => {
 
   const categories = ['Todos', ...new Set(products.map(p => p.categoria || 'Sem categoria'))];
 
-  // Funções de cliente
-  const selectClient = (client) => {
-    setSelectedClient(client);
-    setShowClientModal(false);
-    setClientSearch('');
-  };
-
-  const clearClient = () => {
-    setSelectedClient(null);
-  };
+  // Funções de cliente (já declaradas acima)
+  // selectClient e clearClient já foram definidas anteriormente
 
   const filteredClients = clients.filter(client => 
     client.nome?.toLowerCase().includes(clientSearch.toLowerCase()) ||
@@ -298,18 +333,18 @@ const PDV = () => {
     }
 
     if (!newClient.cpf_cnpj.trim()) {
-      window.alert('CPF ou CNPJ é obrigatório!');
+      window.alert('CPF/CNPJ é obrigatório!');
       return;
     }
 
     try {
       const clientData = {
-        nome: newClient.nome,
-        telefone: newClient.telefone || undefined,
-        email: newClient.email || undefined
+        nome: newClient.nome.trim(),
+        tipo: newClient.tipo,
+        telefone: newClient.telefone.trim(),
+        email: newClient.email.trim()
       };
 
-      // Adicionar CPF ou CNPJ conforme o tipo
       if (newClient.tipo === 'cpf') {
         clientData.cpf = newClient.cpf_cnpj.replace(/\D/g, '');
       } else {
@@ -404,11 +439,12 @@ const PDV = () => {
       </div>
       
       {isMainPage ? (
-        <div className="pdv-main-layout">
+        <div className={`pdv-main-layout ${isCartVisible ? 'cart-open' : ''}`}>
           <div className="pdv-main-grid">
             {/* Scanner de Código de Barras */}
             <div className="barcode-scanner-section">
-              <div className={`scanner-container ${scannerActive ? 'scanner-active' : ''}`}>
+              <div className={`scanner-container ${scannerActive ? 'scanner-active' : ''}`}
+                   {...(isMobile && swipeGesture)}>
                 <div className="scanner-icon">📷</div>
                 <div className="scanner-content">
                   <h3>Scanner de Código de Barras</h3>
@@ -499,134 +535,198 @@ const PDV = () => {
                 )}
               </div>
             </div>
+          </div>
+        </div>
+      ) : null}
 
-            {/* Carrinho de Compras */}
-            <div className="cart-section">
-              {/* Área do Cliente no Carrinho */}
-              <div className="client-area">
-                <div className="client-header">
-                  <h3>👤 Cliente</h3>
-                  <button 
-                    className="btn-edit-client" 
-                    onClick={() => setShowClientModal(true)}
-                  >
-                    ✏️
-                  </button>
-                </div>
-                <div className="client-display">
-                  {selectedClient ? (
-                    <div className="client-details">
-                      <p className="client-name">{selectedClient.nome}</p>
-                      <p className="client-doc">{selectedClient.cpf || selectedClient.cnpj}</p>
-                      {selectedClient.telefone && (
-                        <p className="client-phone">📞 {selectedClient.telefone}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="client-empty">
-                      <p>Consumidor Final</p>
-                      <div className="client-actions">
-                        <button 
-                          className="btn-select" 
-                          onClick={() => setShowClientModal(true)}
-                        >
-                          Selecionar Cliente
-                        </button>
-                        <button 
-                          className="btn-new" 
-                          onClick={() => setShowNewClientModal(true)}
-                        >
-                          + Novo Cliente
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
+      {/* Overlay do carrinho (mobile) */}
+      {isMobile && isCartVisible && (
+        <div className="cart-overlay visible" onClick={hideCart} />
+      )}
+
+      {/* Botão flutuante do carrinho (mobile) */}
+      {isMobile && (
+        <button className="cart-fab" onClick={toggleCart}>
+          🛒
+          {cart.length > 0 && (
+            <span className="cart-count">{cart.length}</span>
+          )}
+        </button>
+      )}
+
+      {/* Carrinho de Compras */}
+      {(isMainPage && !isMobile) || (isMobile && isCartVisible) ? (
+        <div 
+          className={`cart-section ${isMobile ? `swipe-enabled swipe-${cartPosition}` : ''}`}
+          {...(isMobile && swipeGesture)}
+        >
+          {/* Handle para arrastar (mobile) */}
+          {isMobile && (
+            <div className="cart-drag-handle" />
+          )}
+          
+          {/* Indicador de swipe (mobile) */}
+          {isMobile && (
+            <div className="swipe-indicator">
+              {cartPosition === 'visible' ? '→' : '←'}
+            </div>
+          )}
+          
+          <div className="cart-header">
+            <h2>Carrinho</h2>
+            <div className="cart-summary">
+              <span>{cart.length} itens</span>
+              <span>{formatCurrency(total)}</span>
+            </div>
+          </div>
+          
+          <div className="cart-items">
+            {cart.length === 0 ? (
+              <div className="cart-empty">
+                <div className="cart-empty-icon">🛒</div>
+                <h3>Carrinho vazio</h3>
+                <p>Adicione produtos para começar</p>
               </div>
-              
-              <div className="cart-header">
-                <h2>Carrinho</h2>
-                <div className="cart-summary">
-                  <span>{cart.length} itens</span>
-                  <span>{formatCurrency(total)}</span>
-                </div>
-              </div>
-              
-              <div className="cart-items">
-                {cart.length === 0 ? (
-                  <div className="cart-empty">
-                    <div className="cart-empty-icon">🛒</div>
-                    <h3>Carrinho vazio</h3>
-                    <p>Adicione produtos para começar</p>
+            ) : (
+              cart.map(item => (
+                <div key={item.id} className="cart-item">
+                  <div className="cart-item-info">
+                    <div className="cart-item-name">
+                      <span>{item.nome}</span>
+                    </div>
+                    <div className="cart-item-price">
+                      <span>{formatCurrency(item.preco_venda)}</span>
+                    </div>
                   </div>
-                ) : (
-                  cart.map(item => (
-                    <div key={item.id} className="cart-item">
-                      <div className="cart-item-info">
-                        <div className="cart-item-name">
-                          <span>{item.nome}</span>
-                        </div>
-                        <div className="cart-item-price">
-                          <span>{formatCurrency(item.preco_venda)}</span>
-                        </div>
-                      </div>
-                      <div className="cart-item-quantity">
-                        <button 
-                          className="btn-quantity"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                          disabled={item.quantity <= 1}
-                        >
-                          -
-                        </button>
-                        <span className="quantity">{item.quantity}</span>
-                        <button 
-                          className="btn-quantity"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        >
-                          +
-                        </button>
-                      </div>
-                      <div className="cart-item-total">
-                        <span>{formatCurrency(item.preco_venda * item.quantity)}</span>
-                      </div>
-                      <div className="cart-item-actions">
-                        <button 
-                          className="btn-remove"
-                          onClick={() => removeFromCart(item.id)}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              
-              <div className="cart-footer">
-                <div className="cart-total">
-                  <h3>Total: {formatCurrency(total)}</h3>
+                  <div className="cart-item-quantity">
+                    <button 
+                      className="btn-quantity"
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      disabled={item.quantity <= 1}
+                    >
+                      -
+                    </button>
+                    <span className="quantity">{item.quantity}</span>
+                    <button 
+                      className="btn-quantity"
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                    >
+                      +
+                    </button>
+                  </div>
+                  <div className="cart-item-total">
+                    <span>{formatCurrency(item.preco_venda * item.quantity)}</span>
+                  </div>
+                  <div className="cart-item-actions">
+                    <button 
+                      className="btn-remove"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
-                <div className="cart-actions">
-                  <button 
-                    className="btn-cancel"
-                    onClick={handleCancelSale}
-                    disabled={cart.length === 0}
-                  >
-                    ❌ Cancelar Venda
-                  </button>
-                  <button 
-                    className="btn-checkout"
-                    onClick={handlePayment}
-                    disabled={cart.length === 0}
-                  >
-                    💰 Finalizar Venda
-                  </button>
-                </div>
-              </div>
+              ))
+            )}
+          </div>
+          
+          <div className="cart-footer">
+            <div className="cart-total">
+              <h3>Total: {formatCurrency(total)}</h3>
+            </div>
+            <div className="cart-actions">
+              <button 
+                className="btn-cancel"
+                onClick={handleCancelSale}
+                disabled={cart.length === 0}
+              >
+                ❌ Cancelar Venda
+              </button>
+              <button 
+                className="btn-checkout"
+                onClick={handlePayment}
+                disabled={cart.length === 0}
+              >
+                💰 Finalizar Venda
+              </button>
             </div>
           </div>
         </div>
       ) : null}
+
+      {/* Modal de Opções de Pagamento */}
+      {showConsumerModal && (
+        <div className="modal-overlay">
+          <div className="modal-content client-modal">
+            <div className="modal-header">
+              <h2>🧾 Opções de Pagamento</h2>
+              <button className="btn-close-modal" onClick={() => setShowConsumerModal(false)}>
+                ✕
+              </button>
+            </div>
+            
+            <div className="modal-body">
+              <div className="payment-options">
+                <div className="payment-option">
+                  <h3>👤 Cliente Cadastrado</h3>
+                  <p>Emitir cupom fiscal com dados do cliente</p>
+                  {selectedClient ? (
+                    <div className="selected-client-info">
+                      <p><strong>{selectedClient.nome}</strong></p>
+                      <p>{selectedClient.cpf || selectedClient.cnpj}</p>
+                      {selectedClient.telefone && <p>📞 {selectedClient.telefone}</p>}
+                    </div>
+                  ) : (
+                    <div className="no-client-info">
+                      <p>Nenhum cliente selecionado</p>
+                      <button 
+                        className="btn-secondary"
+                        onClick={() => {
+                          setShowConsumerModal(false);
+                          setShowClientModal(true);
+                        }}
+                      >
+                        Selecionar Cliente
+                      </button>
+                    </div>
+                  )}
+                  <button 
+                    className="btn-primary"
+                    onClick={() => handleConsumerPayment(true)}
+                    disabled={!selectedClient}
+                  >
+                    📋 Emitir Cupom Fiscal
+                  </button>
+                </div>
+                
+                <div className="divider">ou</div>
+                
+                <div className="payment-option">
+                  <h3>🧾 Consumidor Final</h3>
+                  <p>Emitir cupom não fiscal sem cadastro</p>
+                  <div className="consumer-info">
+                    <p><strong>Venda para consumidor final</strong></p>
+                    <p>Sem necessidade de dados cadastrais</p>
+                    <p>Cupom simplificado emitido</p>
+                  </div>
+                  <button 
+                    className="btn-success"
+                    onClick={() => handleConsumerPayment(false)}
+                  >
+                    🧾 Emitir Cupom Não Fiscal
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setShowConsumerModal(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal de Seleção de Cliente */}
       {showClientModal && (
@@ -653,17 +753,8 @@ const PDV = () => {
               
               <div className="clients-list">
                 {filteredClients.length === 0 ? (
-                  <div className="no-clients">
+                  <div className="no-clients-info">
                     <p>Nenhum cliente encontrado</p>
-                    <button 
-                      className="btn-primary"
-                      onClick={() => {
-                        setShowClientModal(false);
-                        setShowNewClientModal(true);
-                      }}
-                    >
-                      Cadastrar Novo Cliente
-                    </button>
                   </div>
                 ) : (
                   filteredClients.map(client => (

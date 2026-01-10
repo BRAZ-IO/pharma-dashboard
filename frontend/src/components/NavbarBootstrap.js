@@ -56,7 +56,7 @@ const NavbarBootstrap = ({
     const path = location.pathname;
     const routeMap = {
       '/app/dashboard': 'Dashboard',
-      '/app/pdv': 'PDV - Ponto de Venda',
+      '/app/pdv': 'PDV',
       '/app/produtos': 'Produtos',
       '/app/estoque': 'Estoque',
       '/app/usuarios': 'Usuários',
