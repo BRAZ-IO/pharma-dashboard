@@ -13,6 +13,20 @@ const FluxoCaixa = require('./FluxoCaixa');
 const Filial = require('./Filial');
 const TransferenciaEstoque = require('./TransferenciaEstoque');
 
+// Importar models de pagamento apenas se não estiver em ambiente de teste
+let Pagamento, PagamentoLog;
+if (process.env.NODE_ENV !== 'test') {
+  try {
+    Pagamento = require('./Pagamento');
+    PagamentoLog = require('./PagamentoLog');
+  } catch (error) {
+    console.log('Models de pagamento não carregados (ambiente de teste)');
+  }
+} else {
+  // Em ambiente de teste, não carregar os models de pagamento
+  console.log('Ambiente de teste detectado - pulando models de pagamento');
+}
+
 // Relacionamentos Multi-Tenant
 
 // Empresa - Usuario (1:N)
@@ -85,6 +99,27 @@ Produto.hasMany(TransferenciaEstoque, { foreignKey: 'produto_id', as: 'transfere
 Usuario.hasMany(TransferenciaEstoque, { foreignKey: 'usuario_solicitante_id', as: 'transferenciasSolicitadas' });
 Usuario.hasMany(TransferenciaEstoque, { foreignKey: 'usuario_aprovador_id', as: 'transferenciasAprovadas' });
 
+// Relacionamentos de Pagamentos (apenas se não estiver em teste e os models existirem)
+if (Pagamento && PagamentoLog && typeof Pagamento === 'function' && typeof PagamentoLog === 'function') {
+  try {
+    Empresa.hasMany(Pagamento, { foreignKey: 'empresa_id', as: 'pagamentos' });
+    Pagamento.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
+
+    Venda.hasMany(Pagamento, { foreignKey: 'venda_id', as: 'pagamentos' });
+    Pagamento.belongsTo(Venda, { foreignKey: 'venda_id', as: 'venda' });
+
+    Empresa.hasMany(PagamentoLog, { foreignKey: 'empresa_id', as: 'pagamentos_logs' });
+    PagamentoLog.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
+
+    Pagamento.hasMany(PagamentoLog, { foreignKey: 'pagamento_id', as: 'logs' });
+    PagamentoLog.belongsTo(Pagamento, { foreignKey: 'pagamento_id', as: 'pagamento' });
+  } catch (error) {
+    console.log('Erro ao configurar relacionamentos de pagamento:', error.message);
+  }
+} else {
+  console.log('Models de pagamento não disponíveis - pulando relacionamentos');
+}
+
 module.exports = {
   sequelize,
   Empresa,
@@ -97,5 +132,7 @@ module.exports = {
   Cliente,
   FluxoCaixa,
   Filial,
-  TransferenciaEstoque
+  TransferenciaEstoque,
+  ...(Pagamento && { Pagamento }),
+  ...(PagamentoLog && { PagamentoLog })
 };

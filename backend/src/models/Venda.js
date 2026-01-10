@@ -33,8 +33,8 @@ const Venda = sequelize.define('Venda', {
     defaultValue: 'venda'
   },
   status: {
-    type: DataTypes.ENUM('pendente', 'finalizada', 'cancelada'),
-    defaultValue: 'finalizada'
+    type: DataTypes.ENUM('pendente', 'aguardando_pagamento', 'finalizada', 'cancelada'),
+    defaultValue: 'pendente'
   },
   subtotal: {
     type: DataTypes.DECIMAL(10, 2),
@@ -76,6 +76,26 @@ const Venda = sequelize.define('Venda', {
   nfce_status: {
     type: DataTypes.STRING(20),
     allowNull: true
+  },
+  gateway_pagamento: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Gateway de pagamento utilizado'
+  },
+  gateway_payment_id: {
+    type: DataTypes.STRING(255),
+    allowNull: true,
+    comment: 'ID do pagamento no gateway externo'
+  },
+  gateway_payment_method: {
+    type: DataTypes.STRING(50),
+    allowNull: true,
+    comment: 'Método de pagamento do gateway'
+  },
+  pago_em: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    comment: 'Data e hora do pagamento'
   }
 }, {
   tableName: 'vendas'

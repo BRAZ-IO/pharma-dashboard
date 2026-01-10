@@ -39,15 +39,31 @@ const produtosController = {
         include: [{
           model: Estoque,
           as: 'estoques',
-          attributes: ['quantidade_atual', 'lote', 'data_validade']
+          attributes: ['quantidade_atual', 'lote', 'data_validade'],
+          required: false // Não falhar se não houver estoque
         }],
         limit: parseInt(limit),
         offset: parseInt(offset),
         order: [['nome', 'ASC']]
       });
 
+      // Processar produtos para incluir estoque_atual
+      const produtosComEstoque = produtos.map(produto => {
+        const produtoData = produto.toJSON();
+        
+        // Calcular estoque total (soma de todas as filiais)
+        const estoqueTotal = produto.estoques?.reduce((total, estoque) => {
+          return total + (estoque.quantidade_atual || 0);
+        }, 0) || 0;
+        
+        // Adicionar estoque_atual diretamente no produto
+        produtoData.estoque_atual = estoqueTotal;
+        
+        return produtoData;
+      });
+
       res.json({
-        produtos,
+        produtos: produtosComEstoque,
         pagination: {
           total: count,
           page: parseInt(page),
@@ -84,7 +100,18 @@ const produtosController = {
         });
       }
 
-      res.json({ produto });
+      // Processar produto para incluir estoque_atual
+      const produtoData = produto.toJSON();
+      
+      // Calcular estoque total (soma de todas as filiais)
+      const estoqueTotal = produto.estoques?.reduce((total, estoque) => {
+        return total + (estoque.quantidade_atual || 0);
+      }, 0) || 0;
+      
+      // Adicionar estoque_atual diretamente no produto
+      produtoData.estoque_atual = estoqueTotal;
+
+      res.json({ produto: produtoData });
     } catch (error) {
       next(error);
     }
@@ -114,7 +141,18 @@ const produtosController = {
         });
       }
 
-      res.json({ produto });
+      // Processar produto para incluir estoque_atual
+      const produtoData = produto.toJSON();
+      
+      // Calcular estoque total (soma de todas as filiais)
+      const estoqueTotal = produto.estoques?.reduce((total, estoque) => {
+        return total + (estoque.quantidade_atual || 0);
+      }, 0) || 0;
+      
+      // Adicionar estoque_atual diretamente no produto
+      produtoData.estoque_atual = estoqueTotal;
+
+      res.json({ produto: produtoData });
     } catch (error) {
       next(error);
     }

@@ -10,7 +10,6 @@ import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 import Dashboard from '../pages/Dashboard';
 import PDV from '../pages/PDV';
-import PDVMain from '../pages/PDVMain';
 import PDVVendas from '../pages/PDVVendas';
 import PDVRelatorios from '../pages/PDVRelatorios';
 import Produtos from '../pages/Produtos';
@@ -42,6 +41,7 @@ import FluxoCaixaEntradas from '../pages/FluxoCaixaEntradas';
 import FluxoCaixaSaidas from '../pages/FluxoCaixaSaidas';
 import FluxoCaixaRelatorios from '../pages/FluxoCaixaRelatorios';
 import Transferencias from '../pages/Transferencias';
+import VendasPage from '../pages/VendasPage';
 
 const AppRoutes = () => {
   return (
@@ -66,7 +66,7 @@ const AppRoutes = () => {
       >
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="pdv" element={<PDV />}>
-          <Route index element={<PDVMain />} />
+          <Route index element={<PDVVendas />} />
           <Route path="vendas" element={<PDVVendas />} />
           <Route path="relatorios" element={<PDVRelatorios />} />
         </Route>
@@ -106,6 +106,7 @@ const AppRoutes = () => {
           <Route path="relatorios" element={<FluxoCaixaRelatorios />} />
         </Route>
         <Route path="transferencias" element={<Transferencias />} />
+        <Route path="vendas" element={<VendasPage />} />
         <Route path="perfil" element={<Perfil />} />
         <Route path="ajuda" element={<Ajuda />} />
       </Route>
