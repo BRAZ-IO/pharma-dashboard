@@ -12,6 +12,7 @@ const fluxoCaixaRoutes = require('./fluxoCaixa');
 const filiaisRoutes = require('./filiais');
 const transferenciasRoutes = require('./transferencias');
 const empresasRoutes = require('./empresas');
+const vendasRoutes = require('./vendas');
 
 // Documentação Swagger
 router.use('/docs', swaggerRoutes);
@@ -29,6 +30,7 @@ router.use('/clientes', clientesRoutes);
 router.use('/fluxo-caixa', fluxoCaixaRoutes);
 router.use('/filiais', filiaisRoutes);
 router.use('/transferencias', transferenciasRoutes);
+router.use('/vendas', vendasRoutes);
 
 // Rota de health check
 router.get('/health', (req, res) => {

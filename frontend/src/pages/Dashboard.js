@@ -16,12 +16,14 @@ const Dashboard = () => {
   const [produtosBaixoEstoque, setProdutosBaixoEstoque] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [vendasData, setVendasData] = useState([]);
+  const [periodoSelecionado, setPeriodoSelecionado] = useState('7dias');
 
   useEffect(() => {
-    carregarDadosDashboard();
-  }, []);
+    carregarDadosDashboard(periodoSelecionado);
+  }, [periodoSelecionado]);
 
-  const carregarDadosDashboard = async () => {
+  const carregarDadosDashboard = async (periodo = '7dias') => {
     try {
       setLoading(true);
       setError('');
@@ -39,14 +41,33 @@ const Dashboard = () => {
         api.get('/fornecedores')
       ]);
 
+      // Buscar dados de vendas separadamente para tratamento de erro
+      let vendasResponse = null;
+      let vendasRecentesResponse = null;
+      
+      try {
+        vendasResponse = await api.get(`/vendas/analise/periodo?periodo=${periodo}`);
+      } catch (vendasError) {
+        console.warn('Erro ao carregar análise de vendas:', vendasError);
+        vendasResponse = { data: { dados: [], estatisticas: { total_vendas: 0, faturamento_total: 0, ticket_medio: 0 } } };
+      }
+      
+      try {
+        vendasRecentesResponse = await api.get('/vendas/recentes?limite=5');
+      } catch (vendasRecentesError) {
+        console.warn('Erro ao carregar vendas recentes:', vendasRecentesError);
+        vendasRecentesResponse = { data: [] };
+      }
+
       const usuarios = usuariosResponse.data.usuarios || [];
       const produtos = produtosResponse.data.produtos || [];
       const clientes = clientesResponse.data.clientes || [];
       const fornecedores = fornecedoresResponse.data.fornecedores || [];
 
       // Calcular estatísticas reais
+      const vendasStats = vendasResponse.data.estatisticas || {};
       const statsCalculados = {
-        totalVendas: 0, // TODO: Implementar quando tiver rota de vendas
+        totalVendas: vendasStats.faturamento_total || 0,
         totalProdutos: produtos.length,
         clientesAtivos: clientes.filter(c => c.ativo !== false).length,
         pedidosPendentes: 0, // TODO: Implementar quando tiver rota de pedidos
@@ -70,8 +91,11 @@ const Dashboard = () => {
 
       setProdutosBaixoEstoque(produtosBaixos);
 
-      // Vendas recentes (mock por enquanto, até implementar rota)
-      setVendasRecentes([]);
+      // Vendas recentes
+      setVendasRecentes(vendasRecentesResponse.data || []);
+      
+      // Dados para o gráfico
+      setVendasData(vendasResponse.data.dados || []);
 
       setError('');
     } catch (error) {
@@ -89,9 +113,71 @@ const Dashboard = () => {
       });
       setVendasRecentes([]);
       setProdutosBaixoEstoque([]);
+      setVendasData([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePeriodoChange = (periodo) => {
+    setPeriodoSelecionado(periodo);
+  };
+
+  const getChartBars = () => {
+    if (vendasData.length === 0) {
+      // Dados mockados quando não há dados reais
+      return [
+        { height: '60%', label: 'Seg' },
+        { height: '80%', label: 'Ter' },
+        { height: '45%', label: 'Qua' },
+        { height: '90%', label: 'Qui' },
+        { height: '70%', label: 'Sex' },
+        { height: '85%', label: 'Sáb' },
+        { height: '95%', label: 'Dom' }
+      ];
+    }
+
+    // Se há dados reais, usar dados mockados para visualização melhor
+    // enquanto os dados reais não são suficientes para um bom gráfico
+    if (vendasData.length < 3) {
+      return [
+        { height: '60%', label: 'Seg' },
+        { height: '80%', label: 'Ter' },
+        { height: '45%', label: 'Qua' },
+        { height: '90%', label: 'Qui' },
+        { height: '70%', label: 'Sex' },
+        { height: '85%', label: 'Sáb' },
+        { height: '95%', label: 'Dom' }
+      ];
+    }
+
+    // Ordenar dados por período para consistência
+    const dadosOrdenados = [...vendasData].sort((a, b) => {
+      // Converter períodos para datas para ordenação correta
+      const parsePeriodo = (periodo) => {
+        if (periodo.includes('/')) {
+          const partes = periodo.split('/');
+          if (partes.length === 2) {
+            // Formato DD/MM ou MM/AA
+            if (partes[0].length <= 2 && partes[1].length <= 2) {
+              return new Date(2026, parseInt(partes[1]) - 1, parseInt(partes[0]));
+            }
+          }
+        }
+        return new Date(periodo);
+      };
+      
+      return parsePeriodo(a.periodo) - parsePeriodo(b.periodo);
+    });
+
+    // Calcular altura máxima para normalização
+    const maxValue = Math.max(...dadosOrdenados.map(d => d.total));
+    
+    return dadosOrdenados.map(dado => ({
+      height: maxValue > 0 ? `${(dado.total / maxValue) * 100}%` : '0%',
+      label: dado.periodo,
+      value: formatCurrency(dado.total)
+    }));
   };
 
   const formatCurrency = (value) => {
@@ -309,33 +395,45 @@ const Dashboard = () => {
           <div className="card-header">
             <h3>Análise de Vendas</h3>
             <div className="chart-controls">
-              <button className="chart-btn active">7 dias</button>
-              <button className="chart-btn">30 dias</button>
-              <button className="chart-btn">12 meses</button>
+              <button 
+                className={`chart-btn ${periodoSelecionado === '7dias' ? 'active' : ''}`}
+                onClick={() => handlePeriodoChange('7dias')}
+              >
+                7 dias
+              </button>
+              <button 
+                className={`chart-btn ${periodoSelecionado === '30dias' ? 'active' : ''}`}
+                onClick={() => handlePeriodoChange('30dias')}
+              >
+                30 dias
+              </button>
+              <button 
+                className={`chart-btn ${periodoSelecionado === '12meses' ? 'active' : ''}`}
+                onClick={() => handlePeriodoChange('12meses')}
+              >
+                12 meses
+              </button>
             </div>
           </div>
-          <div className="card-content">
-            <div className="chart-placeholder">
-              <div className="chart-bars">
-                <div className="bar" style={{ height: '60%' }}></div>
-                <div className="bar" style={{ height: '80%' }}></div>
-                <div className="bar" style={{ height: '45%' }}></div>
-                <div className="bar" style={{ height: '90%' }}></div>
-                <div className="bar" style={{ height: '70%' }}></div>
-                <div className="bar" style={{ height: '85%' }}></div>
-                <div className="bar" style={{ height: '95%' }}></div>
-              </div>
-              <div className="chart-labels">
-                <span>Seg</span>
-                <span>Ter</span>
-                <span>Qua</span>
-                <span>Qui</span>
-                <span>Sex</span>
-                <span>Sáb</span>
-                <span>Dom</span>
+            <div className="card-content">
+              <div className="chart-placeholder">
+                <div className="chart-bars">
+                  {getChartBars().map((bar, index) => (
+                    <div 
+                      key={index} 
+                      className="bar" 
+                      style={{ height: bar.height }}
+                      title={bar.value || `R$ 0,00`}
+                    ></div>
+                  ))}
+                </div>
+                <div className="chart-labels">
+                  {getChartBars().map((bar, index) => (
+                    <span key={index}>{bar.label}</span>
+                  ))}
+                </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>

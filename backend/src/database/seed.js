@@ -1,6 +1,6 @@
 require('dotenv').config();
 const { sequelize } = require('../config/database');
-const { Empresa, Usuario, Produto, Estoque, Fornecedor, Cliente, FluxoCaixa } = require('../models');
+const { Empresa, Usuario, Produto, Estoque, Fornecedor, Cliente, FluxoCaixa, Venda, ItemVenda } = require('../models');
 
 const seed = async () => {
   try {
@@ -173,6 +173,12 @@ const seed = async () => {
         localizacao: `Prateleira ${Math.floor(Math.random() * 10) + 1}`
       });
     }
+    
+    // Buscar produtos criados para usar nas vendas
+    const produtosCriados = await Produto.findAll({
+      where: { empresa_id: empresaPadrao.id }
+    });
+    
     console.log('✅ Produtos e estoque criados para Farmácia Teste');
 
     // ========================================
@@ -347,6 +353,89 @@ const seed = async () => {
     console.log('✅ Transações de fluxo de caixa criadas');
 
     console.log('');
+
+    // ========================================
+    // CRIAR VENDAS DE TESTE
+    // ========================================
+
+    console.log('📊 Criando vendas de teste...');
+
+    // Criar vendas para os últimos dias
+    const vendasTeste = [];
+    const diasParaCriar = 7;
+
+    for (let i = 0; i < diasParaCriar; i++) {
+      const dataVenda = new Date();
+      dataVenda.setDate(dataVenda.getDate() - i);
+
+      // Criar 2-4 vendas por dia
+      const vendasDoDia = Math.floor(Math.random() * 3) + 2;
+
+      for (let j = 0; j < vendasDoDia; j++) {
+        const numeroVenda = `V${Date.now()}${i}${j}`;
+        const itensVenda = [];
+
+        // Selecionar produtos aleatórios para a venda
+        const numItens = Math.floor(Math.random() * 3) + 1;
+        const produtosSelecionados = [];
+
+        for (let k = 0; k < numItens; k++) {
+          const produtoAleatorio = produtosCriados[Math.floor(Math.random() * produtosCriados.length)];
+          if (!produtosSelecionados.find(p => p.id === produtoAleatorio.id)) {
+            produtosSelecionados.push(produtoAleatorio);
+          }
+        }
+        
+        let subtotal = 0;
+        
+        produtosSelecionados.forEach(produto => {
+          const quantidade = Math.floor(Math.random() * 3) + 1;
+          const precoUnitario = produto.preco_venda;
+          const subtotalItem = quantidade * precoUnitario;
+          
+          itensVenda.push({
+            produto_id: produto.id,
+            quantidade,
+            preco_unitario: precoUnitario,
+            subtotal: subtotalItem
+          });
+          
+          subtotal += subtotalItem;
+        });
+
+        const desconto = Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0;
+        const total = subtotal - desconto;
+
+        const venda = await Venda.create({
+          empresa_id: empresaPadrao.id,
+          usuario_id: admin.id,
+          numero_venda: numeroVenda,
+          tipo: 'venda',
+          status: 'finalizada',
+          subtotal,
+          desconto,
+          total,
+          forma_pagamento: ['Dinheiro', 'Cartão Crédito', 'Cartão Débito', 'PIX'][Math.floor(Math.random() * 4)],
+          parcelas: 1,
+          observacoes: 'Venda de teste gerada automaticamente',
+          createdAt: dataVenda,
+          updatedAt: dataVenda
+        });
+
+        // Criar itens da venda
+        await ItemVenda.bulkCreate(
+          itensVenda.map(item => ({
+            ...item,
+            venda_id: venda.id
+          }))
+        );
+
+        vendasTeste.push(venda);
+      }
+    }
+
+    console.log(`✅ Criadas ${vendasTeste.length} vendas de teste`);
+
     console.log('🎉 Seed concluído com sucesso!');
     console.log('');
     console.log('═══════════════════════════════════════════════════');
