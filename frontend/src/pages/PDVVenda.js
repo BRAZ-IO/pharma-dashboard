@@ -221,17 +221,14 @@ const PDVVenda = () => {
       }
       
       console.log('Novo produto adicionado ao carrinho');
-      const newItem = {
+      return [...prev, {
         id: produto.id,
         nome: produto.nome,
         preco: parseFloat(produto.preco_venda || produto.preco || 0),
         codigo_barras: produto.codigo_barras,
         quantidade: 1,
-        estoque: produto.estoque || 0
-      };
-      console.log('Item criado:', newItem);
-      
-      return [...prev, newItem];
+        estoque: produto.estoque_atual || 0
+      }];
     });
   };
 
@@ -522,14 +519,14 @@ const PDVVenda = () => {
                             </div>
                           </div>
                           <button 
-                            className={`add-product-btn ${produto.estoque_atual === 0 ? 'disabled' : ''}`}
+                            className={`add-product-btn ${(produto.estoque_atual || 0) === 0 ? 'disabled' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
-                              if (produto.estoque > 0) {
+                              if ((produto.estoque_atual || 0) > 0) {
                                 adicionarAoCarrinho(produto);
                               }
                             }}
-                            disabled={produto.estoque === 0}
+                            disabled={(produto.estoque_atual || 0) === 0}
                           >
                             <FaPlus />
                           </button>
