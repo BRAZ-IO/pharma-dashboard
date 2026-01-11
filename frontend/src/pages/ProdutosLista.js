@@ -133,25 +133,22 @@ const ProdutosLista = () => {
                 </div>
               </div>
 
-              <div className="produto-body">
-                <div className="produto-price">
-                  <span className="price-label">Preço</span>
-                  <span className="price-value">{formatCurrency(produto.preco_venda || 0)}</span>
+              <div className="produto-details">
+                <div className="detail-row">
+                  <span className="detail-label">Preço</span>
+                  <span className="detail-value price">{formatCurrency(produto.preco_venda || 0)}</span>
                 </div>
 
-                <div className="produto-stock">
-                  <span className="stock-label">Estoque</span>
-                  <span className={`stock-value ${stockStatus.class}`}>
+                <div className="detail-row">
+                  <span className="detail-label">Estoque</span>
+                  <span className={`detail-value ${stockStatus.class}`}>
                     {produto.estoque_atual || 0} unid.
                   </span>
-                  <span className={`stock-status ${stockStatus.class}`}>
-                    {stockStatus.label}
-                  </span>
                 </div>
 
-                <div className="produto-category">
-                  <span className="category-label">Categoria</span>
-                  <span className="category-value">{produto.categoria || 'Sem categoria'}</span>
+                <div className="detail-row">
+                  <span className="detail-label">Categoria</span>
+                  <span className="detail-value">{produto.categoria || 'Sem categoria'}</span>
                 </div>
               </div>
 
@@ -175,7 +172,7 @@ const ProdutosLista = () => {
                   onClick={() => navigate(`/app/estoque/movimentacoes?produto=${produto.id}`)}
                   title="Gerenciar estoque"
                 >
-                  �
+                  📦
                 </button>
               </div>
             </div>

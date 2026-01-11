@@ -205,10 +205,14 @@ const PDVVenda = () => {
   };
 
   const adicionarAoCarrinho = (produto) => {
+    console.log('Adicionando produto:', produto);
+    console.log('Estoque atual:', produto.estoque);
+    
     setCarrinho(prev => {
       const itemExistente = prev.find(item => item.id === produto.id);
       
       if (itemExistente) {
+        console.log('Produto já existe no carrinho, aumentando quantidade');
         return prev.map(item =>
           item.id === produto.id
             ? { ...item, quantidade: item.quantidade + 1 }
@@ -216,14 +220,18 @@ const PDVVenda = () => {
         );
       }
       
-      return [...prev, {
+      console.log('Novo produto adicionado ao carrinho');
+      const newItem = {
         id: produto.id,
         nome: produto.nome,
         preco: parseFloat(produto.preco_venda || produto.preco || 0),
         codigo_barras: produto.codigo_barras,
         quantidade: 1,
         estoque: produto.estoque || 0
-      }];
+      };
+      console.log('Item criado:', newItem);
+      
+      return [...prev, newItem];
     });
   };
 
@@ -490,7 +498,10 @@ const PDVVenda = () => {
                         <div 
                           key={produto.id} 
                           className="product-card"
-                          onClick={() => adicionarAoCarrinho(produto)}
+                          onClick={() => {
+                            console.log('Clique no card detectado para produto:', produto.nome);
+                            adicionarAoCarrinho(produto);
+                          }}
                         >
                           <div className="product-image">
                             {produto.imagem ? (
@@ -506,11 +517,23 @@ const PDVVenda = () => {
                             <div className="product-price">
                               {formatCurrency(parseFloat(produto.preco_venda || produto.preco || 0))}
                             </div>
-                            <div className="product-stock">
+                            <div className={`product-stock ${
+                              produto.estoque === 0 ? 'out-of-stock' : 
+                              produto.estoque <= 5 ? 'low-stock' : ''
+                            }`}>
                               Estoque: {produto.estoque || 0}
                             </div>
                           </div>
-                          <button className="add-product-btn">
+                          <button 
+                            className={`add-product-btn ${produto.estoque === 0 ? 'disabled' : ''}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (produto.estoque > 0) {
+                                adicionarAoCarrinho(produto);
+                              }
+                            }}
+                            disabled={produto.estoque === 0}
+                          >
                             <FaPlus />
                           </button>
                         </div>
