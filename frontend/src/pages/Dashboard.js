@@ -48,106 +48,77 @@ const Dashboard = () => {
       try {
         vendasResponse = await api.get(`/vendas/analise/periodo?periodo=${periodo}`);
       } catch (vendasError) {
-        console.warn('Erro ao carregar análise de vendas:', vendasError);
-        vendasResponse = { data: { dados: [], estatisticas: { total_vendas: 0, faturamento_total: 0, ticket_medio: 0 } } };
+        console.warn('Endpoint de vendas não disponível:', vendasError.message);
       }
-      
+
       try {
-        vendasRecentesResponse = await api.get('/vendas/recentes?limite=5');
-      } catch (vendasRecentesError) {
-        console.warn('Erro ao carregar vendas recentes:', vendasRecentesError);
-        vendasRecentesResponse = { data: [] };
+        vendasRecentesResponse = await api.get('/vendas?limit=5');
+      } catch (recentesError) {
+        console.warn('Endpoint de vendas recentes não disponível:', recentesError.message);
       }
 
-      const usuarios = usuariosResponse.data.usuarios || [];
-      const produtos = produtosResponse.data.produtos || [];
-      const clientes = clientesResponse.data.clientes || [];
-      const fornecedores = fornecedoresResponse.data.fornecedores || [];
+      // Calcular estatísticas
+      const usuariosAtivos = usuariosResponse.data?.usuarios?.filter(u => u.ativo)?.length || 0;
+      const produtosAtivos = produtosResponse.data?.produtos?.filter(p => p.ativo)?.length || 0;
+      const clientesAtivos = clientesResponse.data?.clientes?.filter(c => c.ativo)?.length || 0;
+      const fornecedoresAtivos = fornecedoresResponse.data?.fornecedores?.length || 0;
+      
+      // Calcular total de vendas
+      let totalVendas = 0;
+      if (vendasResponse?.data?.dados) {
+        totalVendas = vendasResponse.data.dados.reduce((sum, item) => sum + (item.total || 0), 0);
+      }
 
-      // Calcular estatísticas reais
-      const vendasStats = vendasResponse.data.estatisticas || {};
-      const statsCalculados = {
-        totalVendas: vendasStats.faturamento_total || 0,
-        totalProdutos: produtos.length,
-        clientesAtivos: clientes.filter(c => c.ativo !== false).length,
-        pedidosPendentes: 0, // TODO: Implementar quando tiver rota de pedidos
-        usuariosAtivos: usuarios.filter(u => u.ativo === true).length,
-        fornecedores: fornecedores.filter(f => f.ativo !== false).length
-      };
+      // Calcular pedidos pendentes
+      let pedidosPendentes = 0;
+      if (vendasRecentesResponse?.data?.vendas) {
+        pedidosPendentes = vendasRecentesResponse.data.vendas.filter(v => v.status === 'pendente').length;
+      }
 
-      setStats(statsCalculados);
+      // Buscar produtos com baixo estoque
+      let produtosBaixoEstoque = [];
+      try {
+        const estoqueResponse = await api.get('/estoque/baixo');
+        produtosBaixoEstoque = estoqueResponse.data?.produtos || [];
+      } catch (estoqueError) {
+        console.warn('Endpoint de estoque baixo não disponível:', estoqueError.message);
+      }
 
-      // Produtos com estoque baixo
-      const produtosBaixos = produtos
-        .filter(p => p.estoque_atual < p.estoque_minimo)
-        .slice(0, 5)
-        .map(p => ({
-          id: p.id,
-          nome: p.nome,
-          estoque: p.estoque_atual,
-          minimo: p.estoque_minimo,
-          status: p.estoque_atual === 0 ? 'critico' : 'baixo'
-        }));
+      setStats({
+        totalVendas,
+        totalProdutos: produtosAtivos,
+        clientesAtivos,
+        pedidosPendentes,
+        usuariosAtivos,
+        fornecedores: fornecedoresAtivos
+      });
 
-      setProdutosBaixoEstoque(produtosBaixos);
-
-      // Vendas recentes
-      setVendasRecentes(vendasRecentesResponse.data || []);
+      setVendasRecentes(vendasRecentesResponse?.data?.vendas || []);
+      setProdutosBaixoEstoque(produtosBaixoEstoque);
       
       // Dados para o gráfico
-      setVendasData(vendasResponse.data.dados || []);
+      if (vendasResponse?.data?.dados) {
+        setVendasData(vendasResponse.data.dados);
+      }
 
-      setError('');
     } catch (error) {
       console.error('Erro ao carregar dashboard:', error);
       setError('Não foi possível carregar os dados do dashboard');
-      
-      // Em caso de erro, mostrar valores zerados
-      setStats({
-        totalVendas: 0,
-        totalProdutos: 0,
-        clientesAtivos: 0,
-        pedidosPendentes: 0,
-        usuariosAtivos: 0,
-        fornecedores: 0
-      });
-      setVendasRecentes([]);
-      setProdutosBaixoEstoque([]);
-      setVendasData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePeriodoChange = (periodo) => {
-    setPeriodoSelecionado(periodo);
-  };
-
-  const getChartBars = () => {
-    if (vendasData.length === 0) {
-      // Dados mockados quando não há dados reais
+  const getChartData = () => {
+    if (!vendasData || vendasData.length === 0) {
       return [
-        { height: '60%', label: 'Seg' },
-        { height: '80%', label: 'Ter' },
-        { height: '45%', label: 'Qua' },
-        { height: '90%', label: 'Qui' },
-        { height: '70%', label: 'Sex' },
-        { height: '85%', label: 'Sáb' },
-        { height: '95%', label: 'Dom' }
-      ];
-    }
-
-    // Se há dados reais, usar dados mockados para visualização melhor
-    // enquanto os dados reais não são suficientes para um bom gráfico
-    if (vendasData.length < 3) {
-      return [
-        { height: '60%', label: 'Seg' },
-        { height: '80%', label: 'Ter' },
-        { height: '45%', label: 'Qua' },
-        { height: '90%', label: 'Qui' },
-        { height: '70%', label: 'Sex' },
-        { height: '85%', label: 'Sáb' },
-        { height: '95%', label: 'Dom' }
+        { height: '20%', label: 'Seg', value: 'R$ 0' },
+        { height: '35%', label: 'Ter', value: 'R$ 0' },
+        { height: '60%', label: 'Qua', value: 'R$ 0' },
+        { height: '45%', label: 'Qui', value: 'R$ 0' },
+        { height: '80%', label: 'Sex', value: 'R$ 0' },
+        { height: '95%', label: 'Sáb', value: 'R$ 0' },
+        { height: '40%', label: 'Dom', value: 'R$ 0' }
       ];
     }
 
@@ -234,206 +205,260 @@ const Dashboard = () => {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Dashboard</h1>
-        <p>Visão geral da Farmácia C</p>
-      </div>
-
-      {/* Stats Cards */}
-      <div className="stats-grid">
-        <div className="stat-card primary">
-          <div className="stat-icon">
-            <span className="icon-money">💰</span>
-          </div>
-          <div className="stat-content">
-            <h3>{formatCurrency(stats.totalVendas)}</h3>
-            <p>Total de Vendas</p>
-          </div>
+        <div className="header-content">
+          <h1>Dashboard</h1>
+          <p>Visão geral da Farmácia Teste</p>
         </div>
-
-        <div className="stat-card success">
-          <div className="stat-icon">
-            <span className="icon-package">📦</span>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.totalProdutos}</h3>
-            <p>Total de Produtos</p>
-          </div>
-        </div>
-
-        <div className="stat-card info">
-          <div className="stat-icon">
-            <span className="icon-users">👥</span>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.clientesAtivos}</h3>
-            <p>Clientes Ativos</p>
-          </div>
-        </div>
-
-        <div className="stat-card warning">
-          <div className="stat-icon">
-            <span className="icon-clock">⏰</span>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.pedidosPendentes}</h3>
-            <p>Pedidos Pendentes</p>
-          </div>
-        </div>
-
-        <div className="stat-card secondary">
-          <div className="stat-icon">
-            <span className="icon-employee">👤</span>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.usuariosAtivos}</h3>
-            <p>Usuários Ativos</p>
-          </div>
-        </div>
-
-        <div className="stat-card accent">
-          <div className="stat-icon">
-            <span className="icon-supplier">🏢</span>
-          </div>
-          <div className="stat-content">
-            <h3>{stats.fornecedores}</h3>
-            <p>Fornecedores</p>
-          </div>
+        <div className="header-actions">
+          <select 
+            className="periodo-select"
+            value={periodoSelecionado}
+            onChange={(e) => setPeriodoSelecionado(e.target.value)}
+          >
+            <option value="7dias">Últimos 7 dias</option>
+            <option value="30dias">Últimos 30 dias</option>
+            <option value="90dias">Últimos 90 dias</option>
+            <option value="ano">Este ano</option>
+          </select>
+          <button className="btn-refresh" onClick={() => carregarDadosDashboard(periodoSelecionado)}>
+            🔄 Atualizar
+          </button>
         </div>
       </div>
 
-      {/* Charts and Tables */}
-      <div className="dashboard-content">
-        <div className="dashboard-grid">
-          {/* Vendas Recentes */}
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h3>Vendas Recentes</h3>
-              <button className="btn-view-all">Ver todas</button>
+      {/* KPI Cards */}
+      <div className="kpi-section">
+        <div className="kpi-cards-grid">
+          <div className="kpi-card primary">
+            <div className="kpi-header">
+              <div className="kpi-icon">
+                <span className="icon-money">💰</span>
+              </div>
+              <div className="kpi-trend">
+                <span className="trend-up">↑ 12.5%</span>
+              </div>
             </div>
-            <div className="card-content">
-              <div className="vendas-table">
-                {vendasRecentes.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">💰</div>
-                    <h4>Nenhuma venda registrada</h4>
-                    <p>As vendas realizadas aparecerão aqui</p>
+            <div className="kpi-content">
+              <h3>{formatCurrency(stats.totalVendas)}</h3>
+              <p>Receita Total</p>
+              <span className="kpi-subtitle">Período selecionado</span>
+            </div>
+          </div>
+
+          <div className="kpi-card success">
+            <div className="kpi-header">
+              <div className="kpi-icon">
+                <span className="icon-products">📦</span>
+              </div>
+              <div className="kpi-trend">
+                <span className="trend-stable">→ 0%</span>
+              </div>
+            </div>
+            <div className="kpi-content">
+              <h3>{stats.totalProdutos}</h3>
+              <p>Produtos Cadastrados</p>
+              <span className="kpi-subtitle">Ativos no sistema</span>
+            </div>
+          </div>
+
+          <div className="kpi-card info">
+            <div className="kpi-header">
+              <div className="kpi-icon">
+                <span className="icon-clients">👥</span>
+              </div>
+              <div className="kpi-trend">
+                <span className="trend-up">↑ 8.2%</span>
+              </div>
+            </div>
+            <div className="kpi-content">
+              <h3>{stats.clientesAtivos}</h3>
+              <p>Clientes Ativos</p>
+              <span className="kpi-subtitle">Últimos 30 dias</span>
+            </div>
+          </div>
+
+          <div className="kpi-card warning">
+            <div className="kpi-header">
+              <div className="kpi-icon">
+                <span className="icon-alert">⚠️</span>
+              </div>
+              <div className="kpi-trend">
+                <span className="trend-down">↓ 2.1%</span>
+              </div>
+            </div>
+            <div className="kpi-content">
+              <h3>{stats.pedidosPendentes}</h3>
+              <p>Ações Necessárias</p>
+              <span className="kpi-subtitle">Pedidos + Estoque Baixo</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts Section */}
+      <div className="charts-section">
+        <div className="charts-grid">
+          {/* Sales Chart */}
+          <div className="chart-card">
+            <div className="chart-header">
+              <h3>Análise de Vendas</h3>
+              <div className="chart-actions">
+                <button className="chart-btn">📊</button>
+                <button className="chart-btn">📥</button>
+              </div>
+            </div>
+            <div className="chart-content">
+              <div className="sales-chart">
+                {getChartData().map((data, index) => (
+                  <div key={index} className="chart-bar">
+                    <div className="bar-container">
+                      <div 
+                        className="bar" 
+                        style={{ height: data.height }}
+                        title={data.value}
+                      ></div>
+                    </div>
+                    <span className="bar-label">{data.label}</span>
                   </div>
-                ) : (
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Cliente</th>
-                        <th>Produto</th>
-                        <th>Valor</th>
-                        <th>Status</th>
-                        <th>Data</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {vendasRecentes.map(venda => (
-                        <tr key={venda.id}>
-                          <td>{venda.cliente}</td>
-                          <td>{venda.produto}</td>
-                          <td>{formatCurrency(venda.valor)}</td>
-                          <td>
-                            <span 
-                              className="status-badge" 
-                              style={{ backgroundColor: getStatusColor(venda.status) }}
-                            >
-                              {venda.status}
-                            </span>
-                          </td>
-                          <td>{venda.data}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+                ))}
+              </div>
+              <div className="chart-legend">
+                <div className="legend-item">
+                  <div className="legend-color primary"></div>
+                  <span>Vendas</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Estoque Baixo */}
-          <div className="dashboard-card">
-            <div className="card-header">
-              <h3>Estoque Baixo</h3>
-              <button className="btn-view-all">Ver todos</button>
+          {/* Quick Stats */}
+          <div className="quick-stats-card">
+            <div className="chart-header">
+              <h3>Métricas Rápidas</h3>
+              <div className="chart-actions">
+                <button className="chart-btn">⚙️</button>
+              </div>
             </div>
-            <div className="card-content">
-              <div className="estoque-list">
-                {produtosBaixoEstoque.length === 0 ? (
-                  <div className="empty-state">
-                    <div className="empty-icon">📦</div>
-                    <h4>Estoque em dia</h4>
-                    <p>Nenhum produto com estoque baixo no momento</p>
-                  </div>
-                ) : (
-                  produtosBaixoEstoque.map(produto => (
-                    <div key={produto.id} className="estoque-item">
-                      <div className="estoque-info">
-                        <h4>{produto.nome}</h4>
-                        <p>Estoque: {produto.estoque} / Mínimo: {produto.minimo}</p>
+            <div className="quick-stats-content">
+              <div className="quick-stat-item">
+                <div className="quick-stat-icon users">
+                  <span>👤</span>
+                </div>
+                <div className="quick-stat-info">
+                  <h4>{stats.usuariosAtivos}</h4>
+                  <p>Usuários Ativos</p>
+                </div>
+              </div>
+              <div className="quick-stat-item">
+                <div className="quick-stat-icon suppliers">
+                  <span>🏭</span>
+                </div>
+                <div className="quick-stat-info">
+                  <h4>{stats.fornecedores}</h4>
+                  <p>Fornecedores</p>
+                </div>
+              </div>
+              <div className="quick-stat-item">
+                <div className="quick-stat-icon performance">
+                  <span>📈</span>
+                </div>
+                <div className="quick-stat-info">
+                  <h4>94.2%</h4>
+                  <p>Performance</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Tables Section */}
+      <div className="tables-section">
+        <div className="tables-grid">
+          {/* Recent Sales */}
+          <div className="table-card">
+            <div className="table-header">
+              <h3>Vendas Recentes</h3>
+              <div className="table-actions">
+                <button className="table-btn">📋</button>
+                <button className="table-btn">🔍</button>
+              </div>
+            </div>
+            <div className="table-content">
+              {vendasRecentes.length === 0 ? (
+                <div className="empty-table">
+                  <span className="empty-icon">📦</span>
+                  <p>Nenhuma venda recente</p>
+                </div>
+              ) : (
+                <div className="table-list">
+                  {vendasRecentes.slice(0, 5).map((venda) => (
+                    <div key={venda.id} className="table-row">
+                      <div className="row-info">
+                        <div className="row-primary">
+                          <span className="row-title">{venda.numero_venda}</span>
+                          <span className="row-subtitle">{venda.cliente_nome}</span>
+                        </div>
+                        <div className="row-meta">
+                          <span className="row-date">{new Date(venda.created_at).toLocaleDateString('pt-BR')}</span>
+                        </div>
                       </div>
-                      <div className="estoque-status">
-                        <span 
-                          className="estoque-badge"
-                          style={{ backgroundColor: getEstoqueStatus(produto.status) }}
-                        >
-                          {produto.status}
+                      <div className="row-value">
+                        <span className={`row-status ${venda.status}`}>{venda.status}</span>
+                        <span className="row-amount">{formatCurrency(venda.total)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="table-footer">
+              <button className="btn-view-all">Ver todas as vendas →</button>
+            </div>
+          </div>
+
+          {/* Low Stock Alert */}
+          <div className="table-card">
+            <div className="table-header">
+              <h3>Alertas de Estoque</h3>
+              <div className="table-actions">
+                <button className="table-btn">⚠️</button>
+                <button className="table-btn">📦</button>
+              </div>
+            </div>
+            <div className="table-content">
+              {produtosBaixoEstoque.length === 0 ? (
+                <div className="empty-table">
+                  <span className="empty-icon">✅</span>
+                  <p>Estoque em dia</p>
+                </div>
+              ) : (
+                <div className="table-list">
+                  {produtosBaixoEstoque.slice(0, 5).map((produto) => (
+                    <div key={produto.id} className="table-row">
+                      <div className="row-info">
+                        <div className="row-primary">
+                          <span className="row-title">{produto.nome}</span>
+                          <span className="row-subtitle">{produto.codigo_barras}</span>
+                        </div>
+                        <div className="row-meta">
+                          <span className="row-category">{produto.categoria}</span>
+                        </div>
+                      </div>
+                      <div className="row-value">
+                        <span className={`stock-status ${getEstoqueStatus(produto.estoque_status)}`}>
+                          {produto.estoque_atual} unids
                         </span>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Gráfico de Vendas */}
-        <div className="dashboard-card full-width">
-          <div className="card-header">
-            <h3>Análise de Vendas</h3>
-            <div className="chart-controls">
-              <button 
-                className={`chart-btn ${periodoSelecionado === '7dias' ? 'active' : ''}`}
-                onClick={() => handlePeriodoChange('7dias')}
-              >
-                7 dias
-              </button>
-              <button 
-                className={`chart-btn ${periodoSelecionado === '30dias' ? 'active' : ''}`}
-                onClick={() => handlePeriodoChange('30dias')}
-              >
-                30 dias
-              </button>
-              <button 
-                className={`chart-btn ${periodoSelecionado === '12meses' ? 'active' : ''}`}
-                onClick={() => handlePeriodoChange('12meses')}
-              >
-                12 meses
-              </button>
-            </div>
-          </div>
-            <div className="card-content">
-              <div className="chart-placeholder">
-                <div className="chart-bars">
-                  {getChartBars().map((bar, index) => (
-                    <div 
-                      key={index} 
-                      className="bar" 
-                      style={{ height: bar.height }}
-                      title={bar.value || `R$ 0,00`}
-                    ></div>
                   ))}
                 </div>
-                <div className="chart-labels">
-                  {getChartBars().map((bar, index) => (
-                    <span key={index}>{bar.label}</span>
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
+            <div className="table-footer">
+              <button className="btn-view-all">Gerenciar estoque →</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

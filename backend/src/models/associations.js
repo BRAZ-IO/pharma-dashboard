@@ -8,6 +8,7 @@ const TransferenciaEstoque = require('./TransferenciaEstoque');
 const Venda = require('./Venda');
 const ItemVenda = require('./ItemVenda');
 const Cliente = require('./Cliente');
+const FluxoCaixa = require('./FluxoCaixa');
 
 // Associações da Empresa
 Empresa.hasMany(Filial, {
@@ -164,6 +165,28 @@ Produto.hasMany(ItemVenda, {
   as: 'itensVenda'
 });
 
+// Associações do FluxoCaixa
+FluxoCaixa.belongsTo(Empresa, {
+  foreignKey: 'empresa_id',
+  as: 'empresa'
+});
+
+FluxoCaixa.belongsTo(Venda, {
+  foreignKey: 'venda_id',
+  as: 'venda'
+});
+
+// Associações inversas
+Empresa.hasMany(FluxoCaixa, {
+  foreignKey: 'empresa_id',
+  as: 'fluxoCaixa'
+});
+
+Venda.hasOne(FluxoCaixa, {
+  foreignKey: 'venda_id',
+  as: 'fluxoCaixa'
+});
+
 module.exports = {
   Empresa,
   Filial,
@@ -173,5 +196,6 @@ module.exports = {
   TransferenciaEstoque,
   Venda,
   ItemVenda,
-  Cliente
+  Cliente,
+  FluxoCaixa
 };

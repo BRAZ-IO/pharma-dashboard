@@ -1,4 +1,4 @@
-const { FluxoCaixa } = require('../models');
+const { FluxoCaixa, Venda } = require('../models');
 const { validationResult } = require('express-validator');
 const { Op } = require('sequelize');
 
@@ -148,6 +148,10 @@ exports.excluir = async (req, res) => {
 // Obter resumo do fluxo de caixa
 exports.obterResumo = async (req, res) => {
   try {
+    console.log('🔍 Endpoint /resumo chamado');
+    console.log('📋 Query params:', req.query);
+    console.log('🏢 Empresa ID:', req.empresaId);
+    
     const { empresaId } = req;
     const { dataInicio, dataFim } = req.query;
 
@@ -158,6 +162,8 @@ exports.obterResumo = async (req, res) => {
       if (dataInicio) where.data[Op.gte] = dataInicio;
       if (dataFim) where.data[Op.lte] = dataFim;
     }
+
+    console.log('📊 Where clause:', where);
 
     // Buscar totais por tipo
     const [entradas, saidas] = await Promise.all([
@@ -189,6 +195,15 @@ exports.obterResumo = async (req, res) => {
     const totalEntradas = entradas || 0;
     const totalSaidas = saidas || 0;
     const saldo = totalEntradas - totalSaidas;
+
+    console.log('💰 Valores calculados:', {
+      totalEntradas,
+      totalSaidas,
+      saldo,
+      qtdEntradas,
+      qtdSaidas,
+      transacoesRecentes: transacoesRecentes.length
+    });
 
     res.json({
       totalEntradas,
@@ -310,5 +325,80 @@ exports.obterCategorias = async (req, res) => {
   } catch (error) {
     console.error('Erro ao obter categorias:', error);
     res.status(500).json({ erro: 'Erro ao obter categorias' });
+  }
+};
+
+// Listar transações do PDV (vendas)
+exports.listarTransacoesPDV = async (req, res) => {
+  try {
+    const { empresaId } = req;
+    const { 
+      page = 1, 
+      limit = 10, 
+      dataInicio, 
+      dataFim,
+      forma_pagamento 
+    } = req.query;
+    const offset = (page - 1) * limit;
+
+    const where = { 
+      empresa_id: empresaId,
+      categoria: 'Vendas PDV',
+      venda_id: { [Op.not]: null } // Apenas transações vinculadas a vendas
+    };
+    
+    if (dataInicio || dataFim) {
+      where.data = {};
+      if (dataInicio) where.data[Op.gte] = dataInicio;
+      if (dataFim) where.data[Op.lte] = dataFim;
+    }
+    
+    if (forma_pagamento) where.forma_pagamento = forma_pagamento;
+
+    const { count, rows } = await FluxoCaixa.findAndCountAll({
+      where,
+      include: [
+        {
+          model: Venda,
+          as: 'venda',
+          attributes: ['id', 'numero_venda', 'status', 'created_at'],
+          include: [
+            {
+              model: require('../models').ItemVenda,
+              as: 'itens',
+              attributes: ['quantidade', 'preco_unitario', 'subtotal']
+            }
+          ]
+        }
+      ],
+      limit: parseInt(limit),
+      offset: parseInt(offset),
+      order: [['data', 'DESC'], ['created_at', 'DESC']]
+    });
+
+    // Calcular totais
+    const totais = await FluxoCaixa.findAll({
+      where,
+      attributes: [
+        [FluxoCaixa.sequelize.fn('SUM', FluxoCaixa.sequelize.col('valor')), 'total_entradas'],
+        [FluxoCaixa.sequelize.fn('COUNT', FluxoCaixa.sequelize.col('id')), 'total_vendas']
+      ]
+    });
+
+    const stats = totais[0];
+
+    res.json({
+      transacoes: rows,
+      totais: {
+        total_entradas: parseFloat(stats.dataValues.total_entradas || 0),
+        total_vendas: parseInt(stats.dataValues.total_vendas || 0)
+      },
+      total: count,
+      page: parseInt(page),
+      totalPages: Math.ceil(count / limit)
+    });
+  } catch (error) {
+    console.error('Erro ao listar transações do PDV:', error);
+    res.status(500).json({ erro: 'Erro ao listar transações do PDV' });
   }
 };

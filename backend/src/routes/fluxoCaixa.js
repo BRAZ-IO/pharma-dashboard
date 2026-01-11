@@ -50,6 +50,7 @@ const fluxoCaixaValidation = [
 
 // Rotas
 router.get('/', fluxoCaixaController.listarTodos);
+router.get('/pdv', fluxoCaixaController.listarTransacoesPDV);
 router.get('/resumo', fluxoCaixaController.obterResumo);
 router.get('/relatorio', fluxoCaixaController.obterRelatorio);
 router.get('/categorias', fluxoCaixaController.obterCategorias);

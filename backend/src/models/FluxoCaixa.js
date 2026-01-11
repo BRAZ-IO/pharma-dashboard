@@ -65,6 +65,14 @@ const FluxoCaixa = sequelize.define('FluxoCaixa', {
       model: 'empresas',
       key: 'id'
     }
+  },
+  venda_id: {
+    type: DataTypes.UUID,
+    allowNull: true,
+    references: {
+      model: 'vendas',
+      key: 'id'
+    }
   }
 }, {
   tableName: 'FluxoCaixa',
@@ -83,6 +91,9 @@ const FluxoCaixa = sequelize.define('FluxoCaixa', {
     },
     {
       fields: ['categoria']
+    },
+    {
+      fields: ['venda_id']
     }
   ]
 });

@@ -58,6 +58,58 @@
   color: #f1aeb5;
 }
 
+.valor-col.negativo {
+  color: #f1aeb5;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.saidas-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.filter-group label {
+  color: #e8eaed;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #e8eaed;
+  font-size: 0.875rem;
+  transition: all 0.3s ease;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: #64b5f6;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.filter-group select option {
+  background: #0f1a2e;
+  color: #e8eaed;
+}
+
 .saidas-table-container {
   background: linear-gradient(135deg, #0f1a2e 0%, #1a2332 100%);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -176,6 +228,10 @@
 /* Responsive */
 @media (max-width: 768px) {
   .saidas-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .saidas-filters {
     grid-template-columns: 1fr;
   }
 

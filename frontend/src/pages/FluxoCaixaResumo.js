@@ -55,31 +55,25 @@ const FluxoCaixaResumo = () => {
       
       setDados({
         saldoAnterior: dadosFluxo.saldo_anterior || 0,
-        entradas: dadosFluxo.total_entradas || 0,
-        saidas: dadosFluxo.total_saidas || 0,
-        saldoAtual: dadosFluxo.saldo_atual || 0
+        entradas: dadosFluxo.totalEntradas || 0,
+        saidas: dadosFluxo.totalSaidas || 0,
+        saldoAtual: dadosFluxo.saldo || 0
       });
       
-      setTransacoes(dadosFluxo.transacoes || []);
+      setTransacoes(dadosFluxo.transacoesRecentes || []);
       setError('');
     } catch (error) {
       console.error('Erro ao carregar dados do fluxo de caixa:', error);
-      setError('Não foi possível carregar os dados do fluxo de caixa');
+      setError('Não foi possível carregar os dados do fluxo de caixa: ' + error.message);
       
-      // Fallback para dados mock se a API falhar
+      // Não usar mais dados mockados - mostrar o erro real
       setDados({
-        saldoAnterior: 15000,
-        entradas: 28500,
-        saidas: 12300,
-        saldoAtual: 31200
+        saldoAnterior: 0,
+        entradas: 0,
+        saidas: 0,
+        saldoAtual: 0
       });
-      setTransacoes([
-        { id: 1, descricao: 'Venda PDV - Pedido #1234', tipo: 'entrada', valor: 450, data: '2026-01-08', categoria: 'Vendas' },
-        { id: 2, descricao: 'Pagamento Cliente', tipo: 'entrada', valor: 1500, data: '2026-01-07', categoria: 'Contas a Receber' },
-        { id: 3, descricao: 'Compra de Medicamentos', tipo: 'saida', valor: 1200, data: '2026-01-08', categoria: 'Compras' },
-        { id: 4, descricao: 'Pagamento de Aluguel', tipo: 'saida', valor: 3500, data: '2026-01-08', categoria: 'Despesas Fixas' },
-        { id: 5, descricao: 'Salário Funcionários', tipo: 'saida', valor: 8500, data: '2026-01-05', categoria: 'Folha de Pagamento' }
-      ]);
+      setTransacoes([]);
     } finally {
       setLoading(false);
     }
@@ -105,17 +99,29 @@ const FluxoCaixaResumo = () => {
       if (!dadosAgrupados[data]) {
         dadosAgrupados[data] = 0;
       }
-      dadosAgrupados[data] += transacao.tipo === 'entrada' ? transacao.valor : -transacao.valor;
+      const valor = parseFloat(transacao.valor) || 0;
+      dadosAgrupados[data] += transacao.tipo === 'entrada' ? valor : -valor;
     });
     
     // Criar array para o gráfico
     const dias = Object.keys(dadosAgrupados).sort();
-    let saldoAcumulado = dados.saldoAnterior;
+    let saldoAcumulado = parseFloat(dados.saldoAnterior) || 0;
     
     return dias.map(dia => ({
       dia: dia,
-      saldo: saldoAcumulado += dadosAgrupados[dia]
+      saldo: saldoAcumulado += dadosAgrupados[dia] || 0
     }));
+  };
+
+  const getChartPoints = () => {
+    const dados = getDadosEvolucao();
+    if (dados.length === 0) return '';
+    
+    const maxValue = Math.max(...dados.map(item => Math.abs(item.valor) || 1));
+    return dados.map((d, i) => {
+      const y = 250 - (d.valor || 0) / maxValue * 200;
+      return `${50 + i * 80},${y}`;
+    }).join(' ');
   };
 
   const getDadosDistribuicao = () => {
@@ -125,12 +131,13 @@ const FluxoCaixaResumo = () => {
       if (!distribuicao[transacao.categoria]) {
         distribuicao[transacao.categoria] = 0;
       }
-      distribuicao[transacao.categoria] += transacao.valor;
+      const valor = parseFloat(transacao.valor) || 0;
+      distribuicao[transacao.categoria] += valor;
     });
     
     return Object.entries(distribuicao).map(([categoria, valor]) => ({
       categoria,
-      valor,
+      valor: valor || 0,
       cor: categoria === 'Vendas' ? '#26de81' : 
             categoria === 'Serviços' ? '#64b5f6' : 
             categoria === 'Compras' ? '#e74c3c' : 
@@ -195,135 +202,182 @@ const FluxoCaixaResumo = () => {
 
       <div className="resumo-graficos">
         <div className="grafico-container">
-          <h3>Evolução do Saldo</h3>
-          <div className="grafico-linha">
-            <div className="chart-container">
+          <div className="grafico-header">
+            <h3>Evolução Financeira</h3>
+            <div className="grafico-subtitle">Análise de Saldo Período</div>
+          </div>
+          <div className="evolucao-container">
+            <div className="chart-wrapper">
               <div className="chart-line">
-                <svg width="100%" height="200" viewBox="0 0 600 200" className="chart-svg">
-                  {/* Grid lines */}
-                  {[0, 1, 2, 3, 4].map(i => (
-                    <line
-                      key={`grid-${i}`}
-                      x1="50"
-                      y1={40 + i * 40}
-                      x2="550"
-                      y2={40 + i * 40}
-                      stroke="rgba(255, 255, 255, 0.1)"
-                      strokeDasharray="2,2"
+                <div className="chart-container">
+                  <svg width="100%" height="250" viewBox="0 0 600 250" className="chart-svg">
+                    {[0, 1, 2, 3, 4].map(i => (
+                      <line
+                        key={`grid-${i}`}
+                        x1="50"
+                        y1={50 + i * 40}
+                        x2="550"
+                        y2={50 + i * 40}
+                        stroke="rgba(255, 255, 255, 0.1)"
+                        strokeWidth="1"
+                      />
+                    ))}
+                    
+                    {[0, 1, 2, 3, 4].map(i => (
+                      <text
+                        key={`y-label-${i}`}
+                        x="40"
+                        y={55 + i * 40}
+                        fill="#78909c"
+                        fontSize="11"
+                        textAnchor="end"
+                      >
+                        {getDadosEvolucao()[4 - i]?.valor || 0}
+                      </text>
+                    ))}
+                    
+                    <polyline
+                      points={getChartPoints()}
+                      fill="none"
+                      stroke="#64b5f6"
+                      strokeWidth="3"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
                     />
-                  ))}
-                  
-                  {/* Y-axis labels */}
-                  {[0, 1, 2, 3, 4].map(i => (
-                    <text
-                      key={`label-${i}`}
-                      x="40"
-                      y={45 + i * 40}
-                      fill="#78909c"
-                      fontSize="12"
-                      textAnchor="end"
-                    >
-                      {formatCurrency(35000 - i * 7500)}
-                    </text>
-                  ))}
-                  
-                  {/* Line chart */}
-                  <polyline
-                    points={getDadosEvolucao().map((d, i) => 
-                      `${50 + i * 80},${180 - (d.saldo / 35000) * 140}`
-                    ).join(' ')}
-                    fill="none"
-                    stroke="#64b5f6"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  
-                  {/* Data points */}
-                  {getDadosEvolucao().map((d, i) => (
-                    <g key={`point-${i}`}>
-                      <circle
-                        cx={50 + i * 80}
-                        cy={180 - (d.saldo / 35000) * 140}
-                        r="5"
-                        fill="#64b5f6"
-                        className="chart-point"
-                      />
-                      <circle
-                        cx={50 + i * 80}
-                        cy={180 - (d.saldo / 35000) * 140}
-                        r="8"
-                        fill="rgba(100, 181, 246, 0.3)"
-                        className="chart-point-hover"
-                      />
-                    </g>
-                  ))}
-                  
-                  {/* X-axis labels */}
-                  {getDadosEvolucao().map((d, i) => (
-                    <text
-                      key={`x-label-${i}`}
-                      x={50 + i * 80}
-                      y="195"
-                      fill="#78909c"
-                      fontSize="11"
-                      textAnchor="middle"
-                    >
-                      {d.dia}
-                    </text>
-                  ))}
-                </svg>
+                    
+                    <polygon
+                      points={`50,250 ${getChartPoints()} 450,250`}
+                      fill="rgba(100, 181, 246, 0.2)"
+                    />
+                    
+                    {getDadosEvolucao().map((d, i) => {
+                      const maxValue = Math.max(...getDadosEvolucao().map(item => Math.abs(item.valor) || 1));
+                      const y = 250 - (d.valor || 0) / maxValue * 200;
+                      return (
+                        <g key={`point-${i}`}>
+                          <circle
+                            cx={50 + i * 80}
+                            cy={y}
+                            r="5"
+                            fill="#64b5f6"
+                            className="chart-point"
+                          />
+                          <circle
+                            cx={50 + i * 80}
+                            cy={y}
+                            r="8"
+                            fill="rgba(100, 181, 246, 0.3)"
+                            className="chart-point-hover"
+                          />
+                        </g>
+                      );
+                    })}
+                    
+                    {getDadosEvolucao().map((d, i) => (
+                      <text
+                        key={`x-label-${i}`}
+                        x={50 + i * 80}
+                        y="245"
+                        fill="#78909c"
+                        fontSize="11"
+                        textAnchor="middle"
+                      >
+                        {d.dia}
+                      </text>
+                    ))}
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div className="evolucao-stats">
+              <div className="stat-item">
+                <span className="stat-label">Maior Saldo</span>
+                <span className="stat-value positive">
+                  {formatCurrency(getDadosEvolucao().length > 0 ? Math.max(...getDadosEvolucao().map(d => d.valor || 0)) : 0)}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Menor Saldo</span>
+                <span className="stat-value negative">
+                  {formatCurrency(getDadosEvolucao().length > 0 ? Math.min(...getDadosEvolucao().map(d => d.valor || 0)) : 0)}
+                </span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-label">Média</span>
+                <span className="stat-value">
+                  {formatCurrency(getDadosEvolucao().length > 0 ? getDadosEvolucao().reduce((sum, d) => sum + (d.valor || 0), 0) / getDadosEvolucao().length : 0)}
+                </span>
               </div>
             </div>
           </div>
         </div>
         
         <div className="grafico-container">
-          <h3>Distribuição Entradas vs Saídas</h3>
-          <div className="grafico-pizza">
-            <div className="chart-container">
-              <svg width="200" height="200" viewBox="0 0 200 200" className="pie-chart">
-                {getDadosDistribuicao().map((d, i) => {
-                  const total = getDadosDistribuicao().reduce((sum, item) => sum + item.valor, 0);
-                  const percentage = (d.valor / total) * 100;
-                  const angle = (percentage / 100) * 360;
-                  const startAngle = getDadosDistribuicao().slice(0, i).reduce((sum, item) => 
-                    sum + (item.valor / total) * 360, 0
-                  );
-                  
-                  const startAngleRad = (startAngle - 90) * Math.PI / 180;
-                  const endAngleRad = (startAngle + angle - 90) * Math.PI / 180;
-                  
-                  const x1 = 100 + 80 * Math.cos(startAngleRad);
-                  const y1 = 100 + 80 * Math.sin(startAngleRad);
-                  const x2 = 100 + 80 * Math.cos(endAngleRad);
-                  const y2 = 100 + 80 * Math.sin(endAngleRad);
-                  
-                  const largeArcFlag = angle > 180 ? 1 : 0;
-                  
-                  return (
-                    <g key={`slice-${i}`} className="pie-slice">
-                      <path
-                        d={`M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                        fill={d.cor}
-                        className="pie-segment"
-                      />
-                    </g>
-                  );
-                })}
-              </svg>
-              
-              <div className="pie-legend">
+          <div className="grafico-header">
+            <h3>Distribuição Financeira</h3>
+            <div className="grafico-subtitle">Entradas vs Saídas</div>
+          </div>
+          <div className="distribuicao-container">
+            <div className="pizza-wrapper">
+              <div className="chart-container">
+                <svg width="250" height="250" viewBox="0 0 250 250" className="pie-chart">
+                  {getDadosDistribuicao().map((d, i) => {
+                    const total = getDadosDistribuicao().reduce((sum, item) => sum + item.valor, 0);
+                    const percentage = (d.valor / total) * 100;
+                    const angle = (percentage / 100) * 360;
+                    const startAngle = getDadosDistribuicao().slice(0, i).reduce((sum, item) => 
+                      sum + (item.valor / total) * 360, 0
+                    );
+                    
+                    const startAngleRad = (startAngle - 90) * Math.PI / 180;
+                    const endAngleRad = (startAngle + angle - 90) * Math.PI / 180;
+                    
+                    const x1 = 125 + 100 * Math.cos(startAngleRad);
+                    const y1 = 125 + 100 * Math.sin(startAngleRad);
+                    const x2 = 125 + 100 * Math.cos(endAngleRad);
+                    const y2 = 125 + 100 * Math.sin(endAngleRad);
+                    
+                    const largeArcFlag = angle > 180 ? 1 : 0;
+                    
+                    return (
+                      <g key={`slice-${i}`} className="pie-slice">
+                        <path
+                          d={`M 125 125 L ${x1} ${y1} A 100 100 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
+                          fill={d.cor}
+                          className="pie-segment"
+                        />
+                      </g>
+                    );
+                  })}
+                </svg>
+              </div>
+            </div>
+            <div className="distribuicao-legend">
+              <h4>Resumo Financeiro</h4>
+              <div className="legend-items">
                 {getDadosDistribuicao().map((d, i) => (
-                  <div key={`legend-${i}`} className="legend-item">
-                    <div 
-                      className="legend-color" 
-                      style={{ backgroundColor: d.cor }}
-                    ></div>
-                    <span className="legend-text">{d.categoria}</span>
-                    <span className="legend-value">{formatCurrency(d.valor)}</span>
+                  <div key={`legend-${i}`} className="legend-item-modern">
+                    <div className="legend-info">
+                      <div 
+                        className="legend-color" 
+                        style={{ backgroundColor: d.cor }}
+                      ></div>
+                      <div className="legend-details">
+                        <span className="legend-category">{d.categoria}</span>
+                        <span className="legend-amount">{formatCurrency(d.valor)}</span>
+                      </div>
+                    </div>
+                    <div className="legend-percentage">
+                      {((d.valor / getDadosDistribuicao().reduce((sum, item) => sum + item.valor, 0)) * 100).toFixed(1)}%
+                    </div>
                   </div>
                 ))}
+              </div>
+              <div className="total-distribuicao">
+                <span className="total-label">Total</span>
+                <span className="total-value">
+                  {formatCurrency(getDadosDistribuicao().reduce((sum, item) => sum + item.valor, 0))}
+                </span>
               </div>
             </div>
           </div>
@@ -344,27 +398,27 @@ const FluxoCaixaResumo = () => {
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>08/01/2026</td>
-                <td>Venda PDV - Pedido #1234</td>
-                <td>Vendas</td>
-                <td className="tipo-entrada">Entrada</td>
-                <td className="valor positivo">+R$ 450,00</td>
-              </tr>
-              <tr>
-                <td>08/01/2026</td>
-                <td>Compra de Medicamentos</td>
-                <td>Compras</td>
-                <td className="tipo-saida">Saída</td>
-                <td className="valor negativo">-R$ 1.200,00</td>
-              </tr>
-              <tr>
-                <td>07/01/2026</td>
-                <td>Venda PDV - Pedido #1233</td>
-                <td>Vendas</td>
-                <td className="tipo-entrada">Entrada</td>
-                <td className="valor positivo">+R$ 320,00</td>
-              </tr>
+              {transacoes.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: 'center', padding: '2rem', color: '#adb5bd' }}>
+                    Nenhuma transação encontrada no período
+                  </td>
+                </tr>
+              ) : (
+                transacoes.map((transacao, index) => (
+                  <tr key={transacao.id || index}>
+                    <td>{new Date(transacao.data).toLocaleDateString('pt-BR')}</td>
+                    <td>{transacao.descricao}</td>
+                    <td>{transacao.categoria}</td>
+                    <td className={transacao.tipo === 'entrada' ? 'tipo-entrada' : 'tipo-saida'}>
+                      {transacao.tipo === 'entrada' ? 'Entrada' : 'Saída'}
+                    </td>
+                    <td className={`valor ${transacao.tipo === 'entrada' ? 'positivo' : 'negativo'}`}>
+                      {transacao.tipo === 'entrada' ? '+' : '-'}R$ {parseFloat(transacao.valor || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

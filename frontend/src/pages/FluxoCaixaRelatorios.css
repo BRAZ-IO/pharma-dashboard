@@ -148,6 +148,26 @@
   color: #e8eaed;
 }
 
+.tipo-badge.completo {
+  background: rgba(100, 181, 246, 0.2);
+  color: #64b5f6;
+}
+
+.tipo-badge.entradas {
+  background: rgba(117, 183, 152, 0.2);
+  color: #75b798;
+}
+
+.tipo-badge.saidas {
+  background: rgba(241, 174, 181, 0.2);
+  color: #f1aeb5;
+}
+
+.tipo-badge.resumo {
+  background: rgba(255, 165, 2, 0.2);
+  color: #ffa502;
+}
+
 .acoes-col {
   text-align: right;
   white-space: nowrap;
@@ -160,9 +180,7 @@
 }
 
 .relatorios-config {
-  background: #2d2d2d;
-  border: 1px solid #495057;
-  border-radius: 8px;
+  margin-top: 2rem;
   padding: 1.5rem;
 }
 

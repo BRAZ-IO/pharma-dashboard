@@ -75,6 +75,10 @@ Venda.belongsTo(Cliente, { foreignKey: 'cliente_id', as: 'cliente' });
 Empresa.hasMany(FluxoCaixa, { foreignKey: 'empresa_id', as: 'fluxo_caixa' });
 FluxoCaixa.belongsTo(Empresa, { foreignKey: 'empresa_id', as: 'empresa' });
 
+// Venda - FluxoCaixa (1:1)
+Venda.hasOne(FluxoCaixa, { foreignKey: 'venda_id', as: 'fluxo_caixa' });
+FluxoCaixa.belongsTo(Venda, { foreignKey: 'venda_id', as: 'venda' });
+
 // Relacionamentos de Pagamentos (apenas se não estiver em teste e os models existirem)
 if (Pagamento && PagamentoLog && typeof Pagamento === 'function' && typeof PagamentoLog === 'function') {
   try {

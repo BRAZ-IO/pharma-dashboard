@@ -1,12 +1,49 @@
 const express = require('express');
 const router = express.Router();
-const { Venda, ItemVenda, Produto, Usuario, Empresa, Cliente } = require('../models');
+const { Venda, ItemVenda, Produto, Usuario, Empresa, Cliente, FluxoCaixa } = require('../models');
 const { authMiddleware } = require('../middlewares/auth');
 const { sequelize } = require('../config/database');
 const { Op } = require('sequelize');
 
 // Aplicar middleware de autenticação em todas as rotas
 router.use(authMiddleware);
+
+// Função para registrar venda no fluxo de caixa
+const registrarVendaNoFluxoCaixa = async (venda, usuario) => {
+  try {
+    console.log('🔄 Iniciando registro no fluxo de caixa para venda:', venda.numero_venda);
+    console.log('📋 Venda completa:', JSON.stringify(venda, null, 2));
+    console.log('👤 Usuário:', JSON.stringify(usuario, null, 2));
+    
+    const fluxoCaixaData = {
+      descricao: `Venda ${venda.numero_venda} - ${venda.cliente_nome}`,
+      tipo: 'entrada',
+      valor: venda.total,
+      categoria: 'Vendas PDV',
+      forma_pagamento: venda.forma_pagamento === 'dinheiro' ? 'Dinheiro' : 
+                       venda.forma_pagamento === 'cartao_credito' ? 'Cartão Crédito' :
+                       venda.forma_pagamento === 'cartao_debito' ? 'Cartão Débito' :
+                       venda.forma_pagamento === 'pix' ? 'PIX' : venda.forma_pagamento,
+      data: new Date(),
+      responsavel: usuario?.nome || 'Sistema',
+      observacoes: `Venda automática via PDV - ${venda.itens?.length || 0} itens`,
+      empresa_id: venda.empresa_id,
+      venda_id: venda.id
+    };
+    
+    console.log('📊 Dados do fluxo de caixa a serem criados:', fluxoCaixaData);
+    
+    const fluxoRegistro = await FluxoCaixa.create(fluxoCaixaData);
+    console.log('✅ Venda registrada no fluxo de caixa:', fluxoRegistro.id);
+    console.log('🔍 Verificando se foi salvo com venda_id:', fluxoRegistro.venda_id);
+    return fluxoRegistro;
+  } catch (error) {
+    console.error('❌ Erro ao registrar venda no fluxo de caixa:', error);
+    console.error('Stack trace:', error.stack);
+    // Não falhar a venda se o fluxo de caixa falhar
+    return null;
+  }
+};
 
 // Listar vendas com filtros e paginação
 router.get('/', async (req, res) => {
@@ -185,6 +222,19 @@ router.post('/', async (req, res) => {
           }
         ]
       });
+
+      // Registrar venda no fluxo de caixa (fora da transação principal)
+      console.log('🚀🚀🚀 CHAMANDO FUNÇÃO DE INTEGRAÇÃO COM FLUXO DE CAIXA... 🚀🚀🚀');
+      console.log('📊 Dados da venda:', {
+        id: vendaCompleta.id,
+        numero: vendaCompleta.numero_venda,
+        total: vendaCompleta.total,
+        empresa: vendaCompleta.empresa_id
+      });
+      console.log('👤 Usuário logado:', req.user);
+      
+      const resultadoFluxo = await registrarVendaNoFluxoCaixa(vendaCompleta, req.user);
+      console.log('📋📋📋 RESULTADO DA INTEGRAÇÃO:', resultadoFluxo ? '✅ SUCESSO' : '❌ FALHOU');
 
       res.status(201).json(vendaCompleta);
 
