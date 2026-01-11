@@ -498,10 +498,7 @@ const PDVVenda = () => {
                         <div 
                           key={produto.id} 
                           className="product-card"
-                          onClick={() => {
-                            console.log('Clique no card detectado para produto:', produto.nome);
-                            adicionarAoCarrinho(produto);
-                          }}
+                          onClick={() => (produto.estoque_atual || 0) > 0 && adicionarAoCarrinho(produto)}
                         >
                           <div className="product-image">
                             {produto.imagem ? (
@@ -518,14 +515,14 @@ const PDVVenda = () => {
                               {formatCurrency(parseFloat(produto.preco_venda || produto.preco || 0))}
                             </div>
                             <div className={`product-stock ${
-                              produto.estoque === 0 ? 'out-of-stock' : 
-                              produto.estoque <= 5 ? 'low-stock' : ''
+                              (produto.estoque_atual || 0) === 0 ? 'out-of-stock' : 
+                              (produto.estoque_atual || 0) <= 5 ? 'low-stock' : ''
                             }`}>
-                              Estoque: {produto.estoque || 0}
+                              Estoque: {produto.estoque_atual || 0}
                             </div>
                           </div>
                           <button 
-                            className={`add-product-btn ${produto.estoque === 0 ? 'disabled' : ''}`}
+                            className={`add-product-btn ${produto.estoque_atual === 0 ? 'disabled' : ''}`}
                             onClick={(e) => {
                               e.stopPropagation();
                               if (produto.estoque > 0) {
@@ -913,7 +910,7 @@ const PDVVenda = () => {
                     )}
 
                     <button 
-                      className="finalizar-venda-btn"
+                      className="finalize-btn"
                       onClick={finalizarVenda}
                       disabled={loadingPagamento || (metodoPagamento === 'dinheiro' && parseFloat(valorRecebido) < calcularTotal())}
                     >
